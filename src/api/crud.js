@@ -9,6 +9,17 @@ export default function bindCrudApi(app) {
 
   router.get("/tables/:table", loadTableContext(app), crudApi.getAll());
   router.get("/tables/:table/:id", loadTableContext(app), crudApi.getOne());
+  router.patch(
+    "/tables/:table/:id",
+    loadTableContext(app),
+    crudApi.updateOne()
+  );
+  router.post("/tables/:table", loadTableContext(app), crudApi.createOne());
+  router.delete(
+    "/tables/:table/:id",
+    loadTableContext(app),
+    crudApi.deleteOne()
+  );
 
   return router;
 }
@@ -24,7 +35,7 @@ class CrudApi {
       const { table } = res.locals;
       const rows = await this.app.getDAO().getAll(table);
       console.log("hey world");
-      res.json({ rows });
+      res.status(200).json({ rows });
     };
   }
 
@@ -35,11 +46,38 @@ class CrudApi {
       const { id } = req.params;
       const row = await this.app.getDAO().getOne(table, id);
       console.log("hey world");
-      res.json({ row });
+      res.status(200).json({ row });
     };
   }
 
   // createOne route
+  createOne() {
+    return async (req, res, next) => {
+      //validate the schema and here before creating ???
+      const { table } = res.locals;
+      const createdRow = await this.app.getDAO().createOne(table, req.body);
+      console.log("hey world");
+      res.status(201).json({ createdRow });
+    };
+  }
+
   // updateOne route
+  updateOne() {
+    return async (req, res, next) => {
+      const { table } = res.locals;
+      const { id } = req.params;
+      const updatedRow = await this.app.getDAO().updateOne(table, id, req.body);
+      res.status(200).json({ updatedRow });
+    };
+  }
+
   // deleteOne route
+  deleteOne() {
+    return async (req, res, next) => {
+      const { table } = res.locals;
+      const { id } = req.params;
+      await this.app.getDAO().deleteOne(table, id);
+      res.status(204).json({ message: "Row Successfully Deleted" });
+    };
+  }
 }

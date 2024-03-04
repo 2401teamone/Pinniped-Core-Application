@@ -49,6 +49,37 @@ class DAO {
       throw new Error(`Error fetching record: ${e.message}`);
     }
   }
+
+  async createOne(table, newRow) {
+    try {
+      const createdRow = await this.getDB()(table)
+        .returning("*")
+        .insert(newRow);
+      return createdRow;
+    } catch (e) {
+      throw new Error(`Error creating record: ${e.message}`);
+    }
+  }
+
+  async updateOne(table, id, newRow) {
+    try {
+      const updatedRow = await this.getDB()(table)
+        .returning("*")
+        .where({ id })
+        .update(newRow);
+      return updatedRow;
+    } catch (e) {
+      throw new Error(`Error updating record: ${e.message}`);
+    }
+  }
+
+  async deleteOne(table, id) {
+    try {
+      await this.getDB()(table).where({ id }).del();
+    } catch (e) {
+      throw new Error(`Failed to delete row: ${e.message}`);
+    }
+  }
 }
 
 export default DAO;

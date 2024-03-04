@@ -1,4 +1,21 @@
 
 GET http://localhost:3000/api/tables/todos
-###
+### getAll From todos
 GET http://localhost:3000/api/tables/todos/1
+### getOne From todos
+POST http://localhost:3000/api/tables/todos
+content-type: application/json
+
+{
+  "todo": "Learn more about Elephant Seals..."
+}
+###
+PATCH http://localhost:3000/api/tables/todos/5
+content-type: application/json
+
+{
+  "todo": "updated todo 5!"
+}
+###
+DELETE http://localhost:3000/api/tables/todos/1
+### deleteOne From todos
