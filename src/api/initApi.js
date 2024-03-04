@@ -7,7 +7,7 @@ function initApi(app) {
   server.use(cors());
 
   server.get("/test", async (req, res) => {
-    const records = await app.DAO.getRecords("todos");
+    const records = await app.DAO.findTableByName("todos");
     console.log("hey world");
     res.json({
       records,

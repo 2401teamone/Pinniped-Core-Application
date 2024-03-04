@@ -9,7 +9,6 @@ class DAO {
     return knex({
       client: "better-sqlite3",
       useNullAsDefault: true,
-      debug: true,
       connection: {
         filename: "s.db",
       },
@@ -18,13 +17,28 @@ class DAO {
 
   disconnect() {}
 
+  getDB() {
+    return this.db;
+  }
+
   async getRecords(tableName) {
     try {
-      console.log(this.db);
-      const records = await this.db(tableName).select("*");
+      const records = await this.getDB()(tableName).select("*");
       return records;
     } catch (e) {
       throw new Error(`Error fetching records: ${e.message}`);
+    }
+  }
+
+  async findTableByName(name) {
+    try {
+      const table = await this.getDB().raw(
+        `SELECT name, type FROM sqlite_master WHERE type='table' AND name='${name}';`
+      );
+
+      return table[0].name;
+    } catch (e) {
+      throw new Error(`Error fetching table: ${e.message}`);
     }
   }
 }
