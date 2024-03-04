@@ -6,10 +6,11 @@ function initApi(app) {
   server.use(express.json());
   server.use(cors());
 
-  server.get("/test", (req, res) => {
+  server.get("/test", async (req, res) => {
+    const records = await app.DAO.getRecords("todos");
     console.log("hey world");
     res.json({
-      message: "hey world",
+      records,
     });
   });
 

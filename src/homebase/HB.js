@@ -1,4 +1,5 @@
 import initApi from "../api/initApi.js";
+import DAO from "../dao/dao.js";
 
 class HB {
   static createApp(config) {
@@ -6,7 +7,7 @@ class HB {
   }
 
   constructor(config) {
-    // this.DAO = new DAO();
+    this.DAO = new DAO();
   }
 
   // onGetAllRecords() {}
