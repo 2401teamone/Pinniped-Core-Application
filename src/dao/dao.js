@@ -21,24 +21,32 @@ class DAO {
     return this.db;
   }
 
-  async getRecords(tableName) {
+  async findTableByName(name) {
     try {
-      const records = await this.getDB()(tableName).select("*");
+      const table = await this.getDB().raw(
+        `SELECT name, type FROM sqlite_master WHERE type='table' AND name='${name}';`
+      );
+      return table[0].name;
+    } catch (e) {
+      throw new Error(`Error fetching table: ${e.message}`);
+    }
+  }
+
+  async getAll(table) {
+    try {
+      const records = await this.getDB()(table).select("*");
       return records;
     } catch (e) {
       throw new Error(`Error fetching records: ${e.message}`);
     }
   }
 
-  async findTableByName(name) {
+  async getOne(table, id) {
     try {
-      const table = await this.getDB().raw(
-        `SELECT name, type FROM sqlite_master WHERE type='table' AND name='${name}';`
-      );
-
-      return table[0].name;
+      const row = await this.getDB()(table).select("*").where({ id });
+      return row;
     } catch (e) {
-      throw new Error(`Error fetching table: ${e.message}`);
+      throw new Error(`Error fetching record: ${e.message}`);
     }
   }
 }

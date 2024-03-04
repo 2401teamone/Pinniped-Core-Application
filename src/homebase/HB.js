@@ -1,4 +1,4 @@
-import initApi from "../api/initApi.js";
+import initApi from "../api/init_api.js";
 import DAO from "../dao/dao.js";
 
 class HB {
@@ -12,6 +12,10 @@ class HB {
 
   // onGetAllRecords() {}
   // onGetRecord() {}
+
+  getDAO() {
+    return this.DAO;
+  }
 
   start(port) {
     const server = initApi(this);
