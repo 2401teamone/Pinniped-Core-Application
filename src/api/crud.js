@@ -1,5 +1,7 @@
 import { Router } from "express";
 import loadTableContext from "./middleware/load_table_context.js";
+import catchError from "../utils/catch_error.js";
+import { BadRequestError } from "../utils/errors.js";
 
 const BASE = "/tables/:table";
 
@@ -7,18 +9,22 @@ export default function bindCrudApi(app) {
   const router = Router();
   const crudApi = new CrudApi(app);
 
-  router.get("/tables/:table", loadTableContext(app), crudApi.getAll());
-  router.get("/tables/:table/:id", loadTableContext(app), crudApi.getOne());
-  router.patch(
-    "/tables/:table/:id",
+  router.get(BASE, loadTableContext(app), catchError(crudApi.getAll()));
+  router.get(
+    `${BASE}/:id`,
     loadTableContext(app),
-    crudApi.updateOne()
+    catchError(crudApi.getOne())
   );
-  router.post("/tables/:table", loadTableContext(app), crudApi.createOne());
-  router.delete(
-    "/tables/:table/:id",
+  router.post(BASE, loadTableContext(app), catchError(crudApi.createOne()));
+  router.patch(
+    `${BASE}/:id`,
     loadTableContext(app),
-    crudApi.deleteOne()
+    catchError(crudApi.updateOne())
+  );
+  router.delete(
+    `${BASE}/:id`,
+    loadTableContext(app),
+    catchError(crudApi.deleteOne())
   );
 
   return router;
@@ -34,7 +40,6 @@ class CrudApi {
     return async (req, res, next) => {
       const { table } = res.locals;
       const rows = await this.app.getDAO().getAll(table);
-      console.log("hey world");
       res.status(200).json({ rows });
     };
   }
@@ -45,7 +50,7 @@ class CrudApi {
       const { table } = res.locals;
       const { id } = req.params;
       const row = await this.app.getDAO().getOne(table, id);
-      console.log("hey world");
+      if (!row.length) throw new BadRequestError();
       res.status(200).json({ row });
     };
   }
@@ -56,7 +61,6 @@ class CrudApi {
       //validate the schema and here before creating ???
       const { table } = res.locals;
       const createdRow = await this.app.getDAO().createOne(table, req.body);
-      console.log("hey world");
       res.status(201).json({ createdRow });
     };
   }
@@ -77,7 +81,7 @@ class CrudApi {
       const { table } = res.locals;
       const { id } = req.params;
       await this.app.getDAO().deleteOne(table, id);
-      res.status(204).json({ message: "Row Successfully Deleted" });
+      res.status(204);
     };
   }
 }

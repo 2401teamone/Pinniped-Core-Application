@@ -1,32 +1,37 @@
 class AppError extends Error {
-  constructor(msg, status, type, detail, errorCode) {
-    super(msg);
+  constructor(message, status, errorCode, detail) {
+    super(message);
     this.status = status;
-    this.detail = detail;
     this.errorCode = errorCode;
+    this.detail = detail;
   }
 }
+
+/**
+ * Message
+ * Status Code
+ * Error Code
+ * More detailed description
+ */
 
 export class TableNotFoundError extends AppError {
   constructor(table) {
     super(
       `Table ${table} not found`,
       404,
-      "TableNotFoundError",
-      `Table ${table} not found.  You've likely attempted to access a table that does not exist within the database`,
-      "TABLE_NOT_FOUND"
+      "TABLE_NOT_FOUND",
+      `Table ${table} not found.  You've likely attempted to access a table that does not exist within the database`
     );
   }
 }
 
 export class DatabaseError extends AppError {
-  constructor(table, message) {
+  constructor() {
     super(
-      `Table ${table} not found`,
+      `Database error`,
       404,
-      "TableNotFoundError",
-      `Table ${table} not found.  You've likely attempted to access a table that does not exist within the database`,
-      "TABLE_NOT_FOUND"
+      "DATABASE_ERROR",
+      "The database encountered an error.  Don't look at us"
     );
   }
 }
@@ -36,9 +41,30 @@ export class BadRequestError extends AppError {
     super(
       "Hmm this operation didn't work",
       400,
-      "BadRequestError",
-      "Failed to execute the request.  This is likely due to...",
-      "BAD_REQUEST"
+      "BAD_REQUEST",
+      "Failed to execute the request. Probably due to an invalid ID provided."
+    );
+  }
+}
+
+export class AdminPrivilegesRequired extends AppError {
+  constructor(table) {
+    super(
+      `Admin privilege is required for the ${table} table`,
+      401,
+      "ADMIN_REQUIRED",
+      "You don't have admin privileges to access this resource."
+    );
+  }
+}
+
+export class ValidationError extends AppError {
+  constructor(table) {
+    super(
+      `Validation failed for this attempt`,
+      402,
+      "INVALID_REQUEST",
+      `You likely provided data that is not compatible with the ${table} table`
     );
   }
 }

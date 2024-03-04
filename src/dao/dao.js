@@ -1,4 +1,5 @@
 import knex from "knex";
+import { DatabaseError, BadRequestError } from "../utils/errors.js";
 
 class DAO {
   constructor(dbFile) {
@@ -26,9 +27,9 @@ class DAO {
       const table = await this.getDB().raw(
         `SELECT name, type FROM sqlite_master WHERE type='table' AND name='${name}';`
       );
-      return table[0].name;
+      return table;
     } catch (e) {
-      throw new Error(`Error fetching table: ${e.message}`);
+      throw new DatabaseError();
     }
   }
 
@@ -37,7 +38,7 @@ class DAO {
       const records = await this.getDB()(table).select("*");
       return records;
     } catch (e) {
-      throw new Error(`Error fetching records: ${e.message}`);
+      throw new DatabaseError();
     }
   }
 
@@ -46,7 +47,7 @@ class DAO {
       const row = await this.getDB()(table).select("*").where({ id });
       return row;
     } catch (e) {
-      throw new Error(`Error fetching record: ${e.message}`);
+      throw new DatabaseError();
     }
   }
 
@@ -57,7 +58,11 @@ class DAO {
         .insert(newRow);
       return createdRow;
     } catch (e) {
-      throw new Error(`Error creating record: ${e.message}`);
+      if (e.message.slice(0, 11) === "insert into") {
+        throw new BadRequestError();
+      } else {
+        throw new DatabaseError();
+      }
     }
   }
 
@@ -69,7 +74,7 @@ class DAO {
         .update(newRow);
       return updatedRow;
     } catch (e) {
-      throw new Error(`Error updating record: ${e.message}`);
+      throw new DatabaseError();
     }
   }
 
@@ -77,7 +82,7 @@ class DAO {
     try {
       await this.getDB()(table).where({ id }).del();
     } catch (e) {
-      throw new Error(`Failed to delete row: ${e.message}`);
+      throw new DatabaseError();
     }
   }
 }

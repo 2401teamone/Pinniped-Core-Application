@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import bindCrudApi from "./crud.js";
+import errorHandler from "./middleware/error_handler.js";
 
 function initApi(app) {
   const server = express();
@@ -17,6 +18,9 @@ function initApi(app) {
   server.use("/api", crudRouter);
   // server.use("/api", authRouter);
   // server.use("/api", ddlRouter);
+
+  //Catch All Error Handler
+  server.use(errorHandler);
 
   return server;
 }

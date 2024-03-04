@@ -1,12 +1,12 @@
+import { TableNotFoundError } from "../../utils/errors.js";
+import catchError from "../../utils/catch_error.js";
+
 export default function loadTableContext(app) {
-  return async (req, res, next) => {
+  return catchError(async (req, res, next) => {
     const { table } = req.params;
-    try {
-      res.locals.table = await app.getDAO().findTableByName(table);
-      next();
-    } catch (e) {
-      // if no table, throw error
-      throw new Error(`Table not found`);
-    }
-  };
+    const foundTable = await app.getDAO().findTableByName(table);
+    if (!foundTable.length) throw new TableNotFoundError(table);
+    res.locals.table = foundTable[0].name;
+    next();
+  });
 }
