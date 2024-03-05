@@ -36,7 +36,7 @@ class CrudApi {
   }
 
   // getAll route
-  getAll() {
+  getAllHandler() {
     return async (req, res, next) => {
       const { table } = res.locals;
       const rows = await this.app.getDAO().getAll(table);
@@ -45,7 +45,7 @@ class CrudApi {
   }
 
   // getOne route
-  getOne() {
+  getOneHandler() {
     return async (req, res, next) => {
       const { table } = res.locals;
       const { id } = req.params;
@@ -56,7 +56,7 @@ class CrudApi {
   }
 
   // createOne route
-  createOne() {
+  createOneHandler() {
     return async (req, res, next) => {
       //validate the schema and here before creating ???
       const { table } = res.locals;
@@ -66,7 +66,7 @@ class CrudApi {
   }
 
   // updateOne route
-  updateOne() {
+  updateOneHandler() {
     return async (req, res, next) => {
       const { table } = res.locals;
       const { id } = req.params;
@@ -76,7 +76,7 @@ class CrudApi {
   }
 
   // deleteOne route
-  deleteOne() {
+  deleteOneHandler() {
     return async (req, res, next) => {
       const { table } = res.locals;
       const { id } = req.params;
