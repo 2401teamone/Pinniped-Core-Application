@@ -9,22 +9,26 @@ export default function bindCrudApi(app) {
   const router = Router();
   const crudApi = new CrudApi(app);
 
-  router.get(BASE, loadTableContext(app), catchError(crudApi.getAll()));
+  router.get(BASE, loadTableContext(app), catchError(crudApi.getAllHandler()));
   router.get(
     `${BASE}/:id`,
     loadTableContext(app),
-    catchError(crudApi.getOne())
+    catchError(crudApi.getOneHandler())
   );
-  router.post(BASE, loadTableContext(app), catchError(crudApi.createOne()));
+  router.post(
+    BASE,
+    loadTableContext(app),
+    catchError(crudApi.createOneHandler())
+  );
   router.patch(
     `${BASE}/:id`,
     loadTableContext(app),
-    catchError(crudApi.updateOne())
+    catchError(crudApi.updateOneHandler())
   );
   router.delete(
     `${BASE}/:id`,
     loadTableContext(app),
-    catchError(crudApi.deleteOne())
+    catchError(crudApi.deleteOneHandler())
   );
 
   return router;
