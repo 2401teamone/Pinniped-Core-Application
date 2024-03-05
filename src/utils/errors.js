@@ -1,3 +1,10 @@
+/**
+ * Message
+ * Status Code
+ * Error Code
+ * More detailed description
+ */
+
 class AppError extends Error {
   constructor(message, status, errorCode, detail) {
     super(message);
@@ -6,13 +13,6 @@ class AppError extends Error {
     this.detail = detail;
   }
 }
-
-/**
- * Message
- * Status Code
- * Error Code
- * More detailed description
- */
 
 export class TableNotFoundError extends AppError {
   constructor(table) {
@@ -65,6 +65,17 @@ export class ValidationError extends AppError {
       402,
       "INVALID_REQUEST",
       `You likely provided data that is not compatible with the ${table} table`
+    );
+  }
+}
+
+export class InvalidCustomRouteError extends AppError {
+  constructor(message) {
+    super(
+      message,
+      402,
+      "INVALID_CUSTOM_ROUTE",
+      "Your provided method, path, and/or handler were invalid per the custom route requirements.  Please visit our documentation to learn more."
     );
   }
 }
