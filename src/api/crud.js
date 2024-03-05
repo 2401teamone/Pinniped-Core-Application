@@ -5,7 +5,7 @@ import { BadRequestError } from "../utils/errors.js";
 
 const BASE = "/tables/:table";
 
-export default function bindCrudApi(app) {
+export default function generateCrudRouter(app) {
   const router = Router();
   const crudApi = new CrudApi(app);
 
