@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import bindCrudApi from "./crud.js";
+import generateCrudRouter from "./crud.js";
 import errorHandler from "./middleware/error_handler.js";
 
 function initApi(app) {
@@ -11,7 +11,7 @@ function initApi(app) {
   // server.use(logger)
   // server.use(rateLimiter)
 
-  const crudRouter = bindCrudApi(app);
+  const crudRouter = generateCrudRouter(app);
   // const authRouter = bindAuthApi(app);
   // const ddlRouter = bindDdlApi(app);
 
