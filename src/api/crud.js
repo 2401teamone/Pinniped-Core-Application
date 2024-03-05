@@ -44,7 +44,14 @@ class CrudApi {
     return async (req, res, next) => {
       const { table } = res.locals;
       const rows = await this.app.getDAO().getAll(table);
-      res.status(200).json({ rows });
+      const event = {
+        table,
+        rows,
+        res,
+      };
+      this.app.onGetAllRows().trigger(event);
+      if (event.res.finished) return null;
+      res.status(200).json({ rows: event.rows });
     };
   }
 

@@ -1,7 +1,7 @@
 
 GET http://localhost:3000/api/tables/todos
 ### getAll From todos
-GET http://localhost:3000/api/tables/todos/5
+GET http://localhost:3000/api/tables/todos/3
 ### getOne From todos
 POST http://localhost:3000/api/tables/todos
 content-type: application/json
