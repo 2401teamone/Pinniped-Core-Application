@@ -7,11 +7,11 @@ export default function generateSchemaRouter(app) {
   const router = Router();
   const schemaApi = new SchemaApi(app);
 
-  router.get('/', schemaApi.getAllTablesHandler());
-  router.post('/', schemaApi.createTableHandler());
-  router.get('/:tablename', schemaApi.getTableHandler());
-  router.patch('/:tablename', schemaApi.updateTableHandler());
-  router.delete('/:tablename', schemaApi.dropTableHandler());
+  router.get('/', catchError(schemaApi.getAllTablesHandler()));
+  router.post('/', catchError(schemaApi.createTableHandler()));
+  router.get('/:table', catchError(schemaApi.getTableHandler()));
+  router.patch('/:table', catchError(schemaApi.updateTableHandler()));
+  router.delete('/:table', catchError(schemaApi.dropTableHandler()));
 
   return router;
 }
@@ -66,12 +66,12 @@ class SchemaApi {
 
   dropTableHandler() {
     return async (req, res, next) => {
-      // drop table from database
-      /**
-       * PB actually running Go version of this... await dao.DB().raw(`DROP TABLE IF EXISTS ${tableName}`))
-       * knex.schema.dropTableIfExists(tableName)
-      // delete row from _tables table
-      */
+      const { table } = req.params;
+      this.app.getDAO().runTransaction(async (trx) => {
+        await this.app.getDAO().dropTable(table, trx);
+        await this.app.getDAO().deleteTableMetaData(table, trx);
+        res.status(204).json({ message: 'Table dropped' });
+      });
     };
   }
 }

@@ -120,6 +120,14 @@ class DAO {
       })
       .transacting(trx);
   }
+
+  async deleteTableMetaData(name, trx) {
+    await this.getDB()('tablemeta').where({ name }).del().transacting(trx);
+  }
+
+  async dropTable(name, trx) {
+    await this.getDB().schema.dropTable(name).transacting(trx);
+  }
 }
 
 export default DAO;
