@@ -37,10 +37,31 @@ POST http://localhost:3000/api/schema
 content-type : application/json
 
 {
-  "name" : "Puffins",
+  "name" : "Penguins",
   "columns" : [{"name":"size","type":"text"}]
 }
 ### Adds a table
 
 DELETE http://localhost:3000/api/schema/Penguins
 ### Drops a table
+
+PUT http://localhost:3000/api/schema
+content-type : application/json
+
+{
+  "id": "2",
+  "name" : "Penguins",
+  "columns" : [{"name":"bigness","type":"text"}]
+}
+### Updates Schema
+
+PUT http://localhost:3000/api/schema
+content-type : application/json
+
+{
+  "id": "2",
+  "name" : "Seals",
+  "columns" : [{"name":"bigness","type":"text"}]
+}
+### Rename Table
+

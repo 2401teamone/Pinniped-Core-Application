@@ -1,18 +1,18 @@
-import { Router } from 'express';
-import loadTableContext from './middleware/load_table_context.js';
-import catchError from '../utils/catch_error.js';
-import { BadRequestError } from '../utils/errors.js';
-import Table from '../models/table.js';
+import { Router } from "express";
+import loadTableContext from "./middleware/load_table_context.js";
+import catchError from "../utils/catch_error.js";
+import { BadRequestError } from "../utils/errors.js";
+import Table from "../models/table.js";
 
 export default function generateSchemaRouter(app) {
   const router = Router();
   const schemaApi = new SchemaApi(app);
 
-  router.get('/', catchError(schemaApi.getAllTablesHandler()));
-  router.post('/', catchError(schemaApi.createTableHandler()));
-  router.get('/:table', catchError(schemaApi.getTableHandler()));
-  router.patch('/:table', catchError(schemaApi.updateTableHandler()));
-  router.delete('/:table', catchError(schemaApi.dropTableHandler()));
+  router.get("/", catchError(schemaApi.getAllTablesHandler()));
+  router.post("/", catchError(schemaApi.createTableHandler()));
+  router.get("/:table", catchError(schemaApi.getTableHandler()));
+  router.put("/", catchError(schemaApi.updateTableHandler()));
+  router.delete("/:table", catchError(schemaApi.dropTableHandler()));
 
   return router;
 }
@@ -65,18 +65,20 @@ class SchemaApi {
     return async (req, res, next) => {
       const { id, name, columns } = req.body;
 
-      const tableFromMeta = this.app.getDAO().findTableByName(name);
+      let tableFromMeta = await this.app.getDAO().search("tablemeta", { id });
+
       if (!tableFromMeta)
-        throw new BadRequestError('Table not found in metadata table.');
+        throw new BadRequestError("Table not found in metadata table.");
+      tableFromMeta = tableFromMeta[0];
+      tableFromMeta.columns = JSON.parse(tableFromMeta.columns);
 
       const oldTable = new Table(tableFromMeta);
-      const newTable = new Table(id, name, columns);
+      const newTable = new Table({ id, name, columns });
+      // console.log("Old Table: ", oldTable);
+      // console.log("New Table: ", newTable);
 
-      // Check Column Length
-      //  Deleted Column
-      //  Renamed Column
-
-      res.json(table);
+      Table.migrate(oldTable, newTable, this.app);
+      res.json(newTable);
     };
   }
 
@@ -86,7 +88,7 @@ class SchemaApi {
       this.app.getDAO().runTransaction(async (trx) => {
         await this.app.getDAO().dropTable(table, trx);
         await this.app.getDAO().deleteTableMetaData(table, trx);
-        res.status(204).json({ message: 'Table dropped' });
+        res.status(204).json({ message: "Table dropped" });
       });
     };
   }

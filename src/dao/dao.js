@@ -1,5 +1,5 @@
-import knex from 'knex';
-import { DatabaseError, BadRequestError } from '../utils/errors.js';
+import knex from "knex";
+import { DatabaseError, BadRequestError } from "../utils/errors.js";
 
 class DAO {
   constructor(dbFile) {
@@ -8,10 +8,10 @@ class DAO {
 
   _connect(dbFile) {
     return knex({
-      client: 'better-sqlite3',
+      client: "better-sqlite3",
       useNullAsDefault: true,
       connection: {
-        filename: 's.db',
+        filename: "s.db",
       },
     });
   }
@@ -37,7 +37,7 @@ class DAO {
   async findTableByName(name) {
     try {
       const table = await this.getDB().raw(
-        `SELECT name, type FROM sqlite_master WHERE type='table' AND name='${name}';`
+        `SELECT * FROM tablemeta WHERE name='${name}';`
       );
       return table;
     } catch (e) {
@@ -45,9 +45,18 @@ class DAO {
     }
   }
 
+  async search(table, searchObj) {
+    try {
+      const rows = await this.getDB()(table).select("*").where(searchObj);
+      return rows;
+    } catch (e) {
+      throw new DatabaseError();
+    }
+  }
+
   async getAll(table) {
     try {
-      const records = await this.getDB()(table).select('*');
+      const records = await this.getDB()(table).select("*");
       return records;
     } catch (e) {
       throw new DatabaseError();
@@ -56,7 +65,7 @@ class DAO {
 
   async getOne(table, id) {
     try {
-      const row = await this.getDB()(table).select('*').where({ id });
+      const row = await this.getDB()(table).select("*").where({ id });
       return row;
     } catch (e) {
       throw new DatabaseError();
@@ -66,11 +75,11 @@ class DAO {
   async createOne(table, newRow) {
     try {
       const createdRow = await this.getDB()(table)
-        .returning('*')
+        .returning("*")
         .insert(newRow);
       return createdRow;
     } catch (e) {
-      if (e.message.slice(0, 11) === 'insert into') {
+      if (e.message.slice(0, 11) === "insert into") {
         throw new BadRequestError();
       } else {
         throw new DatabaseError();
@@ -81,7 +90,7 @@ class DAO {
   async updateOne(table, id, newRow) {
     try {
       const updatedRow = await this.getDB()(table)
-        .returning('*')
+        .returning("*")
         .where({ id })
         .update(newRow);
       return updatedRow;
@@ -100,8 +109,8 @@ class DAO {
 
   async addTableMetaData(name, columns, trx) {
     columns = JSON.stringify(columns);
-    const createdRow = await this.getDB()('tablemeta')
-      .returning('*')
+    const createdRow = await this.getDB()("tablemeta")
+      .returning("*")
       .insert({ name, columns })
       .transacting(trx);
     return createdRow;
@@ -122,11 +131,15 @@ class DAO {
   }
 
   async deleteTableMetaData(name, trx) {
-    await this.getDB()('tablemeta').where({ name }).del().transacting(trx);
+    await this.getDB()("tablemeta").where({ name }).del().transacting(trx);
   }
 
   async dropTable(name, trx) {
     await this.getDB().schema.dropTable(name).transacting(trx);
+  }
+
+  async renameTable(name, newName, trx) {
+    await this.getDB().schema.renameTable(name, newName).transacting(trx);
   }
 }
 
