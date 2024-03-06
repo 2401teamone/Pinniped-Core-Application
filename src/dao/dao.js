@@ -1,5 +1,5 @@
-import knex from "knex";
-import { DatabaseError, BadRequestError } from "../utils/errors.js";
+import knex from 'knex';
+import { DatabaseError, BadRequestError } from '../utils/errors.js';
 
 class DAO {
   constructor(dbFile) {
@@ -8,10 +8,10 @@ class DAO {
 
   _connect(dbFile) {
     return knex({
-      client: "better-sqlite3",
+      client: 'better-sqlite3',
       useNullAsDefault: true,
       connection: {
-        filename: "s.db",
+        filename: 's.db',
       },
     });
   }
@@ -20,6 +20,18 @@ class DAO {
 
   getDB() {
     return this.db;
+  }
+
+  async runTransaction(callback) {
+    const trx = await this.getDB().transaction();
+    try {
+      const result = await callback(trx);
+      await trx.commit();
+      return result;
+    } catch (e) {
+      await trx.rollback();
+      throw new DatabaseError();
+    }
   }
 
   async findTableByName(name) {
@@ -35,7 +47,7 @@ class DAO {
 
   async getAll(table) {
     try {
-      const records = await this.getDB()(table).select("*");
+      const records = await this.getDB()(table).select('*');
       return records;
     } catch (e) {
       throw new DatabaseError();
@@ -44,7 +56,7 @@ class DAO {
 
   async getOne(table, id) {
     try {
-      const row = await this.getDB()(table).select("*").where({ id });
+      const row = await this.getDB()(table).select('*').where({ id });
       return row;
     } catch (e) {
       throw new DatabaseError();
@@ -54,11 +66,11 @@ class DAO {
   async createOne(table, newRow) {
     try {
       const createdRow = await this.getDB()(table)
-        .returning("*")
+        .returning('*')
         .insert(newRow);
       return createdRow;
     } catch (e) {
-      if (e.message.slice(0, 11) === "insert into") {
+      if (e.message.slice(0, 11) === 'insert into') {
         throw new BadRequestError();
       } else {
         throw new DatabaseError();
@@ -69,7 +81,7 @@ class DAO {
   async updateOne(table, id, newRow) {
     try {
       const updatedRow = await this.getDB()(table)
-        .returning("*")
+        .returning('*')
         .where({ id })
         .update(newRow);
       return updatedRow;
@@ -84,6 +96,29 @@ class DAO {
     } catch (e) {
       throw new DatabaseError();
     }
+  }
+
+  async addTableMetaData(name, columns, trx) {
+    columns = JSON.stringify(columns);
+    const createdRow = await this.getDB()('tablemeta')
+      .returning('*')
+      .insert({ name, columns })
+      .transacting(trx);
+    return createdRow;
+    // return await this.createOne('tablemeta', { name, columns });
+  }
+
+  async createTable(name, columns, trx) {
+    return await this.getDB()
+      .schema.createTable(name, (table) => {
+        columns.forEach((column) => {
+          if (!table[column.type]) {
+            throw new DatabaseError();
+          }
+          table[column.type](column.name);
+        });
+      })
+      .transacting(trx);
   }
 }
 

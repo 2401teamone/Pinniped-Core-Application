@@ -29,3 +29,12 @@ DELETE http://localhost:3000/api/tables/todos/5
 
 GET http://localhost:3000/custom
 ### Testing Custom Route
+
+POST http://localhost:3000/api/schema
+content-type : application/json
+
+{
+  "name" : "Whales",
+  "columns" : [{"name":"size","type":"text"}]
+}
+### Adds a table
