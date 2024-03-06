@@ -3,6 +3,7 @@ import loadTableContext from "./middleware/load_table_context.js";
 import catchError from "../utils/catch_error.js";
 import { BadRequestError } from "../utils/errors.js";
 import Table from "../models/table.js";
+import { v4 as uuidv4 } from "uuid";
 
 export default function generateSchemaRouter(app) {
   const router = Router();
@@ -47,16 +48,27 @@ class SchemaApi {
   createTableHandler() {
     return async (req, res, next) => {
       const { name, columns } = req.body;
+
+      // create a new table instance
+      // autogenerate id for table
+      // create column instances for each column
+      // autogenerate column id's
+
+      const newTable = new Table({ name, columns });
+
+      console.log(newTable);
+      console.log(newTable.columns);
+
       // within transaction
       this.app.getDAO().runTransaction(async (trx) => {
         // add row to tablemeta
-        let newTable = await this.app
+        let newTableMetaData = await this.app
           .getDAO()
-          .addTableMetaData(name, columns, trx);
+          .addTableMetaData(newTable, trx);
 
         // add table to sqlite
-        await this.app.getDAO().createTable(name, columns, trx);
-        res.json(newTable);
+        await this.app.getDAO().createTable(newTable, trx);
+        res.json(newTableMetaData);
       });
     };
   }
@@ -70,12 +82,11 @@ class SchemaApi {
       if (!tableFromMeta)
         throw new BadRequestError("Table not found in metadata table.");
       tableFromMeta = tableFromMeta[0];
+
       tableFromMeta.columns = JSON.parse(tableFromMeta.columns);
 
       const oldTable = new Table(tableFromMeta);
       const newTable = new Table({ id, name, columns });
-      // console.log("Old Table: ", oldTable);
-      // console.log("New Table: ", newTable);
 
       Table.migrate(oldTable, newTable, this.app);
       res.json(newTable);

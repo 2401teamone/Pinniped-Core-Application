@@ -107,23 +107,26 @@ class DAO {
     }
   }
 
-  async addTableMetaData(name, columns, trx) {
-    columns = JSON.stringify(columns);
+  async addTableMetaData(table, trx) {
     const createdRow = await this.getDB()("tablemeta")
       .returning("*")
-      .insert({ name, columns })
+      .insert({ name: table.name, columns: JSON.stringify(table.columns) })
       .transacting(trx);
     return createdRow;
     // return await this.createOne('tablemeta', { name, columns });
   }
 
-  async createTable(name, columns, trx) {
+  async createTable(table, trx) {
+    console.log({ name: table.name, columns: table.columns.columns });
     return await this.getDB()
-      .schema.createTable(name, (table) => {
-        columns.forEach((column) => {
+      .schema.createTable(table.name, (table) => {
+        console.log("creating table");
+        table.columns.columns.forEach((column) => {
           if (!table[column.type]) {
+            console.log("hit error");
             throw new DatabaseError();
           }
+          console.log("looping", column.type, column.name);
           table[column.type](column.name);
         });
       })
@@ -140,6 +143,31 @@ class DAO {
 
   async renameTable(name, newName, trx) {
     await this.getDB().schema.renameTable(name, newName).transacting(trx);
+  }
+
+  async addColumn(tableName, columnName, options, trx) {
+    await this.getDB()
+      .schema // .table(tableName, table => {
+      //   table[options.type](columnName)
+      // })
+      .addColumn(tableName, columnName, options)
+      .transacting(trx);
+  }
+
+  async renameColumn(tableName, name, newName, trx) {
+    await this.getDB()
+      .schema.table(tableName, (table) => {
+        table.renameColumn(name, newName);
+      })
+      .transacting(trx);
+  }
+
+  async dropColumn(tableName, columnName, trx) {
+    await this.getDB()
+      .schema.table(tableName, (table) => {
+        table.dropColumn(columnName);
+      })
+      .transacting(trx);
   }
 }
 
