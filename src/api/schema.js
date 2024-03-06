@@ -2,6 +2,7 @@ import { Router } from 'express';
 import loadTableContext from './middleware/load_table_context.js';
 import catchError from '../utils/catch_error.js';
 import { BadRequestError } from '../utils/errors.js';
+import Table from '../models/table.js';
 
 export default function generateSchemaRouter(app) {
   const router = Router();
@@ -61,7 +62,22 @@ class SchemaApi {
   }
 
   updateTableHandler() {
-    return async (req, res, next) => {};
+    return async (req, res, next) => {
+      const { id, name, columns } = req.body;
+
+      const tableFromMeta = this.app.getDAO().findTableByName(name);
+      if (!tableFromMeta)
+        throw new BadRequestError('Table not found in metadata table.');
+
+      const oldTable = new Table(tableFromMeta);
+      const newTable = new Table(id, name, columns);
+
+      // Check Column Length
+      //  Deleted Column
+      //  Renamed Column
+
+      res.json(table);
+    };
   }
 
   dropTableHandler() {
