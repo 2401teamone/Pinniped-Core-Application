@@ -79,3 +79,14 @@ export class InvalidCustomRouteError extends AppError {
     );
   }
 }
+
+export class AuthenticationError extends AppError {
+  constructor(message = "Authentication Error") {
+    super(
+      message,
+      400,
+      "AUTH_ERROR",
+      `Please try again with updated credentials.`
+    );
+  }
+}

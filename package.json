@@ -8,11 +8,15 @@
     "dev": "nodemon index.js",
     "reset-db": "rm -f hb.db && touch hb.db && npm run seed-data",
     "seed-data": "sqlite3 hb.db < seed-data.sql",
+    "reset-sessions": "rm -f session.db && touch session.db",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.1.1",
+    "better-sqlite3-session-store": "^0.1.0",
+    "express-session": "^1.18.0",
     "better-sqlite3": "^9.4.3",
     "cors": "^2.8.5",
     "express": "^4.18.3",

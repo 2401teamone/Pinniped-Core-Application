@@ -1,0 +1,12 @@
+GET http://localhost:3000/api/auth
+### GET the current session
+
+
+POST http://localhost:3000/api/auth/register
+content-type : application/json
+
+{
+  "username": "test",
+  "password": "password"
+}
+### Creates a new user
