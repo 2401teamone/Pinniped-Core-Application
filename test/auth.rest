@@ -1,7 +1,6 @@
 GET http://localhost:3000/api/auth
 ### GET the current session
 
-
 POST http://localhost:3000/api/auth/register
 content-type : application/json
 
@@ -10,3 +9,15 @@ content-type : application/json
   "password": "password"
 }
 ### Creates a new user
+
+POST http://localhost:3000/api/auth/login
+content-type : application/json
+
+{
+  "username": "test",
+  "password": "password"
+}
+### Attempts to login
+
+POST http://localhost:3000/api/auth/logout
+### Attempts to logout of current user

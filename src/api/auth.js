@@ -16,8 +16,10 @@ export default function generateAuthRouter(app) {
   router.post("/register", catchError(authApi.registerHandler()));
 
   //Login a user
+  router.post("/login", catchError(authApi.loginHandler()));
 
   //Logout a user
+  router.post("/logout", catchError(authApi.logoutHandler()));
 
   return router;
 }
@@ -62,10 +64,40 @@ class AuthApi {
   }
 
   loginHandler() {
-    return async (req, res, next) => {};
+    return async (req, res, next) => {
+      const { username, password } = req.body;
+
+      //Check if username exists
+      const existingUser = await this.app
+        .getDAO()
+        .search("users", { username });
+
+      if (!existingUser.length) {
+        throw new AuthenticationError();
+      }
+
+      const match = await bcrypt.compare(password, existingUser[0].password);
+
+      if (!match) {
+        throw new AuthenticationError();
+      }
+
+      const user = existingUser[0];
+      delete user.password;
+
+      //set session user
+      req.session.user = user;
+
+      console.log("logged in user: ", user);
+
+      res.status(200).json({ message: "User logged in successfully" });
+    };
   }
 
   logoutHandler() {
-    return async (req, res, next) => {};
+    return async (req, res, next) => {
+      delete req.session.user;
+      res.status(200).json({ message: "User logged out" });
+    };
   }
 }
