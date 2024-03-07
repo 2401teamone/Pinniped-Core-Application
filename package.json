@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon index.js",
-    "seed-data": "sqlite3 s.db < seed-data.sql",
+    "reset-db": "rm -f hb.db && touch hb.db && npm run seed-data",
+    "seed-data": "sqlite3 hb.db < seed-data.sql",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -15,7 +16,8 @@
     "better-sqlite3": "^9.4.3",
     "cors": "^2.8.5",
     "express": "^4.18.3",
-    "knex": "^3.1.0"
+    "knex": "^3.1.0",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.0"

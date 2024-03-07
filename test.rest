@@ -1,8 +1,10 @@
 
 GET http://localhost:3000/api/tables/todos
 ### getAll From todos
+
 GET http://localhost:3000/api/tables/todos/3
 ### getOne From todos
+
 POST http://localhost:3000/api/tables/todos
 content-type: application/json
 
@@ -10,6 +12,7 @@ content-type: application/json
   "todo": "Learn more about Elephant Seals..."
 }
 ###
+
 POST http://localhost:3000/api/tables/todos
 content-type: application/json
 
@@ -29,3 +32,83 @@ DELETE http://localhost:3000/api/tables/todos/5
 
 GET http://localhost:3000/custom
 ### Testing Custom Route
+
+
+DELETE http://localhost:3000/api/schema/ElephantSeals
+### Drops a table
+
+
+POST http://localhost:3000/api/schema
+content-type : application/json
+
+{
+  "name" : "ElephantSeals",
+  "schema" : [{"name":"size","type":"text"},{"name":"sex","type":"text"}]
+}
+
+### Adds a table
+PUT http://localhost:3000/api/schema
+content-type : application/json
+
+{
+  "id": "2",
+  "name" : "Penguins",
+  "schema" : [{"name":"bigness","type":"text"}]
+}
+### Update Column
+
+PUT http://localhost:3000/api/schema/b14f8abd-fc0e-4eb0-97bd-c57e65690c00
+content-type : application/json
+
+{
+  "id": "b14f8abd-fc0e-4eb0-97bd-c57e65690c00",
+  "name" : "BigSeals",
+  "schema" : [{"id":"fd3fb92d-0e9b-4f55-8633-42a74d0ee228", "name":"size","type":"text"}, {"id":"6840d4bc-10b8-4d37-9847-321dd7fac071","name":"gender","type":"text"}]
+}
+### Rename Table
+
+PUT http://localhost:3000/api/schema/b14f8abd-fc0e-4eb0-97bd-c57e65690c00
+content-type : application/json
+
+{
+  "id": "b14f8abd-fc0e-4eb0-97bd-c57e65690c00",
+  "name" : "ElephantSeals",
+  "schema" : [{"id":"fd3fb92d-0e9b-4f55-8633-42a74d0ee228", "name":"size","type":"text"}]
+}
+### Drop a column 
+
+PUT http://localhost:3000/api/schema/b14f8abd-fc0e-4eb0-97bd-c57e65690c00
+content-type : application/json
+
+{
+  "id": "b14f8abd-fc0e-4eb0-97bd-c57e65690c00",
+  "name" : "ElephantSeals",
+  "schema" : [{"id":"fd3fb92d-0e9b-4f55-8633-42a74d0ee228", "name":"size","type":"text"}, {"name":"sex","type":"text"}]
+}
+### Add a column 
+
+
+PUT http://localhost:3000/api/schema/b14f8abd-fc0e-4eb0-97bd-c57e65690c00
+content-type : application/json
+
+{
+  "id": "b14f8abd-fc0e-4eb0-97bd-c57e65690c00",
+  "name" : "ElephantSeals",
+  "schema" : [{"id":"fd3fb92d-0e9b-4f55-8633-42a74d0ee228", "name":"size","type":"text"}, {"id":"6840d4bc-10b8-4d37-9847-321dd7fac071","name":"gender","type":"text"}]
+}
+### Rename a column 
+
+
+PUT http://localhost:3000/api/schema/b14f8abd-fc0e-4eb0-97bd-c57e65690c00
+content-type : application/json
+
+{
+  "id": "b14f8abd-fc0e-4eb0-97bd-c57e65690c00",
+  "name" : "ArcticSeals",
+  "schema" : [{"id":"fd3fb92d-0e9b-4f55-8633-42a74d0ee228", "name":"Bigness","type":"text"}, {"name":"favFood","type":"text"}]
+}
+### Rename table, rename column, add Column, Delete Column
+
+
+GET http://localhost:3000/api/schema
+### GET all rows in the tablemeta table
