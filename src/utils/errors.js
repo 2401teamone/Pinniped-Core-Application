@@ -47,11 +47,11 @@ export class BadRequestError extends AppError {
   }
 }
 
-export class AdminPrivilegesRequired extends AppError {
-  constructor(table) {
+export class ForbiddenError extends AppError {
+  constructor(message = "Admin privilege is required") {
     super(
-      `Admin privilege is required for the ${table} table`,
-      401,
+      message,
+      403,
       "ADMIN_REQUIRED",
       "You don't have admin privileges to access this resource."
     );

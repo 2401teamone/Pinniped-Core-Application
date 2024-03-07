@@ -1,10 +1,12 @@
 import express from "express";
 import cors from "cors";
+
 import generateCrudRouter from "./crud.js";
 import generateCustomRouter from "./custom.js";
 import generateSchemaRouter from "./schema.js";
 import generateUIRouter from "./ui.js";
 import generateAuthRouter from "./auth.js";
+
 import errorHandler from "./middleware/error_handler.js";
 
 import session from "express-session";
@@ -31,8 +33,8 @@ function initApi(app) {
       secret: "elephant seal",
       resave: false,
       saveUninitialized: true,
-      // cookie: { maxAge: 60 * 60 * 1000 }, // 1 hour
-      cookie: { maxAge: 30 * 1000 }, // 30 seconds
+      cookie: { maxAge: 60 * 60 * 1000 }, // 1 hour
+      // cookie: { maxAge: 30 * 1000 }, // 30 seconds
       // enable below property when in production and using HTTPS or set up auto config through ENV
       // cookie: { secure: true }
     })
