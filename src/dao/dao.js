@@ -36,9 +36,7 @@ class DAO {
 
   async findTableByName(name) {
     try {
-      const table = await this.getDB().raw(
-        `SELECT * FROM tablemeta WHERE name='${name}';`
-      );
+      const table = await this.getDB()("tablemeta").select("*").where({ name });
       return table;
     } catch (e) {
       throw new Error(e.message);
@@ -49,7 +47,6 @@ class DAO {
     try {
       console.log(table, fields, "SEARCHING");
       const rows = await this.getDB()(table).select("*").where(fields);
-
       return rows;
     } catch (e) {
       throw new Error(e.message);

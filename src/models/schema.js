@@ -2,7 +2,10 @@ import Column from "./column.js";
 
 class Schema {
   constructor(schema) {
-    console.log(schema, "in schema class");
+    if (typeof schema === "string") {
+      schema = JSON.parse(schema);
+    }
+
     this.columns = schema.map((column) => new Column({ ...column }));
   }
 

@@ -1,9 +1,15 @@
 import { Router } from "express";
 import loadTableContext from "./middleware/load_table_context.js";
 import catchError from "../utils/catch_error.js";
-import { BadRequestError } from "../utils/errors.js";
+import { BadRequestError, ForbiddenError } from "../utils/errors.js";
 
 const BASE = "/tables/:table";
+
+const ACCESS_LEVEL = {
+  admin: 3,
+  user: 2,
+  public: 1,
+};
 
 export default function generateCrudRouter(app) {
   const router = Router();
@@ -43,7 +49,28 @@ class CrudApi {
   getAllHandler() {
     return async (req, res, next) => {
       const { table } = res.locals;
-      const rows = await this.app.getDAO().getAll(table);
+
+      //JUST FOR TESTING
+      table.getAllRule = "admin";
+
+      // Sets access level depending on the role of the user
+      const sessionAccessLevel = req.session.hasOwnProperty("user")
+        ? ACCESS_LEVEL[req.session.user.role]
+        : ACCESS_LEVEL["public"];
+
+      const requiredAccessLevel = ACCESS_LEVEL[table.getAllRule];
+
+      console.log(sessionAccessLevel, requiredAccessLevel);
+
+      // If the user doesn't have the appropriate access level, boot them.
+      if (requiredAccessLevel > sessionAccessLevel) {
+        throw new ForbiddenError();
+      }
+
+      // check if table requires specific rules
+      // check if logged in user has a role that allows for table specific rule
+      // if not, throw ForbiddenError
+      const rows = await this.app.getDAO().getAll(table.name);
       const event = {
         table,
         rows,

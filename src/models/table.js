@@ -4,18 +4,26 @@ import { v4 as uuidv4 } from "uuid";
 const DEFAULT_RULE = "user";
 
 class Table {
-  constructor({ id, name, schema, rules = {} }) {
+  constructor({
+    id,
+    name,
+    schema,
+    getAllRule,
+    getOneRule,
+    createRule,
+    updateRule,
+    deleteRule,
+  }) {
     this.id = id;
     this.name = name;
-    // this.type = type;
 
     this.schema = new Schema(schema);
 
-    this.getAllRule = rules.getAllRule || DEFAULT_RULE;
-    this.getOneRule = rules.getOneRule || DEFAULT_RULE;
-    this.createRule = rules.createRule || DEFAULT_RULE;
-    this.updateRule = rules.updateRule || DEFAULT_RULE;
-    this.deleteRule = rules.deleteRule || DEFAULT_RULE;
+    this.getAllRule = getAllRule || DEFAULT_RULE;
+    this.getOneRule = getOneRule || DEFAULT_RULE;
+    this.createRule = createRule || DEFAULT_RULE;
+    this.updateRule = updateRule || DEFAULT_RULE;
+    this.deleteRule = deleteRule || DEFAULT_RULE;
   }
 
   generateId() {
