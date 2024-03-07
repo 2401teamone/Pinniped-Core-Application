@@ -47,11 +47,11 @@ export class BadRequestError extends AppError {
   }
 }
 
-export class AdminPrivilegesRequired extends AppError {
-  constructor(table) {
+export class ForbiddenError extends AppError {
+  constructor(message = "Admin privilege is required") {
     super(
-      `Admin privilege is required for the ${table} table`,
-      401,
+      message,
+      403,
       "ADMIN_REQUIRED",
       "You don't have admin privileges to access this resource."
     );
@@ -76,6 +76,17 @@ export class InvalidCustomRouteError extends AppError {
       402,
       "INVALID_CUSTOM_ROUTE",
       "Your provided method, path, and/or handler were invalid per the custom route requirements.  Please visit our documentation to learn more."
+    );
+  }
+}
+
+export class AuthenticationError extends AppError {
+  constructor(message = "Authentication Error") {
+    super(
+      message,
+      400,
+      "AUTH_ERROR",
+      `Please try again with updated credentials.`
     );
   }
 }

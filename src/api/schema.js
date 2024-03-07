@@ -1,14 +1,18 @@
 import { Router } from "express";
-import loadTableContext from "./middleware/load_table_context.js";
-import catchError from "../utils/catch_error.js";
-import { BadRequestError } from "../utils/errors.js";
-import Table from "../models/table.js";
 import { v4 as uuidv4 } from "uuid";
+
+import Table from "../models/table.js";
+import catchError from "../utils/catch_error.js";
+
+import loadTableContext from "./middleware/load_table_context.js";
+import adminOnly from "./middleware/admin_only.js";
+import { BadRequestError } from "../utils/errors.js";
 
 export default function generateSchemaRouter(app) {
   const router = Router();
   const schemaApi = new SchemaApi(app);
 
+  router.use(adminOnly());
   router.get("/", catchError(schemaApi.getAllTablesHandler()));
   router.post("/", catchError(schemaApi.createTableHandler()));
   router.get("/:table", catchError(schemaApi.getTableHandler()));
