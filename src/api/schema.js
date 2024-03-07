@@ -1,19 +1,19 @@
-import { Router } from 'express';
-import loadTableContext from './middleware/load_table_context.js';
-import catchError from '../utils/catch_error.js';
-import { BadRequestError } from '../utils/errors.js';
-import Table from '../models/table.js';
-import { v4 as uuidv4 } from 'uuid';
+import { Router } from "express";
+import loadTableContext from "./middleware/load_table_context.js";
+import catchError from "../utils/catch_error.js";
+import { BadRequestError } from "../utils/errors.js";
+import Table from "../models/table.js";
+import { v4 as uuidv4 } from "uuid";
 
 export default function generateSchemaRouter(app) {
   const router = Router();
   const schemaApi = new SchemaApi(app);
 
-  router.get('/', catchError(schemaApi.getAllTablesHandler()));
-  router.post('/', catchError(schemaApi.createTableHandler()));
-  router.get('/:table', catchError(schemaApi.getTableHandler()));
-  router.patch('/:table', catchError(schemaApi.updateTableHandler()));
-  router.delete('/:table', catchError(schemaApi.dropTableHandler()));
+  router.get("/", catchError(schemaApi.getAllTablesHandler()));
+  router.post("/", catchError(schemaApi.createTableHandler()));
+  router.get("/:table", catchError(schemaApi.getTableHandler()));
+  router.put("/:id", catchError(schemaApi.updateTableHandler()));
+  router.delete("/:table", catchError(schemaApi.dropTableHandler()));
 
   return router;
 }
@@ -26,6 +26,10 @@ class SchemaApi {
   getAllTablesHandler() {
     return async (req, res, next) => {
       // Grabs the Main Table which contains all tables
+
+      const allTableMeta = await this.app.getDAO().getAll("tablemeta");
+      console.log(allTableMeta);
+      res.json(allTableMeta);
     };
   }
 
@@ -47,14 +51,14 @@ class SchemaApi {
    */
   createTableHandler() {
     return async (req, res, next) => {
-      const { name, columns } = req.body;
+      const { name, schema } = req.body;
 
       // create a new table instance
       // autogenerate id for table
       // create column instances for each column
       // autogenerate column id's
 
-      const newTable = new Table({ name, columns });
+      const newTable = new Table({ name, schema });
       newTable.generateId();
 
       // within transaction
@@ -66,6 +70,7 @@ class SchemaApi {
 
         // add table to sqlite
         await this.app.getDAO().createTable(newTable, trx);
+        console.log(newTable);
         res.json(newTableMetaData);
       });
     };
@@ -73,22 +78,23 @@ class SchemaApi {
 
   updateTableHandler() {
     return async (req, res, next) => {
-      const { id, name, columns } = req.body;
+      const { name, schema } = req.body;
+      const { id } = req.params;
 
-      let tableFromMeta = await this.app.getDAO().search('tablemeta', { name });
+      let tableFromMeta = await this.app.getDAO().search("tablemeta", { id });
 
       if (!tableFromMeta)
-        throw new BadRequestError('Table not found in metadata table.');
+        throw new BadRequestError("Table not found in metadata table.");
 
       tableFromMeta = tableFromMeta[0];
 
-      tableFromMeta.columns = JSON.parse(tableFromMeta.columns);
+      tableFromMeta.schema = JSON.parse(tableFromMeta.schema);
 
       const oldTable = new Table({ ...tableFromMeta });
-      const newTable = new Table({ id, name, columns });
+      const newTable = new Table({ id, name, schema });
 
       if (oldTable.id !== newTable.id) {
-        throw new BadRequestError('Table id cannot be changed.');
+        throw new BadRequestError("Table ID cannot be changed.");
       }
 
       await Table.migrate(oldTable, newTable, this.app);
@@ -103,7 +109,7 @@ class SchemaApi {
       this.app.getDAO().runTransaction(async (trx) => {
         await this.app.getDAO().dropTable(table, trx);
         await this.app.getDAO().deleteTableMetaData(table, trx);
-        res.status(204).json({ message: 'Table dropped' });
+        res.status(204).json({ message: "Table dropped" });
       });
     };
   }

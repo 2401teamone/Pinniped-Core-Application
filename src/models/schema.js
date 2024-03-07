@@ -1,8 +1,8 @@
-import Column from './column.js';
+import Column from "./column.js";
 
 class Schema {
-  constructor(columns) {
-    this.columns = columns.map((column) => new Column({ ...column }));
+  constructor(schema) {
+    this.columns = schema.map((column) => new Column({ ...column }));
   }
 
   getColumns() {

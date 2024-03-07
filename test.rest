@@ -38,7 +38,7 @@ content-type : application/json
 
 {
   "name" : "ElephantSeals",
-  "columns" : [{"name":"size","type":"text"},{"name":"sex","type":"text"}]
+  "schema" : [{"name":"size","type":"text"},{"name":"sex","type":"text"}]
 }
 ### Adds a table
 
@@ -51,9 +51,9 @@ content-type : application/json
 {
   "id": "2",
   "name" : "Penguins",
-  "columns" : [{"name":"bigness","type":"text"}]
+  "schema" : [{"name":"bigness","type":"text"}]
 }
-### Updates Schema
+### Update Column
 
 PUT http://localhost:3000/api/schema
 content-type : application/json
@@ -61,7 +61,19 @@ content-type : application/json
 {
   "id": "2",
   "name" : "Seals",
-  "columns" : [{"name":"bigness","type":"text"}]
+  "schema" : [{"name":"size","type":"text"}]
 }
 ### Rename Table
 
+PUT http://localhost:3000/api/schema/b14f8abd-fc0e-4eb0-97bd-c57e65690c00
+content-type : application/json
+
+{
+  "id": "b14f8abd-fc0e-4eb0-97bd-c57e65690c00",
+  "name" : "ElephantSeals",
+  "schema" : [{"id":"fd3fb92d-0e9b-4f55-8633-42a74d0ee228", "name":"size","type":"text"}]
+}
+### Drop a column 
+
+GET http://localhost:3000/api/schema
+### GET all rows in the tablemeta table
