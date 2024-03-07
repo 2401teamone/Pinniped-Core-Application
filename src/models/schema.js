@@ -1,14 +1,16 @@
-import Column from "./column.js";
+import Column from './column.js';
 
-class Columns {
+class Schema {
   constructor(columns) {
-    this.columns = columns.map((column) => new Column(column));
+    this.columns = columns.map((column) => new Column({ ...column }));
+  }
+
+  getColumns() {
+    return this.columns;
   }
 
   initializeIds() {
-    this.columns.forEach((column) => {
-      column.initializeId();
-    });
+    this.columns.forEach((column) => column.initializeId());
   }
 
   getColumnById(id) {
@@ -22,4 +24,4 @@ class Columns {
   }
 }
 
-export default Columns;
+export default Schema;

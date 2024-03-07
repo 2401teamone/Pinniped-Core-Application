@@ -1,46 +1,41 @@
-import Columns from "./columns.js";
-import { v4 as uuidv4 } from "uuid";
+import Schema from './schema.js';
+import { v4 as uuidv4 } from 'uuid';
+
+const DEFAULT_RULE = 'user';
 
 class Table {
-  constructor({ id = uuidv4(), name, columns, rules = {} }) {
-    this.name = name;
+  constructor({ id, name, columns, rules = {} }) {
     this.id = id;
+    this.name = name;
     // this.type = type;
 
-    this.columns = new Columns(columns);
+    this.schema = new Schema(columns);
 
-    this.getAllRule = rules.getAllRule;
-    this.getOneRule = rules.getOneRule;
-    this.createRule = rules.createRule;
-    this.updateRule = rules.updateRule;
-    this.deleteRule = rules.deleteRule;
+    this.getAllRule = rules.getAllRule || DEFAULT_RULE;
+    this.getOneRule = rules.getOneRule || DEFAULT_RULE;
+    this.createRule = rules.createRule || DEFAULT_RULE;
+    this.updateRule = rules.updateRule || DEFAULT_RULE;
+    this.deleteRule = rules.deleteRule || DEFAULT_RULE;
   }
 
-  getColumns() {
-    return this.columns;
+  generateId() {
+    this.id = uuidv4();
   }
 
   //Loop over the old table and new table, and run DDL operations
   //to make the SQLite table in question match the new table info
-  static migrate(oldTable, newTable, app) {
+  static async migrate(oldTable, newTable, app) {
+    console.log('MIGRATING');
+    console.log(oldTable, newTable);
     const oldTableName = oldTable.name;
     const tableName = newTable.name;
-    const oldColumns = oldTable.getColumns();
-    const newColumns = newTable.getColumns();
+    const oldColumns = oldTable.schema.getColumns();
+    const newColumns = newTable.schema.getColumns();
 
     app.getDAO().runTransaction(async (trx) => {
-      // Add Columns
-      // for (let column of newColumns) {
-      //   if (oldColumns.getAllRule(column.id)) continue;
-      //   await app
-      //     .getDAO()
-      //     .addColumn(newTable, column.name, column.options, trx);
-      // }
-
       // Delete Columns
       for (let column of oldColumns) {
-        if (newColumns.getColumnById(column.id)) continue;
-
+        if (newTable.schema.getColumnById(column.id)) continue;
         await app.getDAO().dropColumn(tableName, column.name);
       }
 
@@ -57,9 +52,9 @@ class Table {
       }
 
       // Rename Table
+      //Run a DDL method on the table in question, updating it's name
+      //to match the newTable name
       if (oldTable.name !== newTable.name) {
-        //Run a DDL method on the table in question, updating it's name
-        //to match the newTable name
         await app.getDAO().renameTable(oldTableName, tableName, trx);
       }
     });
