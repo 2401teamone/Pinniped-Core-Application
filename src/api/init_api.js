@@ -52,6 +52,7 @@ function initApi(app) {
   server.use("/api/schema", schemaRouter);
   server.use("/", customRouter);
   server.use("/ui", UIRouter);
+
   server.get("*", (req, res, next) => {
     res.send("Page does not exist");
   });
