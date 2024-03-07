@@ -86,11 +86,16 @@ class SchemaApi {
       if (!tableFromMeta)
         throw new BadRequestError("Table not found in metadata table.");
 
+      console.log(tableFromMeta, "table from meta");
       tableFromMeta = tableFromMeta[0];
 
       tableFromMeta.schema = JSON.parse(tableFromMeta.schema);
 
-      const oldTable = new Table({ ...tableFromMeta });
+      const oldTable = new Table({
+        id: tableFromMeta.id,
+        name: tableFromMeta.name,
+        schema: tableFromMeta.schema.columns,
+      });
       const newTable = new Table({ id, name, schema });
 
       if (oldTable.id !== newTable.id) {

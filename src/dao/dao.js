@@ -166,10 +166,10 @@ class DAO {
     await this.getDB().schema.renameTable(name, newName).transacting(trx);
   }
 
-  async addColumn(tableName, columnName, options, trx) {
+  async addColumn(tableName, column, trx) {
     await this.getDB()
       .schema.table(tableName, (table) => {
-        table[options.type](columnName);
+        table[column.type](column.name);
       })
       .transacting(trx);
   }

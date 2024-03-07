@@ -2,6 +2,7 @@ import Column from "./column.js";
 
 class Schema {
   constructor(schema) {
+    console.log(schema, "in schema class");
     this.columns = schema.map((column) => new Column({ ...column }));
   }
 
@@ -19,7 +20,7 @@ class Schema {
     return foundColumn;
   }
 
-  stringifyToJson() {
+  stringifyColumns() {
     return JSON.stringify(this.columns);
   }
 }

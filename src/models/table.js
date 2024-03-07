@@ -28,7 +28,7 @@ class Table {
     console.log("MIGRATING");
     console.log(oldTable, newTable);
     const oldTableName = oldTable.name;
-    const tableName = newTable.name;
+    const newTableName = newTable.name;
     const oldColumns = oldTable.schema.getColumns();
     const newColumns = newTable.schema.getColumns();
 
@@ -36,27 +36,28 @@ class Table {
       // Delete Columns
       for (let column of oldColumns) {
         if (newTable.schema.getColumnById(column.id)) continue;
-        await app.getDAO().dropColumn(tableName, column.name, trx);
+        await app.getDAO().dropColumn(oldTable.name, column.name, trx);
       }
 
-      // // Add OR Rename Columns
-      // for (let column of newColumns) {
-      //   let match = oldColumns.getColumnById(column.id);
-      //   if (match === null) await app.getDAO().addColumn(oldTable.name, column);
+      // Add OR Rename Columns
+      for (let column of newColumns) {
+        let match = oldTable.schema.getColumnById(column.id);
+        if (match === null)
+          await app.getDAO().addColumn(oldTable.name, column, trx);
 
-      //   if (match && match.name != column.name) {
-      //     await app
-      //       .getDAO()
-      //       .renameColumn(oldTableName, match.name, column.name, trx);
-      //   }
-      // }
+        if (match && match.name !== column.name) {
+          await app
+            .getDAO()
+            .renameColumn(oldTableName, match.name, column.name, trx);
+        }
+      }
 
-      // // Rename Table
-      // //Run a DDL method on the table in question, updating it's name
-      // //to match the newTable name
-      // if (oldTable.name !== newTable.name) {
-      //   await app.getDAO().renameTable(oldTableName, tableName, trx);
-      // }
+      // Rename Table - WORKING (on its own)
+      //Run a DDL method on the table in question, updating it's name
+      //to match the newTable name
+      if (oldTable.name !== newTable.name) {
+        await app.getDAO().renameTable(oldTableName, newTableName, trx);
+      }
 
       await app.getDAO().updateTableMetaData(newTable, trx);
     });
