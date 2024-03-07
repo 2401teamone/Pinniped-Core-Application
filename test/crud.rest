@@ -1,0 +1,34 @@
+
+GET http://localhost:3000/api/tables/ElephantSeals
+### getAll From users
+
+GET http://localhost:3000/api/tables/todos/3
+### getOne From todos
+
+POST http://localhost:3000/api/tables/todos
+content-type: application/json
+
+{
+  "todo": "Learn more about Elephant Seals..."
+}
+###
+
+POST http://localhost:3000/api/tables/todos
+content-type: application/json
+
+{
+  "description": "This won't work..."
+}
+###
+PATCH http://localhost:3000/api/tables/todos/5
+content-type: application/json
+
+{
+  "todo": "updated todo 5!"
+}
+###
+DELETE http://localhost:3000/api/tables/todos/5
+### deleteOne From todos
+
+GET http://localhost:3000/custom
+### Testing Custom Route
