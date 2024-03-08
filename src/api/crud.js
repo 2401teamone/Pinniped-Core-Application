@@ -50,7 +50,6 @@ class CrudApi {
   getAllHandler() {
     return async (req, res, next) => {
       const { table } = res.locals;
-
       // //JUST FOR TESTING
       table.getAllRule = "public";
 
@@ -60,7 +59,7 @@ class CrudApi {
         : ACCESS_LEVEL["public"];
 
       const requiredAccessLevel = ACCESS_LEVEL[table.getAllRule];
-      console.log(sessionAccessLevel, requiredAccessLevel);
+      // console.log(sessionAccessLevel, requiredAccessLevel);
 
       // If the user doesn't have the appropriate access level, boot them.
       if (requiredAccessLevel > sessionAccessLevel) {
@@ -96,7 +95,7 @@ class CrudApi {
     return async (req, res, next) => {
       const { table } = res.locals;
       const { rowId } = req.params;
-      const row = await this.app.getDAO().getOne(table, rowId);
+      const row = await this.app.getDAO().getOne(table.name, rowId);
       if (!row.length) throw new BadRequestError();
       res.status(200).json({ row });
     };
@@ -107,7 +106,9 @@ class CrudApi {
     return async (req, res, next) => {
       //validate the schema and here before creating ???
       const { table } = res.locals;
-      const createdRow = await this.app.getDAO().createOne(table, req.body);
+      const createdRow = await this.app
+        .getDAO()
+        .createOne(table.name, { ...req.body, id: uuidv4() });
       res.status(201).json({ createdRow });
     };
   }
@@ -119,7 +120,7 @@ class CrudApi {
       const { rowId } = req.params;
       const updatedRow = await this.app
         .getDAO()
-        .updateOne(table, rowId, req.body);
+        .updateOne(table.name, rowId, req.body);
       res.status(200).json({ updatedRow });
     };
   }
@@ -129,8 +130,8 @@ class CrudApi {
     return async (req, res, next) => {
       const { table } = res.locals;
       const { rowId } = req.params;
-      await this.app.getDAO().deleteOne(table, rowId);
-      res.status(204);
+      await this.app.getDAO().deleteOne(table.name, rowId);
+      res.status(204).end();
     };
   }
 }

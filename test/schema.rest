@@ -1,6 +1,5 @@
-DELETE http://localhost:3000/api/schema/ElephantSeals
+DELETE http://localhost:3000/api/schema/111f55ef-cd34-43f0-b608-ad1f11ba1c28
 ### Drops a table
-
 
 POST http://localhost:3000/api/schema
 content-type : application/json
@@ -20,13 +19,14 @@ content-type : application/json
 }
 
 ### Adds a table
-PUT http://localhost:3000/api/schema
+
+PUT http://localhost:3000/api/schema/7e637ce9-68cb-4dec-a7b1-81bb5fe13b6e
 content-type : application/json
 
 {
-  "id": "2",
-  "name" : "Penguins",
-  "columns" : [{"name":"bigness","type":"text"}]
+  "id": "7e637ce9-68cb-4dec-a7b1-81bb5fe13b6e",
+  "name" : "ElephantSeals",
+  "columns" : [{"id":"16308ebf-68bb-4319-9ca8-0611b143330d","name":"size","type":"text"},{"name":"gender","type":"text"}]
 }
 ### Update Column
 
@@ -81,7 +81,6 @@ content-type : application/json
   "columns" : [{"id":"fd3fb92d-0e9b-4f55-8633-42a74d0ee228", "name":"Bigness","type":"text"}, {"name":"favFood","type":"text"}]
 }
 ### Rename table, rename column, add Column, Delete Column
-
 
 GET http://localhost:3000/api/schema
 ### GET all rows in the tablemeta table

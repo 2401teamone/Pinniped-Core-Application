@@ -1,7 +1,7 @@
-import Column from './column.js';
-import { v4 as uuidv4 } from 'uuid';
+import Column from "./column.js";
+import { v4 as uuidv4 } from "uuid";
 
-const DEFAULT_RULE = 'public';
+const DEFAULT_RULE = "public";
 
 class Table {
   /**
@@ -21,7 +21,7 @@ class Table {
     const newTableName = newTable.name;
     const oldColumns = oldTable.getColumns();
     const newColumns = newTable.getColumns();
-    console.log('MIGRATING');
+    console.log("MIGRATING");
     console.log(oldTable, newTable);
 
     app.getDAO().runTransaction(async (trx) => {
@@ -51,7 +51,12 @@ class Table {
         await app.getDAO().renameTable(oldTableName, newTableName, trx);
       }
 
-      await app.getDAO().updateTableMetaData(newTable, trx);
+      await app
+        .getDAO()
+        .updateTableMetaData(
+          { ...newTable, columns: newTable.stringifyColumns() },
+          trx
+        );
     });
   }
 
@@ -68,7 +73,7 @@ class Table {
     this.id = id;
     this.name = name;
 
-    if (typeof columns === 'string') {
+    if (typeof columns === "string") {
       columns = JSON.parse(columns);
     }
     this.columns = columns.map((column) => new Column({ ...column }));
@@ -89,7 +94,7 @@ class Table {
   }
 
   stringifyColumns() {
-    return JSON.stringify(this.columns);
+    return JSON.stringify(this.getColumns());
   }
 
   getColumnById(id) {
