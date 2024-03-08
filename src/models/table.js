@@ -1,13 +1,65 @@
-import Schema from "./schema.js";
-import { v4 as uuidv4 } from "uuid";
+import Schema from './schema.js';
+import Column from './column.js';
+import { v4 as uuidv4 } from 'uuid';
 
-const DEFAULT_RULE = "user";
+const DEFAULT_RULE = 'user';
 
 class Table {
+  /**
+   * Migrate
+   * @param {object Table} oldTable
+   * @param {object Table} newTable
+   * @param {object HB} app
+   * Induces schema changes based on the comparison
+   * Between the old table and the new table.
+   * It'll loop through the columns property, looking for whether
+   * (Add Column) The column exists in the new table but not the old,
+   * (Delete Column) The column doesn't exist in the new table but in the old,
+   * (Rename Column) The column exists in both, but has a different name in the two tables.
+   */
+  static async migrate(oldTable, newTable, app) {
+    const oldTableName = oldTable.name;
+    const newTableName = newTable.name;
+    const oldColumns = oldTable.getColumns();
+    const newColumns = newTable.getColumns();
+    console.log('MIGRATING');
+    console.log(oldTable, newTable);
+
+    app.getDAO().runTransaction(async (trx) => {
+      // Delete Columns
+      for (let column of oldColumns) {
+        if (newTable.getColumnById(column.id)) continue;
+        await app.getDAO().dropColumn(oldTable.name, column.name, trx);
+      }
+
+      // Add OR Rename Columns
+      for (let column of newColumns) {
+        let match = oldTable.getColumnById(column.id);
+        if (match === null)
+          await app.getDAO().addColumn(oldTable.name, column, trx);
+
+        if (match && match.name !== column.name) {
+          await app
+            .getDAO()
+            .renameColumn(oldTableName, match.name, column.name, trx);
+        }
+      }
+
+      // Rename Table - WORKING (on its own)
+      // Run a DDL method on the table in question,
+      // updating it's name to match the newTable name.
+      if (oldTable.name !== newTable.name) {
+        await app.getDAO().renameTable(oldTableName, newTableName, trx);
+      }
+
+      await app.getDAO().updateTableMetaData(newTable, trx);
+    });
+  }
+
   constructor({
     id,
     name,
-    schema,
+    columns,
     getAllRule,
     getOneRule,
     createRule,
@@ -17,7 +69,10 @@ class Table {
     this.id = id;
     this.name = name;
 
-    this.schema = new Schema(schema);
+    if (typeof columns === 'string') {
+      columns = JSON.parse(columns);
+    }
+    this.columns = columns.map((column) => new Column({ ...column }));
 
     this.getAllRule = getAllRule || DEFAULT_RULE;
     this.getOneRule = getOneRule || DEFAULT_RULE;
@@ -30,45 +85,22 @@ class Table {
     this.id = uuidv4();
   }
 
-  //Loop over the old table and new table, and run DDL operations
-  //to make the SQLite table in question match the new table info
-  static async migrate(oldTable, newTable, app) {
-    console.log("MIGRATING");
-    console.log(oldTable, newTable);
-    const oldTableName = oldTable.name;
-    const newTableName = newTable.name;
-    const oldColumns = oldTable.schema.getColumns();
-    const newColumns = newTable.schema.getColumns();
+  getColumns() {
+    return this.columns;
+  }
 
-    app.getDAO().runTransaction(async (trx) => {
-      // Delete Columns
-      for (let column of oldColumns) {
-        if (newTable.schema.getColumnById(column.id)) continue;
-        await app.getDAO().dropColumn(oldTable.name, column.name, trx);
-      }
+  stringifyColumns() {
+    return JSON.stringify(this.columns);
+  }
 
-      // Add OR Rename Columns
-      for (let column of newColumns) {
-        let match = oldTable.schema.getColumnById(column.id);
-        if (match === null)
-          await app.getDAO().addColumn(oldTable.name, column, trx);
+  getColumnById(id) {
+    let foundColumn = this.columns.find((column) => column.id === id);
+    if (!foundColumn) return null;
+    return foundColumn;
+  }
 
-        if (match && match.name !== column.name) {
-          await app
-            .getDAO()
-            .renameColumn(oldTableName, match.name, column.name, trx);
-        }
-      }
-
-      // Rename Table - WORKING (on its own)
-      //Run a DDL method on the table in question, updating it's name
-      //to match the newTable name
-      if (oldTable.name !== newTable.name) {
-        await app.getDAO().renameTable(oldTableName, newTableName, trx);
-      }
-
-      await app.getDAO().updateTableMetaData(newTable, trx);
-    });
+  initializeIds() {
+    this.columns.forEach((column) => column.initializeId());
   }
 }
 
