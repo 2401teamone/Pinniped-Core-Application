@@ -7,7 +7,16 @@ content-type : application/json
 
 {
   "name" : "ElephantSeals",
-  "schema" : [{"name":"size","type":"text"},{"name":"sex","type":"text"}]
+  "columns" : [{"name":"size","type":"text"},{"name":"sex","type":"text"}]
+}
+### Adds a table
+
+POST http://localhost:3000/api/schema
+content-type : application/json
+
+{
+  "name" : "Penguins",
+  "columns" : [{"name":"species","type":"text"},{"name":"age","type":"text"}]
 }
 
 ### Adds a table
@@ -17,7 +26,7 @@ content-type : application/json
 {
   "id": "2",
   "name" : "Penguins",
-  "schema" : [{"name":"bigness","type":"text"}]
+  "columns" : [{"name":"bigness","type":"text"}]
 }
 ### Update Column
 
@@ -27,7 +36,7 @@ content-type : application/json
 {
   "id": "b14f8abd-fc0e-4eb0-97bd-c57e65690c00",
   "name" : "BigSeals",
-  "schema" : [{"id":"fd3fb92d-0e9b-4f55-8633-42a74d0ee228", "name":"size","type":"text"}, {"id":"6840d4bc-10b8-4d37-9847-321dd7fac071","name":"gender","type":"text"}]
+  "columns" : [{"id":"fd3fb92d-0e9b-4f55-8633-42a74d0ee228", "name":"size","type":"text"}, {"id":"6840d4bc-10b8-4d37-9847-321dd7fac071","name":"gender","type":"text"}]
 }
 ### Rename Table
 
@@ -37,17 +46,17 @@ content-type : application/json
 {
   "id": "b14f8abd-fc0e-4eb0-97bd-c57e65690c00",
   "name" : "ElephantSeals",
-  "schema" : [{"id":"fd3fb92d-0e9b-4f55-8633-42a74d0ee228", "name":"size","type":"text"}]
+  "columns" : [{"id":"fd3fb92d-0e9b-4f55-8633-42a74d0ee228", "name":"size","type":"text"}]
 }
 ### Drop a column
 
-PUT http://localhost:3000/api/schema/b14f8abd-fc0e-4eb0-97bd-c57e65690c00
+PUT http://localhost:3000/api/schema/f8ef4e7f-6596-4d2f-a488-9a3c092f58cb
 content-type : application/json
 
 {
-  "id": "b14f8abd-fc0e-4eb0-97bd-c57e65690c00",
+  "id": "f8ef4e7f-6596-4d2f-a488-9a3c092f58cb",
   "name" : "ElephantSeals",
-  "schema" : [{"id":"fd3fb92d-0e9b-4f55-8633-42a74d0ee228", "name":"size","type":"text"}, {"name":"sex","type":"text"}]
+  "columns" : [{"id":"b64ab088-911b-4461-836b-4747aedf5988", "name":"size","type":"text"}, {"name":"gender","type":"text"}]
 }
 ### Add a column
 
@@ -58,7 +67,7 @@ content-type : application/json
 {
   "id": "b14f8abd-fc0e-4eb0-97bd-c57e65690c00",
   "name" : "ElephantSeals",
-  "schema" : [{"id":"fd3fb92d-0e9b-4f55-8633-42a74d0ee228", "name":"size","type":"text"}, {"id":"6840d4bc-10b8-4d37-9847-321dd7fac071","name":"gender","type":"text"}]
+  "columns" : [{"id":"fd3fb92d-0e9b-4f55-8633-42a74d0ee228", "name":"size","type":"text"}, {"id":"6840d4bc-10b8-4d37-9847-321dd7fac071","name":"gender","type":"text"}]
 }
 ### Rename a column
 
@@ -69,7 +78,7 @@ content-type : application/json
 {
   "id": "b14f8abd-fc0e-4eb0-97bd-c57e65690c00",
   "name" : "ArcticSeals",
-  "schema" : [{"id":"fd3fb92d-0e9b-4f55-8633-42a74d0ee228", "name":"Bigness","type":"text"}, {"name":"favFood","type":"text"}]
+  "columns" : [{"id":"fd3fb92d-0e9b-4f55-8633-42a74d0ee228", "name":"Bigness","type":"text"}, {"name":"favFood","type":"text"}]
 }
 ### Rename table, rename column, add Column, Delete Column
 
