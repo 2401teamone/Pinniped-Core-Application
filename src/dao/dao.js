@@ -94,7 +94,8 @@ class DAO {
 
   async createOne(table, newRow) {
     try {
-      const createdRow = await this.getDB()(table)
+      console.log(table, newRow);
+      const createdRow = await this.getDB()(table.name)
         .returning('*')
         .insert(newRow);
       return createdRow;
@@ -109,7 +110,7 @@ class DAO {
 
   async updateOne(table, id, newRow) {
     try {
-      const updatedRow = await this.getDB()(table)
+      const updatedRow = await this.getDB()(table.name)
         .returning('*')
         .where({ id })
         .update(newRow);

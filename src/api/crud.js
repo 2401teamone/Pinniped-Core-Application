@@ -1,9 +1,10 @@
-import { Router } from "express";
-import loadTableContext from "./middleware/load_table_context.js";
-import catchError from "../utils/catch_error.js";
-import { BadRequestError, ForbiddenError } from "../utils/errors.js";
+import { Router } from 'express';
+import loadTableContext from './middleware/load_table_context.js';
+import catchError from '../utils/catch_error.js';
+import { BadRequestError, ForbiddenError } from '../utils/errors.js';
+// import uuidv4
 
-const BASE = "/tables/:table";
+const BASE = '/tables/:table';
 
 const ACCESS_LEVEL = {
   admin: 3,
@@ -50,13 +51,13 @@ class CrudApi {
     return async (req, res, next) => {
       const { table } = res.locals;
 
-      //JUST FOR TESTING
-      table.getAllRule = "admin";
+      // //JUST FOR TESTING
+      table.getAllRule = 'public';
 
       // Sets access level depending on the role of the user
-      const sessionAccessLevel = req.session.hasOwnProperty("user")
+      const sessionAccessLevel = req.session.hasOwnProperty('user')
         ? ACCESS_LEVEL[req.session.user.role]
-        : ACCESS_LEVEL["public"];
+        : ACCESS_LEVEL['public'];
 
       const requiredAccessLevel = ACCESS_LEVEL[table.getAllRule];
 
@@ -64,12 +65,15 @@ class CrudApi {
 
       // If the user doesn't have the appropriate access level, boot them.
       if (requiredAccessLevel > sessionAccessLevel) {
-        throw new ForbiddenError();
+        throw new ForbiddenError(
+          "You don't have the appropriate access for this table."
+        );
       }
 
       // check if table requires specific rules
       // check if logged in user has a role that allows for table specific rule
       // if not, throw ForbiddenError
+
       const rows = await this.app.getDAO().getAll(table.name);
       const event = {
         table,
@@ -78,7 +82,13 @@ class CrudApi {
       };
       this.app.onGetAllRows().trigger(event);
       if (event.res.finished) return null;
-      res.status(200).json({ rows: event.rows });
+      res.status(200).json({
+        table: {
+          id: table.id,
+          name: table.name,
+        },
+        rows: event.rows,
+      });
     };
   }
 

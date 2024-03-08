@@ -1,8 +1,7 @@
-import Schema from './schema.js';
 import Column from './column.js';
 import { v4 as uuidv4 } from 'uuid';
 
-const DEFAULT_RULE = 'user';
+const DEFAULT_RULE = 'public';
 
 class Table {
   /**

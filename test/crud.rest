@@ -1,15 +1,23 @@
 
-GET http://localhost:3000/api/tables/ElephantSeals
-### getAll From users
+GET http://localhost:3000/api/tables/ElephantSeals 
+### getAll From users 
 
 GET http://localhost:3000/api/tables/todos/3
 ### getOne From todos
 
-POST http://localhost:3000/api/tables/todos
+POST http://localhost:3000/api/tables/ElephantSeals
 content-type: application/json
 
 {
-  "todo": "Learn more about Elephant Seals..."
+  "size": "Extra big", "gender" : "Male"
+}
+###
+
+POST http://localhost:3000/api/tables/ElephantSeals
+content-type: application/json
+
+{
+  "size": "Small", "gender" : "Female"
 }
 ###
 

@@ -9,6 +9,15 @@ content-type : application/json
   "name" : "ElephantSeals",
   "columns" : [{"name":"size","type":"text"},{"name":"sex","type":"text"}]
 }
+### Adds a table
+
+POST http://localhost:3000/api/schema
+content-type : application/json
+
+{
+  "name" : "Penguins",
+  "columns" : [{"name":"species","type":"text"},{"name":"age","type":"text"}]
+}
 
 ### Adds a table
 PUT http://localhost:3000/api/schema
