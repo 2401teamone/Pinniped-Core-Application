@@ -14,7 +14,7 @@ POST http://localhost:3000/api/schema
 content-type : application/json
 
 {
-  "name" : "Penguins",
+  "name" : "Puffins",
   "columns" : [{"name":"species","type":"text"},{"name":"age","type":"text"}]
 }
 

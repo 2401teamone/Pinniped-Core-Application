@@ -4,6 +4,7 @@ import { DatabaseError, BadRequestError } from "../utils/errors.js";
 class DAO {
   constructor(dbFile) {
     this.db = this._connect(dbFile);
+    this.trxDB;
   }
 
   /**
@@ -26,6 +27,11 @@ class DAO {
   disconnect() {}
 
   getDB() {
+    if (this.trxDB && !this.trxDB.isCompleted()) {
+      console.log("give them the trxDB");
+      return this.trxDB;
+    }
+    console.log("give them normal DB");
     return this.db;
   }
 
@@ -37,6 +43,7 @@ class DAO {
    */
   async runTransaction(callback) {
     const trx = await this.getDB().transaction();
+    this.trxDB = trx;
     try {
       const result = await callback(trx);
       await trx.commit();
@@ -198,11 +205,10 @@ class DAO {
    * A modified version of createOne, but inserts an object
    * Specifically into 'tablemeta'.
    */
-  async addTableMetaData(tableData, trx) {
+  async addTableMetaData(tableData) {
     const createdRow = await this.getDB()("tablemeta")
       .returning("*")
-      .insert(tableData)
-      .transacting(trx);
+      .insert(tableData);
     return createdRow;
   }
 
@@ -245,26 +251,23 @@ class DAO {
    * @returns {Promise <undefined>}
    * Creates a table within the database and
    */
-  async createTable(table, trx) {
+  async createTable(table) {
     const name = table.name;
     const columns = table.getColumns();
 
-    return await this.getDB()
-      .schema.createTable(name, (table) => {
-        columns.forEach((column) => {
-          if (!table[column.type]) {
-            throw new DatabaseError();
-          }
-          table[column.type](column.name);
-        });
-        // table.text("id").primary();
+    return await this.getDB().schema.createTable(name, (table) => {
+      columns.forEach((column) => {
+        if (!table[column.type]) {
+          throw new DatabaseError();
+        }
+        table[column.type](column.name);
+      });
 
-        table.specificType(
-          "id",
-          "TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL"
-        );
-      })
-      .transacting(trx);
+      table.specificType(
+        "id",
+        "TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL"
+      );
+    });
   }
 
   async dropTable(tableName, trx) {
