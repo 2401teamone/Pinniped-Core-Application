@@ -1,11 +1,11 @@
 
-GET http://localhost:3000/api/tables/ElephantSeals 
-### getAll From users 
+GET http://localhost:3000/api/tables/01d0fac8-2413-431f-9f37-bfb98975c682/rows
+### getAll From ElephantSeals
 
 GET http://localhost:3000/api/tables/todos/3
 ### getOne From todos
 
-POST http://localhost:3000/api/tables/ElephantSeals
+POST http://localhost:3000/api/tables/01d0fac8-2413-431f-9f37-bfb98975c682/rows
 content-type: application/json
 
 {

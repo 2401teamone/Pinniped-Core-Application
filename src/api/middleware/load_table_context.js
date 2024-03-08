@@ -4,10 +4,10 @@ import Table from "../../models/table.js";
 
 export default function loadTableContext(app) {
   return catchError(async (req, res, next) => {
-    const { table } = req.params;
+    const { tableId } = req.params;
     // find table in tablemeta
-    let foundTable = await app.getDAO().findTableByName(table);
-    if (!foundTable.length) throw new TableNotFoundError(table);
+    let foundTable = await app.getDAO().findTableById(tableId);
+    if (!foundTable.length) throw new TableNotFoundError(tableId);
     foundTable = foundTable[0];
 
     // create new table instance

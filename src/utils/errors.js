@@ -15,12 +15,12 @@ class AppError extends Error {
 }
 
 export class TableNotFoundError extends AppError {
-  constructor(table) {
+  constructor(tableId) {
     super(
-      `Table ${table} not found`,
+      `Table with an id of ${tableId} was not found`,
       404,
       "TABLE_NOT_FOUND",
-      `Table ${table} not found.  You've likely attempted to access a table that does not exist within the database`
+      `Table not found.  You've likely attempted to access a table that does not exist within the database`
     );
   }
 }

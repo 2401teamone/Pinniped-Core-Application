@@ -1,5 +1,5 @@
-import knex from 'knex';
-import { DatabaseError, BadRequestError } from '../utils/errors.js';
+import knex from "knex";
+import { DatabaseError, BadRequestError } from "../utils/errors.js";
 
 class DAO {
   constructor(dbFile) {
@@ -15,10 +15,10 @@ class DAO {
    */
   _connect(dbFile) {
     return knex({
-      client: 'better-sqlite3',
+      client: "better-sqlite3",
       useNullAsDefault: true,
       connection: {
-        filename: 'hb.db',
+        filename: "hb.db",
       },
     });
   }
@@ -49,7 +49,16 @@ class DAO {
 
   async findTableByName(name) {
     try {
-      const table = await this.getDB()('tablemeta').select('*').where({ name });
+      const table = await this.getDB()("tablemeta").select("*").where({ name });
+      return table;
+    } catch (e) {
+      throw new Error(e.message);
+    }
+  }
+
+  async findTableById(id) {
+    try {
+      const table = await this.getDB()("tablemeta").select("*").where({ id });
       return table;
     } catch (e) {
       throw new Error(e.message);
@@ -66,8 +75,8 @@ class DAO {
    */
   async search(table, fields) {
     try {
-      console.log(table, fields, 'SEARCHING');
-      const rows = await this.getDB()(table).select('*').where(fields);
+      console.log(table, fields, "SEARCHING");
+      const rows = await this.getDB()(table).select("*").where(fields);
       return rows;
     } catch (e) {
       throw new Error(e.message);
@@ -76,7 +85,7 @@ class DAO {
 
   async getAll(table) {
     try {
-      const rows = await this.getDB()(table).select('*');
+      const rows = await this.getDB()(table).select("*");
       return rows;
     } catch (e) {
       throw new Error(e.message);
@@ -85,7 +94,7 @@ class DAO {
 
   async getOne(table, id) {
     try {
-      const row = await this.getDB()(table).select('*').where({ id });
+      const row = await this.getDB()(table).select("*").where({ id });
       return row;
     } catch (e) {
       throw new Error(e.message);
@@ -96,11 +105,11 @@ class DAO {
     try {
       console.log(table, newRow);
       const createdRow = await this.getDB()(table.name)
-        .returning('*')
+        .returning("*")
         .insert(newRow);
       return createdRow;
     } catch (e) {
-      if (e.message.slice(0, 11) === 'insert into') {
+      if (e.message.slice(0, 11) === "insert into") {
         throw new BadRequestError();
       } else {
         throw new Error(e.message);
@@ -111,7 +120,7 @@ class DAO {
   async updateOne(table, id, newRow) {
     try {
       const updatedRow = await this.getDB()(table.name)
-        .returning('*')
+        .returning("*")
         .where({ id })
         .update(newRow);
       return updatedRow;
@@ -137,8 +146,8 @@ class DAO {
    * Specifically into 'tablemeta'.
    */
   async addTableMetaData(table, trx) {
-    const createdRow = await this.getDB()('tablemeta')
-      .returning('*')
+    const createdRow = await this.getDB()("tablemeta")
+      .returning("*")
       .insert({
         id: table.id,
         name: table.name,
@@ -151,8 +160,8 @@ class DAO {
   async updateTableMetaData(table, trx) {
     const { id, columns, ...updatePayload } = table;
 
-    const updatedRow = await this.getDB()('tablemeta')
-      .returning('*')
+    const updatedRow = await this.getDB()("tablemeta")
+      .returning("*")
       .where({ id })
       .update({
         columns: JSON.stringify(columns),
@@ -164,7 +173,7 @@ class DAO {
   }
 
   async deleteTableMetaData(name, trx) {
-    await this.getDB()('tablemeta').where({ name }).del().transacting(trx);
+    await this.getDB()("tablemeta").where({ name }).del().transacting(trx);
   }
 
   async createTable(table, trx) {
@@ -179,7 +188,7 @@ class DAO {
           }
           table[column.type](column.name);
         });
-        table.text('id').primary();
+        table.text("id").primary();
       })
       .transacting(trx);
   }
@@ -211,7 +220,7 @@ class DAO {
   async dropColumn(tableName, columnName, trx) {
     await this.getDB()
       .schema.table(tableName, (table) => {
-        console.log('DROPPING COLUMN', columnName, ' on', tableName);
+        console.log("DROPPING COLUMN", columnName, " on", tableName);
         table.dropColumn(columnName);
       })
       .transacting(trx);

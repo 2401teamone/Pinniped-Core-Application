@@ -1,10 +1,10 @@
-import { Router } from 'express';
-import loadTableContext from './middleware/load_table_context.js';
-import catchError from '../utils/catch_error.js';
-import { BadRequestError, ForbiddenError } from '../utils/errors.js';
-// import uuidv4
+import { Router } from "express";
+import loadTableContext from "./middleware/load_table_context.js";
+import catchError from "../utils/catch_error.js";
+import { BadRequestError, ForbiddenError } from "../utils/errors.js";
+import { v4 as uuidv4 } from "uuid";
 
-const BASE = '/tables/:table';
+const BASE = "/tables/:tableId/rows";
 
 const ACCESS_LEVEL = {
   admin: 3,
@@ -18,7 +18,7 @@ export default function generateCrudRouter(app) {
 
   router.get(BASE, loadTableContext(app), catchError(crudApi.getAllHandler()));
   router.get(
-    `${BASE}/:id`,
+    `${BASE}/:rowId`,
     loadTableContext(app),
     catchError(crudApi.getOneHandler())
   );
@@ -28,12 +28,12 @@ export default function generateCrudRouter(app) {
     catchError(crudApi.createOneHandler())
   );
   router.patch(
-    `${BASE}/:id`,
+    `${BASE}/:rowId`,
     loadTableContext(app),
     catchError(crudApi.updateOneHandler())
   );
   router.delete(
-    `${BASE}/:id`,
+    `${BASE}/:rowId`,
     loadTableContext(app),
     catchError(crudApi.deleteOneHandler())
   );
@@ -52,15 +52,14 @@ class CrudApi {
       const { table } = res.locals;
 
       // //JUST FOR TESTING
-      table.getAllRule = 'public';
+      table.getAllRule = "public";
 
       // Sets access level depending on the role of the user
-      const sessionAccessLevel = req.session.hasOwnProperty('user')
+      const sessionAccessLevel = req.session.hasOwnProperty("user")
         ? ACCESS_LEVEL[req.session.user.role]
-        : ACCESS_LEVEL['public'];
+        : ACCESS_LEVEL["public"];
 
       const requiredAccessLevel = ACCESS_LEVEL[table.getAllRule];
-
       console.log(sessionAccessLevel, requiredAccessLevel);
 
       // If the user doesn't have the appropriate access level, boot them.
@@ -96,8 +95,8 @@ class CrudApi {
   getOneHandler() {
     return async (req, res, next) => {
       const { table } = res.locals;
-      const { id } = req.params;
-      const row = await this.app.getDAO().getOne(table, id);
+      const { rowId } = req.params;
+      const row = await this.app.getDAO().getOne(table, rowId);
       if (!row.length) throw new BadRequestError();
       res.status(200).json({ row });
     };
@@ -117,8 +116,10 @@ class CrudApi {
   updateOneHandler() {
     return async (req, res, next) => {
       const { table } = res.locals;
-      const { id } = req.params;
-      const updatedRow = await this.app.getDAO().updateOne(table, id, req.body);
+      const { rowId } = req.params;
+      const updatedRow = await this.app
+        .getDAO()
+        .updateOne(table, rowId, req.body);
       res.status(200).json({ updatedRow });
     };
   }
@@ -127,8 +128,8 @@ class CrudApi {
   deleteOneHandler() {
     return async (req, res, next) => {
       const { table } = res.locals;
-      const { id } = req.params;
-      await this.app.getDAO().deleteOne(table, id);
+      const { rowId } = req.params;
+      await this.app.getDAO().deleteOne(table, rowId);
       res.status(204);
     };
   }
