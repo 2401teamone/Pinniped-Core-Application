@@ -22,8 +22,6 @@ content-type : application/json
 POST http://localhost:3000/api/auth/logout
 ### Attempts to logout of current user
 
-### GET the current session
-
 POST http://localhost:3000/api/auth/admin/register
 content-type : application/json
 
