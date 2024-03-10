@@ -8,7 +8,6 @@ import { DatabaseError, BadRequestError } from "../utils/errors.js";
 class DAO {
   constructor(dbFile) {
     this.db = this._connect(dbFile);
-    this.trxDB;
   }
 
   /**
@@ -38,11 +37,6 @@ class DAO {
    * @returns {object Transaction} Knex Instance - this.db || this.trxDB
    */
   getDB() {
-    if (this.trxDB && !this.trxDB.isCompleted()) {
-      console.log("give them the trxDB");
-      return this.trxDB;
-    }
-    console.log("give them normal DB");
     return this.db;
   }
 
@@ -55,14 +49,12 @@ class DAO {
    */
   async runTransaction(callback) {
     const trx = await this.getDB().transaction();
-    this.trxDB = trx;
     try {
       const result = await callback();
       await trx.commit();
       return result;
     } catch (e) {
       await trx.rollback();
-      console.log(e);
       throw new Error(e);
     }
   }
@@ -207,10 +199,11 @@ class DAO {
    * @param {id: string, name: string, columns: 'stringJSON'} tableData
    * @return {object} createdRow
    */
-  async addTableMetaData(tableData) {
+  async addTableMetaData(tableData, trx) {
     const createdRow = await this.getDB()("tablemeta")
       .returning("*")
-      .insert(tableData);
+      .insert(tableData)
+      .transacting(trx);
     return createdRow;
   }
 
@@ -249,24 +242,25 @@ class DAO {
    * @param {object Transaction} trx
    * @returns {Promise <undefined>}
    */
-  async createTable(table) {
+  async createTable(table, trx) {
     const name = table.name;
     const columns = table.getColumns();
 
-    return await this.getDB().schema.createTable(name, (table) => {
-      // Adds columns and their data type.
-      columns.forEach((column) => {
-        if (!table[column.type]) {
-          throw new DatabaseError();
-        }
-        table[column.type](column.name);
-      });
-      // Sets the ID column to have the type 'TEXT' and autogenerates a default ID.
-      table.specificType(
-        "id",
-        "TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL"
-      );
-    });
+    return await this.getDB()
+      .schema.createTable(name, (table) => {
+        columns.forEach((column) => {
+          if (!table[column.type]) {
+            throw new DatabaseError();
+          }
+          table[column.type](column.name);
+        });
+
+        table.specificType(
+          "id",
+          "TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL"
+        );
+      })
+      .transacting(trx);
   }
 
   /**

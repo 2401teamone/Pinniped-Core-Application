@@ -72,16 +72,19 @@ class SchemaApi {
       newTable.generateId();
 
       // Transaction
-      this.app.getDAO().runTransaction(async () => {
+      this.app.getDAO().runTransaction(async (trx) => {
         // Add Metadata to 'tablemeta'
-        let newTableMetaData = await this.app.getDAO().addTableMetaData({
-          id: newTable.id,
-          name: newTable.name,
-          columns: newTable.stringifyColumns(),
-        });
+        let newTableMetaData = await this.app.getDAO().addTableMetaData(
+          {
+            id: newTable.id,
+            name: newTable.name,
+            columns: newTable.stringifyColumns(),
+          },
+          trx
+        );
 
         // Add Table to Sqlite3
-        await this.app.getDAO().createTable(newTable);
+        await this.app.getDAO().createTable(newTable, trx);
         console.log(newTable);
         res.json(newTableMetaData);
       });
