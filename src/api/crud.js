@@ -5,13 +5,19 @@ import { BadRequestError, ForbiddenError } from "../utils/errors.js";
 import { v4 as uuidv4 } from "uuid";
 
 const BASE = "/tables/:tableId/rows";
-
 const ACCESS_LEVEL = {
   admin: 3,
   user: 2,
   public: 1,
 };
 
+/**
+ * Creates an Express Router object
+ * That sets middleware and handlers for
+ * The designated CRUD routes.
+ * @param {object HB} app
+ * @returns {object Router} router
+ */
 export default function generateCrudRouter(app) {
   const router = Router();
   const crudApi = new CrudApi(app);
@@ -41,23 +47,34 @@ export default function generateCrudRouter(app) {
   return router;
 }
 
+/**
+ * CrudApi Class
+ * Creates an object that contains methods
+ * that handles the CRUD operations.
+ */
 class CrudApi {
   constructor(app) {
     this.app = app;
   }
 
-  // getAll route
+  /**
+   * Returns a handler function that
+   * Checks if the user has the required access level
+   * And returns all the rows in the provided table.
+   * @returns {function}
+   */
   getAllHandler() {
     return async (req, res, next) => {
       const { table } = res.locals;
-      // //JUST FOR TESTING
+      // JUST FOR TESTING
       table.getAllRule = "public";
 
-      // Sets access level depending on the role of the user
+      // User Access Level
       const sessionAccessLevel = req.session.hasOwnProperty("user")
         ? ACCESS_LEVEL[req.session.user.role]
         : ACCESS_LEVEL["public"];
 
+      // Required Table Access Level
       const requiredAccessLevel = ACCESS_LEVEL[table.getAllRule];
       // console.log(sessionAccessLevel, requiredAccessLevel);
 
@@ -68,10 +85,7 @@ class CrudApi {
         );
       }
 
-      // check if table requires specific rules
-      // check if logged in user has a role that allows for table specific rule
-      // if not, throw ForbiddenError
-
+      // Returns the Result
       const rows = await this.app.getDAO().getAll(table.name);
       const event = {
         table,
@@ -79,6 +93,7 @@ class CrudApi {
         res,
       };
       this.app.onGetAllRows().trigger(event);
+
       if (event.res.finished) return null;
       res.status(200).json({
         table: {
@@ -90,7 +105,11 @@ class CrudApi {
     };
   }
 
-  // getOne route
+  /**
+   * Returns a handler function that
+   * Returns a specific row in a specific table.
+   * @returns {function}
+   */
   getOneHandler() {
     return async (req, res, next) => {
       const { table } = res.locals;
@@ -101,10 +120,14 @@ class CrudApi {
     };
   }
 
-  // createOne route
+  /**
+   * Returns a handler function that
+   * Creates a row in a specific table.
+   * @returns {function}
+   */
   createOneHandler() {
     return async (req, res, next) => {
-      //validate the schema and here before creating ???
+      // Need to Validate the Schema of the Request?
       const { table } = res.locals;
       const createdRow = await this.app
         .getDAO()
@@ -113,7 +136,11 @@ class CrudApi {
     };
   }
 
-  // updateOne route
+  /**
+   * Returns a function that
+   * Updates a specific row in a specific table.
+   * @returns {function}
+   */
   updateOneHandler() {
     return async (req, res, next) => {
       const { table } = res.locals;
@@ -125,7 +152,11 @@ class CrudApi {
     };
   }
 
-  // deleteOne route
+  /**
+   * Returns a function that
+   * Deletes a specific row in a specific table.
+   * @returns {function}
+   */
   deleteOneHandler() {
     return async (req, res, next) => {
       const { table } = res.locals;

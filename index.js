@@ -12,14 +12,15 @@ app.addRoute("GET", "/custom", (req, res, next) => {
 //   res.json({ custom: "elephant seals" });
 // });
 
-app.onGetAllRows("random-table", "todos").add((event) => {
-  // console.log("RUNNING EVENT 1");
-  // if (event.table === "random-test") event.res.status(200).send();
-});
+// Handler is Invoked on "GET_ALL_ROWS" Event
+// app.onGetAllRows("random-table", "todos").add((event) => {
+//   console.log("RUNNING EVENT 1");
+//   if (event.table === "random-test") event.res.status(200).send();
+// });
 
-app.onGetAllRows("todos").add((event) => {
-  // console.log("RUNNING EVENT 2");
-});
+// app.onGetAllRows("todos").add((event) => {
+//   console.log("RUNNING EVENT 2");
+// });
 
 // app.onGetOneRow().add();
 
