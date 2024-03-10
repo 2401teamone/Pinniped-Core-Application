@@ -9,8 +9,7 @@ class Table {
    * @param {object Table} oldTable
    * @param {object Table} newTable
    * @param {object HB} app
-   * Induces schema changes based on the comparison
-   * Between the old table and the new table.
+   * Induces schema changes based on the comparison between the old table and the new table.
    * It'll loop through the columns property, looking for whether
    * (Add Column) The column exists in the new table but not the old,
    * (Delete Column) The column doesn't exist in the new table but in the old,

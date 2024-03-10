@@ -2,12 +2,18 @@ import { Router } from "express";
 import { v4 as uuidv4 } from "uuid";
 
 import Table from "../models/table.js";
-import catchError from "../utils/catch_error.js";
-
 import loadTableContext from "./middleware/load_table_context.js";
 import adminOnly from "./middleware/admin_only.js";
+import catchError from "../utils/catch_error.js";
 import { BadRequestError } from "../utils/errors.js";
 
+/**
+ * Creates an Express Router object
+ * That sets middleware and handler functions for
+ * The designated schema routes.
+ * @param {object HB} app
+ * @returns {object Router} router
+ */
 export default function generateSchemaRouter(app) {
   const router = Router();
   const schemaApi = new SchemaApi(app);
@@ -22,11 +28,20 @@ export default function generateSchemaRouter(app) {
   return router;
 }
 
+/**
+ * SchemaApi Class
+ * Creates an object that contains the methods needed for schema changes.
+ */
 class SchemaApi {
   constructor(app) {
     this.app = app;
   }
 
+  /**
+   * Returns a function that grabs all the rows from 'tablemeta'.
+   * Each row in 'tablemeta' represents a table in the Sqlite3 database.
+   * @returns {function}
+   */
   getAllTablesHandler() {
     return async (req, res, next) => {
       const allTableMeta = await this.app.getDAO().getAll("tablemeta");
@@ -44,30 +59,28 @@ class SchemaApi {
   }
 
   /**
-   * Body:
-   * id
-   * name
-   * getAllRule; getOneRule; createOneRule; updateOneRule; deleteOneRule
-   * columns: [{id, name, type, required, unique, default, etc.}]
-   * type options = text; number; boolean; date; json; relation, etc.
+   * Returns a handler function that creates a table to the database.
+   * It adds the metadata of the new table to 'tablemeta',
+   * And creates the table within the Sqlite3 database using the DAO instance.
+   * @returns {function}
    */
   createTableHandler() {
     return async (req, res, next) => {
       const { name, columns } = req.body;
-
       const newTable = new Table({ name, columns });
-      newTable.generateId(); // Put this into the Table constructor //
+      // Sets a generated UUID as the ID for this newTable.
+      newTable.generateId();
 
-      // within transaction
+      // Transaction
       this.app.getDAO().runTransaction(async () => {
-        // add row to tablemeta
+        // Add Metadata to 'tablemeta'
         let newTableMetaData = await this.app.getDAO().addTableMetaData({
           id: newTable.id,
           name: newTable.name,
           columns: newTable.stringifyColumns(),
         });
 
-        // add table to sqlite
+        // Add Table to Sqlite3
         await this.app.getDAO().createTable(newTable);
         console.log(newTable);
         res.json(newTableMetaData);
@@ -75,50 +88,58 @@ class SchemaApi {
     };
   }
 
+  /**
+   * Returns a handler function that updates the table schema in the database.
+   * It searches for the specific row in 'tablemeta' that represents the table to be updated,
+   * And updates that row with the requested information.
+   * Then it updates that table's schema within the Sqlite database.
+   * @returns {function}
+   */
   updateTableHandler() {
     return async (req, res, next) => {
       const { name, columns } = req.body;
       const { id } = req.params;
 
-      let tableFromMeta = await this.app.getDAO().search("tablemeta", { id });
-
+      // Find the specific row (representing a table) in 'tablemeta'.
+      let tableFromMeta = await this.app.getDAO().findTableById(id);
       if (!tableFromMeta)
         throw new BadRequestError("Table not found in metadata table.");
 
-      console.log(tableFromMeta, "table from meta");
       tableFromMeta = tableFromMeta[0];
-
       tableFromMeta.columns = JSON.parse(tableFromMeta.columns);
+      console.log(tableFromMeta, "Table Found in tablemeta");
 
+      // Creates two table instances based on the existing table schema and newly requested table schema.
       const oldTable = new Table(tableFromMeta);
       const newTable = new Table({ id, name, columns });
-
-      if (oldTable.id !== newTable.id) {
+      if (oldTable.id !== newTable.id)
         throw new BadRequestError("Table ID cannot be changed.");
-      }
 
+      // Updates the schema in Sqlite3
       await Table.migrate(oldTable, newTable, this.app);
-
       res.json(newTable);
     };
   }
 
+  /**
+   * Returns a handler function that drops the specified table
+   * Based on the tableId passed in the request.
+   * The table is dropped from the Sqlite3 database,
+   * And the associated row in 'tablemeta' is dropped.
+   * @returns {function}
+   */
   dropTableHandler() {
     return async (req, res, next) => {
-      const { tableId } = req.params;
-      let tableFromMeta = await this.app
-        .getDAO()
-        .search("tablemeta", { id: tableId });
-      if (!tableFromMeta.length) {
-        throw new BadRequestError("Unable to find the table");
-      }
-
+      const { id } = req.params;
+      let tableFromMeta = await this.app.getDAO().findTableById(id);
+      if (!tableFromMeta.length)
+        throw new BadRequestError("Unable to find the table.");
       tableFromMeta = tableFromMeta[0];
 
       this.app.getDAO().runTransaction(async (trx) => {
         await this.app.getDAO().dropTable(tableFromMeta.name, trx);
-        await this.app.getDAO().deleteTableMetaData(tableId, trx);
-        res.status(204).json({ message: "Table dropped" });
+        await this.app.getDAO().deleteTableMetaData(id, trx);
+        res.status(204).json({ message: "Table Dropped" });
       });
     };
   }
