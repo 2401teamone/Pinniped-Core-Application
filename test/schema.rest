@@ -6,8 +6,12 @@ POST http://localhost:3000/api/schema
 content-type : application/json
 
 {
-  "name" : "ElephantSeals",
-  "columns" : [{"name":"size","type":"text"},{"name":"age","type":"number"}]
+  "name" : "Penguins",
+  "columns" : [
+    {"name":"size","type":"text", "options": {"maxLength": 10}},
+    {"name":"age","type":"number", "options": {"min": -5, "max": 5}},
+    {"name": "ElephantSealBrothers", "type": "relation", "options": {"tableId": "f197102a-2d7b-4c30-bcba-6c62108e9977"}}
+  ]
 }
 ### Adds a table
 
@@ -20,18 +24,47 @@ content-type : application/json
 }
 
 ### Adds a table
-PUT http://localhost:3000/api/schema/63f4718b-563b-4fee-9184-41e0914d5839
+PUT http://localhost:3000/api/schema/f582c24a-3ead-411e-b87e-baa50e8722a4
 content-type : application/json
 
 {
-  "id": "63f4718b-563b-4fee-9184-41e0914d5839",
-  "name" : "ElephantSeals",
-  "columns" : [
-      {"id":"a7c0c283-3013-4c1a-b0b0-b5576b03e0b0","name":"size","type":"text"}, 
-      {"id": "9fb888b1-3b19-4107-94c1-5b1afc46fe6d", "name": "age","type": "number", "options": {"min": -5, "max": 5}}, 
-      {"name":"newcolumn","type":"text"}
-    ]
+  "id": "f582c24a-3ead-411e-b87e-baa50e8722a4",
+  "name": "Penguins",
+  "columns": [
+    {
+      "id": "fc54c2d6-f5c9-4568-8676-0212381565d8",
+      "name": "size",
+      "type": "text",
+      "options": {
+        "maxLength": 10,
+        "minLength": 5
+      }
+    },
+    {
+      "id": "1a81443b-cc38-4d1c-bd9b-90a8e5c89fcf",
+      "name": "age",
+      "type": "number",
+      "options": {
+        "min": -5,
+        "max": 5
+      }
+    },
+    {
+      "id": "1e005e42-a300-4fff-9e5e-15914613d993",
+      "name": "ElephantSealBrothers",
+      "type": "relation",
+      "options": {
+        "tableId": "f197102a-2d7b-4c30-bcba-6c62108e9977"
+      }
+    }
+  ],
+  "getAllRule": "public",
+  "getOneRule": "public",
+  "createRule": "public",
+  "deleteRule": "public",
+  "updateRule": "public"
 }
+
 ### Update Column
 
 PUT http://localhost:3000/api/schema/b14f8abd-fc0e-4eb0-97bd-c57e65690c00

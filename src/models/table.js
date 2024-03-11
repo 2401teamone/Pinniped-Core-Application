@@ -68,6 +68,8 @@ class Table {
       throw new Error('All column names must be unique for a single table.');
     }
 
+    // ensure column options are valid
+
     Table.API_RULES.forEach((rule) => {
       if (!Table.API_RULE_VALUES.includes(newTable[rule])) {
         throw new Error(`Invalid ${rule}: ${newTable[rule]}`);
@@ -90,6 +92,28 @@ class Table {
         }
       }
       // no relationship
+      for (let column of newTable.getColumns()) {
+        if (column.type !== 'relation') {
+          continue;
+        }
+
+        let oldColumn = oldTable.getColumnById(column.id);
+        let oldColumnOptions = oldColumn.getOptions();
+        let newColumnOptions = column.getOptions();
+        if (oldColumn !== null) {
+          if (oldColumnOptions.tableId !== newColumnOptions.tableId) {
+            throw new Error('Table relation cannot be changed');
+          }
+        }
+
+        let relatedTable = await app
+          .getDAO()
+          .findTableById(newColumnOptions.tableId);
+        console.log('RELATED TABLE HERE', relatedTable);
+        if (!relatedTable.length) {
+          throw new Error('Table relation does not exist');
+        }
+      }
     }
   }
 
@@ -105,7 +129,7 @@ class Table {
    */
   static async migrate(oldTable, newTable, app) {
     console.log('MIGRATING');
-    console.log(oldTable, newTable);
+    // console.log(oldTable, newTable);
 
     const oldTableName = oldTable.name;
     const newTableName = newTable.name;
