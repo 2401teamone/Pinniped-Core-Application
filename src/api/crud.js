@@ -1,10 +1,11 @@
-import { Router } from "express";
-import loadTableContext from "./middleware/load_table_context.js";
-import catchError from "../utils/catch_error.js";
-import { BadRequestError, ForbiddenError } from "../utils/errors.js";
-import { v4 as uuidv4 } from "uuid";
+import { Router } from 'express';
+import loadTableContext from './middleware/load_table_context.js';
+import validateRecord from './middleware/validate_record.js';
+import catchError from '../utils/catch_error.js';
+import { BadRequestError, ForbiddenError } from '../utils/errors.js';
+import { v4 as uuidv4 } from 'uuid';
 
-const BASE = "/tables/:tableId/rows";
+const BASE = '/tables/:tableId/rows';
 const ACCESS_LEVEL = {
   admin: 3,
   user: 2,
@@ -31,6 +32,7 @@ export default function generateCrudRouter(app) {
   router.post(
     BASE,
     loadTableContext(app),
+    validateRecord(),
     catchError(crudApi.createOneHandler())
   );
   router.patch(
@@ -67,12 +69,12 @@ class CrudApi {
     return async (req, res, next) => {
       const { table } = res.locals;
       // JUST FOR TESTING
-      table.getAllRule = "public";
+      table.getAllRule = 'public';
 
       // User Access Level
-      const sessionAccessLevel = req.session.hasOwnProperty("user")
+      const sessionAccessLevel = req.session.hasOwnProperty('user')
         ? ACCESS_LEVEL[req.session.user.role]
-        : ACCESS_LEVEL["public"];
+        : ACCESS_LEVEL['public'];
 
       // Required Table Access Level
       const requiredAccessLevel = ACCESS_LEVEL[table.getAllRule];
@@ -129,6 +131,9 @@ class CrudApi {
     return async (req, res, next) => {
       // Need to Validate the Schema of the Request?
       const { table } = res.locals;
+
+      validateRecord(table, req.body);
+
       const createdRow = await this.app
         .getDAO()
         .createOne(table.name, { ...req.body, id: uuidv4() });

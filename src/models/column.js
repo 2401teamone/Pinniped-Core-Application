@@ -7,11 +7,10 @@ class TextOptions {
   }
 
   validate(value) {
-    return (
-      typeof value === 'string' &&
-      value.length >= this.minLength &&
-      value.length <= this.maxLength
-    );
+    if (typeof value !== 'string') return [false, 'Value must be a string.'];
+    if (value.length < this.minLength) return [false, 'Value is too short.'];
+    if (value.length > this.maxLength) return [false, 'Value is too long.'];
+    return [true, ''];
   }
 }
 
@@ -22,10 +21,10 @@ class NumberOptions {
   }
 
   validate(value) {
-    if (typeof value !== 'number') return false;
-    if (this.min && value < this.min) return false;
-    if (this.max && value > this.max) return false;
-    return true;
+    if (typeof value !== 'number') return [false, 'Value must be a number.'];
+    if (value < this.min) return [false, 'Value is too small.'];
+    if (value > this.max) return [false, 'Value is too large.'];
+    return [true, ''];
   }
 }
 

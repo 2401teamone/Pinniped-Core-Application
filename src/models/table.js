@@ -191,6 +191,16 @@ class Table {
     return foundColumn;
   }
 
+  getColumnByName(name) {
+    let foundColumn = this.columns.find((column) => column.name === name);
+    if (!foundColumn) return null;
+    return foundColumn;
+  }
+
+  hasColumn(name) {
+    return this.columns.some((column) => column.name === name);
+  }
+
   initializeIds() {
     this.columns.forEach((column) => column.initializeId());
   }
