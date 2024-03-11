@@ -1,5 +1,7 @@
 import Column from "./column.js";
 import { v4 as uuidv4 } from "uuid";
+import fs from "fs";
+import knex from "knex";
 
 class Table {
   static API_RULES = [
@@ -11,6 +13,80 @@ class Table {
   ];
   static API_RULE_VALUES = ["public", "user", "creator", "admin"];
   static DEFAULT_RULE = "public";
+
+  static async createTableMigration(table, app) {
+    let db = knex({
+      client: "better-sqlite3",
+      useNullAsDefault: true,
+      connection: {
+        filename: "hb.db",
+      },
+      debug: true,
+    });
+
+    await app.getDAO().getDB().destroy();
+
+    // Creates a migration file and returns the full filepath to the newly created
+    // Migration file
+    // const knex = app.getDAO().getDB();
+
+    //does not
+    let returnValue = await db.migrate.make(`create_${table.name}`);
+
+    await db.destroy();
+
+    console.log("Return value from Migrate Create: ", returnValue);
+
+    const migrateTemplate = `/**
+    * @param { import("knex").Knex } knex
+    * @returns { Promise<void> }
+    */
+
+    export function up(knex) {
+      return knex.schema.createTable("please", (table) => {
+        table.string("pleaseWork");
+      });
+    }
+    
+    /**
+     * @param { import("knex").Knex } knex
+     * @returns { Promise<void> }
+     */
+    export function down(knex) {
+      return knex.schema.dropTable("please");
+    }
+   `;
+
+    //this is working
+    fs.writeFileSync(returnValue, migrateTemplate);
+
+    // console.log("this is the knex.migrate: ", db.migrate);
+    // console.log("this is the knex.migrate.list: ", db.migrate.list.toString());
+    // console.log("knex log: ", knex);
+
+    // const list = await db.migrate.list();
+    // console.log(list);
+
+    // db = knex({
+    //   client: "better-sqlite3",
+    //   useNullAsDefault: true,
+    //   connection: {
+    //     filename: "hb.db",
+    //   },
+    //   debug: true,
+    // });
+
+    // console.log("migrations list: ", list);
+    // let result = await db.migrate.up();
+
+    // const afterList = await db.migrate.list();
+    // console.log("migractions after: ", afterList);
+    // console.log("migrations list after migrate: ", await db.migrate.list());
+    // console.log(await db.migrate.currentVersion());
+    // console.log(result);
+
+    // await db.destroy(); // MUST CLOSE CONNECTION AFTER RUNNING MIGRATIONS OR SOCKET WILL HANG
+  }
 
   /**
    * Validates the object, newTable, to ensure it meets the requirements

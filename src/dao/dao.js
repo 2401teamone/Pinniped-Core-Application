@@ -23,6 +23,9 @@ class DAO {
       connection: {
         filename: "hb.db",
       },
+      // pool: {
+      //   min: 0,
+      // },
     });
   }
 
@@ -144,6 +147,7 @@ class DAO {
    * @returns {object[]} newRow
    */
   async createOne(tableName, newRow) {
+    console.log(newRow);
     try {
       const createdRow = await this.getDB()(tableName)
         .returning("*")

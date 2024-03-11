@@ -68,29 +68,31 @@ class SchemaApi {
   createTableHandler() {
     return async (req, res, next) => {
       const newTable = new Table(req.body);
-      Table.validateMigration(null, newTable, this.app);
+      await Table.validateMigration(null, newTable, this.app);
 
-      this.app.getDAO().runTransaction(async (trx) => {
-        // Add Metadata to 'tablemeta'
-        let newTableMetaData = await this.app.getDAO().addTableMetaData(
-          {
-            id: newTable.id,
-            name: newTable.name,
-            columns: newTable.stringifyColumns(),
-            getAllRule: newTable.getAllRule,
-            getOneRule: newTable.getOneRule,
-            createRule: newTable.createRule,
-            updateRule: newTable.updateRule,
-            deleteRule: newTable.deleteRule,
-          },
-          trx
-        );
+      await Table.createTableMigration(newTable, this.app);
 
-        // Add Table to Sqlite3
-        await this.app.getDAO().createTable(newTable, trx);
-        console.log(newTable);
-        res.json(newTable);
-      });
+      // this.app.getDAO().runTransaction(async (trx) => { // Add Metadata to 'tablemeta'
+      //   let newTableMetaData = await this.app.getDAO().addTableMetaData(
+      //     {
+      //       id: newTable.id,
+      //       name: newTable.name,
+      //       columns: newTable.stringifyColumns(),
+      //       getAllRule: newTable.getAllRule,
+      //       getOneRule: newTable.getOneRule,
+      //       createRule: newTable.createRule,
+      //       updateRule: newTable.updateRule,
+      //       deleteRule: newTable.deleteRule,
+      //     },
+      //     trx
+      //   );
+
+      //   // Add Table to Sqlite3
+      //   await this.app.getDAO().createTable(newTable, trx);
+      //   console.log(newTable);
+      //   res.json(newTable);
+      // });
+      res.status(200).json({ message: "test" });
     };
   }
 

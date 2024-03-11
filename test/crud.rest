@@ -9,7 +9,7 @@ POST http://localhost:3000/api/tables/7e637ce9-68cb-4dec-a7b1-81bb5fe13b6e/rows
 content-type: application/json
 
 {
-  "size": "Extra big", "sex" : "Male"
+  "size": "Extra big", "gender" : "Male"
 }
 ###
 
