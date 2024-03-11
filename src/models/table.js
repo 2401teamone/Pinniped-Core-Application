@@ -75,12 +75,20 @@ class Table {
     });
 
     if (oldTable !== null) {
+      console.log('checking against oldTable');
       if (oldTable.id !== newTable.id) {
         throw new Error('Table ID cannot be changed.');
       }
-      console.log('checking against oldTable');
       // no column type changes
-
+      for (let column of newTable.columns) {
+        let oldColumn = oldTable.getColumnById(column.id);
+        if (oldColumn === null) continue;
+        if (oldColumn.type !== column.type) {
+          throw new Error(
+            `Column type cannot be changed: ${oldColumn.name} from ${oldColumn.type} to ${column.type}`
+          );
+        }
+      }
       // no relationship
     }
   }
