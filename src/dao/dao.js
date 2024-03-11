@@ -1,55 +1,75 @@
-import knex from 'knex';
-import { DatabaseError, BadRequestError } from '../utils/errors.js';
+import knex from "knex";
+import { DatabaseError, BadRequestError } from "../utils/errors.js";
 
+/**
+ * DAO (Data Access Object) Class
+ * Interacts with Sqlite3 Database through the interface of Knex.
+ */
 class DAO {
   constructor(dbFile) {
     this.db = this._connect(dbFile);
   }
 
   /**
-   * _connect
-   * @param {string} dbFile
-   * @returns {Knex Connection}
    * Connects to the Better-Sqlite3 Database with Knex.
-   * Allows for queries to be chained to the returned Knex connection.
+   * Allows for queries to be chained to the returned Knex instance.
+   * @param {string} dbFile
+   * @returns {Knex Instance}
    */
   _connect(dbFile) {
     return knex({
-      client: 'better-sqlite3',
+      client: "better-sqlite3",
       useNullAsDefault: true,
       connection: {
-        filename: 'hb.db',
+        filename: "hb.db",
       },
     });
   }
 
   disconnect() {}
 
+  /**
+   * Obtains the Knex instance that connected to the database.
+   * If the transaction connection to the database exists,
+   * But the transaction is not completed: return this.trxDB.
+   * If the transaction connection doesn't exist,
+   * Or the transaction is completed: return this.DB.
+   * @returns {object Transaction} Knex Instance - this.db || this.trxDB
+   */
   getDB() {
     return this.db;
   }
 
   /**
-   * runTransaction
+   * Creates a transaction and invokes the callback given.
+   * If the callback is successful, it commits the transaction.
+   * Otherwise, it'll rollback the transaction.
    * @param {function} callback
-   * @return {} result
-   *
+   * @return {undefined} result
    */
   async runTransaction(callback) {
     const trx = await this.getDB().transaction();
     try {
-      const result = await callback(trx);
+      const result = await callback();
       await trx.commit();
       return result;
     } catch (e) {
       await trx.rollback();
-      throw new Error(e.message);
+      throw new Error(e);
     }
   }
 
-  async findTableByName(name) {
+  /**
+   * Searches the table 'tablemeta' and filters based on the name parameter.
+   * Receives an instance of Table if found.
+   * @param {string} tableName
+   * @returns {object Table} table
+   */
+  async findTableByName(tableName) {
     try {
-      const table = await this.getDB()('tablemeta').select('*').where({ name });
+      const table = await this.getDB()("tablemeta")
+        .select("*")
+        .where({ tableName });
       return table;
     } catch (e) {
       throw new Error(e.message);
@@ -57,50 +77,81 @@ class DAO {
   }
 
   /**
-   * Search
-   * @param {string} table
-   * @param {string} fields
-   * @returns {object[]} rows
-   * Searches within a table with the given parameter in the database,
-   * With the additional parameter, fields, to search for specific rows filtered by specific columns.
+   * Searches the table 'tablemeta' and filters based on the ID parameter.
+   * @param {string} id
+   * @returns {object Table} table
    */
-  async search(table, fields) {
+  async findTableById(id) {
     try {
-      console.log(table, fields, 'SEARCHING');
-      const rows = await this.getDB()(table).select('*').where(fields);
+      const table = await this.getDB()("tablemeta").select("*").where({ id });
+      return table;
+    } catch (e) {
+      throw new Error(e.message);
+    }
+  }
+
+  /**
+   * With the additional parameter, fields, to search for specific rows filtered by specific columns.
+   * Searches within a table with the given parameter in the database,
+   * @param {string} tableName
+   * @param {object} fields
+   * @returns {object[]} rows
+   */
+  async search(tableName, fields) {
+    try {
+      console.log(tableName, fields, "SEARCHING");
+      const rows = await this.getDB()(tableName).select("*").where(fields);
       return rows;
     } catch (e) {
       throw new Error(e.message);
     }
   }
 
-  async getAll(table) {
+  /**
+   * Returns all the rows from the specific queried table.
+   * @param {string} tableName
+   * @returns {object[]} rows
+   */
+  async getAll(tableName) {
     try {
-      const rows = await this.getDB()(table).select('*');
+      const rows = await this.getDB()(tableName).select("*");
       return rows;
     } catch (e) {
       throw new Error(e.message);
     }
   }
 
-  async getOne(table, id) {
+  /**
+   * Receives a single row based on the rowId passed, in the table, tableName.
+   * @param {string} tableName
+   * @param {string} rowId
+   * @returns {object[]} row
+   */
+  async getOne(tableName, rowId) {
     try {
-      const row = await this.getDB()(table).select('*').where({ id });
+      const row = await this.getDB()(tableName)
+        .select("*")
+        .where({ id: rowId });
       return row;
     } catch (e) {
       throw new Error(e.message);
     }
   }
 
-  async createOne(table, newRow) {
+  /**
+   * Creates a new row in the specified table and returns the new row.
+   * @param {string} tableName
+   * @returns {object[]} newRow
+   */
+  async createOne(tableName, newRow) {
     try {
-      console.log(table, newRow);
-      const createdRow = await this.getDB()(table.name)
-        .returning('*')
+      const createdRow = await this.getDB()(tableName)
+        .returning("*")
         .insert(newRow);
       return createdRow;
     } catch (e) {
-      if (e.message.slice(0, 11) === 'insert into') {
+      console.log(e);
+      if (e.message.slice(0, 11) === "insert into") {
         throw new BadRequestError();
       } else {
         throw new Error(e.message);
@@ -108,11 +159,20 @@ class DAO {
     }
   }
 
-  async updateOne(table, id, newRow) {
+  /**
+   * Finds the row in tableName based on the rowId,
+   * And updates that row based on the properties of newRow.
+   * Returns updatedRow.
+   * @param {string} tableName
+   * @param {string} rowId
+   * @param {object} newRow
+   * @returns {object} updatedRow
+   */
+  async updateOne(tableName, rowId, newRow) {
     try {
-      const updatedRow = await this.getDB()(table.name)
-        .returning('*')
-        .where({ id })
+      const updatedRow = await this.getDB()(tableName)
+        .returning("*")
+        .where({ id: rowId })
         .update(newRow);
       return updatedRow;
     } catch (e) {
@@ -120,53 +180,68 @@ class DAO {
     }
   }
 
-  async deleteOne(table, id) {
+  /**
+   * Deletes the row in tableName based on rowId.
+   * @param {string} tableName
+   * @param {string} rowId
+   */
+  async deleteOne(tableName, rowId) {
     try {
-      await this.getDB()(table).where({ id }).del();
+      await this.getDB()(tableName).where({ id: rowId }).del();
     } catch (e) {
       throw new Error(e.message);
     }
   }
 
   /**
-   * addTableMetaData
-   * @param {string} table
-   * @param {object Transaction} trx
-   * @return {object} createdRow
    * A modified version of createOne, but inserts an object
    * Specifically into 'tablemeta'.
+   * @param {id: string, name: string, columns: 'stringJSON'} tableData
+   * @return {object} createdRow
    */
-  async addTableMetaData(table, trx) {
-    const createdRow = await this.getDB()('tablemeta')
-      .returning('*')
-      .insert({
-        id: table.id,
-        name: table.name,
-        columns: JSON.stringify(table.getColumns()),
-      })
+  async addTableMetaData(tableData, trx) {
+    const createdRow = await this.getDB()("tablemeta")
+      .returning("*")
+      .insert(tableData)
       .transacting(trx);
     return createdRow;
   }
 
-  async updateTableMetaData(table, trx) {
-    const { id, columns, ...updatePayload } = table;
-
-    const updatedRow = await this.getDB()('tablemeta')
-      .returning('*')
-      .where({ id })
-      .update({
-        columns: JSON.stringify(columns),
-        ...updatePayload,
-      })
+  /**
+   * Updates the row in 'tablemeta' with the properties contained within tableData.
+   * @param {id: string, name: string, columns: stringJSON} tableData
+   * @param {object Transaction} trx
+   * @return {object} updatedRow
+   */
+  async updateTableMetaData(tableData, trx) {
+    const updatedRow = await this.getDB()("tablemeta")
+      .returning("*")
+      .where({ id: tableData.id })
+      .update(tableData)
       .transacting(trx);
-
     return updatedRow;
   }
 
-  async deleteTableMetaData(name, trx) {
-    await this.getDB()('tablemeta').where({ name }).del().transacting(trx);
+  /**
+   * Deletes a row from the `tablemeta` table
+   * Specifically into 'tablemeta'.
+   * @param {string} tableId
+   * @param {object Transaction} trx
+   */
+  async deleteTableMetaData(tableId, trx) {
+    await this.getDB()("tablemeta")
+      .where({ id: tableId })
+      .del()
+      .transacting(trx);
   }
 
+  /**
+   * Creates a table within the database,
+   * Then adds the columns to modify the table's structure.
+   * @param {object Table} table
+   * @param {object Transaction} trx
+   * @returns {Promise <undefined>}
+   */
   async createTable(table, trx) {
     const name = table.name;
     const columns = table.getColumns();
@@ -179,19 +254,40 @@ class DAO {
           }
           table[column.type](column.name);
         });
-        table.text('id').primary();
+
+        table.specificType(
+          "id",
+          "TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL"
+        );
       })
       .transacting(trx);
   }
 
-  async dropTable(name, trx) {
-    await this.getDB().schema.dropTable(name).transacting(trx);
+  /**
+   * Drops the specified table from the database.
+   * @param {string} tableName
+   * @param {object Transaction} trx
+   */
+  async dropTable(tableName, trx) {
+    await this.getDB().schema.dropTable(tableName).transacting(trx);
   }
 
-  async renameTable(name, newName, trx) {
-    await this.getDB().schema.renameTable(name, newName).transacting(trx);
+  /**
+   * Renames the current table, tableName, with newName.
+   * @param {string} tableName
+   * @param {string} newName
+   * @param {object Transaction} trx
+   */
+  async renameTable(tableName, newName, trx) {
+    await this.getDB().schema.renameTable(tableName, newName).transacting(trx);
   }
 
+  /**
+   * Adds the column to the specified table.
+   * @param {string} tableName
+   * @param {object Column} column
+   * @param {object Transaction} trx
+   */
   async addColumn(tableName, column, trx) {
     await this.getDB()
       .schema.table(tableName, (table) => {
@@ -200,6 +296,13 @@ class DAO {
       .transacting(trx);
   }
 
+  /**
+   * Renames a specific column with newName in table, tableName.
+   * @param {string} tableName
+   * @param {string} name
+   * @param {string} newName
+   * @param {object Transaction} trx
+   */
   async renameColumn(tableName, name, newName, trx) {
     await this.getDB()
       .schema.table(tableName, (table) => {
@@ -208,10 +311,16 @@ class DAO {
       .transacting(trx);
   }
 
+  /**
+   * Drops the column, columnName, in tableName.
+   * @param {string} tableName
+   * @param {string} columnName
+   * @param {object Transaction} trx
+   */
   async dropColumn(tableName, columnName, trx) {
     await this.getDB()
       .schema.table(tableName, (table) => {
-        console.log('DROPPING COLUMN', columnName, ' on', tableName);
+        console.log("DROPPING COLUMN", columnName, " on", tableName);
         table.dropColumn(columnName);
       })
       .transacting(trx);

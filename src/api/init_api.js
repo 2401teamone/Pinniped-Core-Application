@@ -20,7 +20,6 @@ function initApi(app) {
   const server = express();
   server.use(express.json());
   server.use(cors());
-
   server.use(
     session({
       store: new SqliteStore({
@@ -59,7 +58,7 @@ function initApi(app) {
     res.send("Page does not exist");
   });
 
-  //Catch All Error Handler
+  // Catch All Error Handler
   server.use(errorHandler);
 
   return server;

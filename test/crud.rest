@@ -1,41 +1,34 @@
 
-GET http://localhost:3000/api/tables/ElephantSeals 
-### getAll From users 
+GET http://localhost:3000/api/tables/7e637ce9-68cb-4dec-a7b1-81bb5fe13b6e/rows
+### getAll From ElephantSeals
 
-GET http://localhost:3000/api/tables/todos/3
-### getOne From todos
+GET http://localhost:3000/api/tables/7e637ce9-68cb-4dec-a7b1-81bb5fe13b6e/rows/raa1d2181831f98
+### getOne From ElephantSeals
 
-POST http://localhost:3000/api/tables/ElephantSeals
+POST http://localhost:3000/api/tables/7e637ce9-68cb-4dec-a7b1-81bb5fe13b6e/rows
 content-type: application/json
 
 {
-  "size": "Extra big", "gender" : "Male"
+  "size": "Extra big", "sex" : "Male"
 }
 ###
 
-POST http://localhost:3000/api/tables/ElephantSeals
+POST http://localhost:3000/api/tables/7e637ce9-68cb-4dec-a7b1-81bb5fe13b6e/rows
 content-type: application/json
 
 {
-  "size": "Small", "gender" : "Female"
+  "size": "Medium", "sex" : "Undefined"
 }
 ###
 
-POST http://localhost:3000/api/tables/todos
+PATCH http://localhost:3000/api/tables/7e637ce9-68cb-4dec-a7b1-81bb5fe13b6e/rows/9f2d83cd-4cdd-408b-b714-8e4d6881a48f
 content-type: application/json
 
 {
-  "description": "This won't work..."
+  "size": "massive"
 }
 ###
-PATCH http://localhost:3000/api/tables/todos/5
-content-type: application/json
-
-{
-  "todo": "updated todo 5!"
-}
-###
-DELETE http://localhost:3000/api/tables/todos/5
+DELETE http://localhost:3000/api/tables/7e637ce9-68cb-4dec-a7b1-81bb5fe13b6e/rows/9f2d83cd-4cdd-408b-b714-8e4d6881a48f
 ### deleteOne From todos
 
 GET http://localhost:3000/custom
