@@ -1,5 +1,6 @@
 import { Router } from "express";
 import loadTableContext from "./middleware/load_table_context.js";
+import apiRules from "./middleware/api_rules.js";
 import catchError from "../utils/catch_error.js";
 import { BadRequestError, ForbiddenError } from "../utils/errors.js";
 import { v4 as uuidv4 } from "uuid";
@@ -22,25 +23,35 @@ export default function generateCrudRouter(app) {
   const router = Router();
   const crudApi = new CrudApi(app);
 
-  router.get(BASE, loadTableContext(app), catchError(crudApi.getAllHandler()));
+  router.get(
+    BASE,
+    loadTableContext(app),
+    apiRules(app),
+    catchError(crudApi.getAllHandler())
+  );
+
   router.get(
     `${BASE}/:rowId`,
     loadTableContext(app),
+    apiRules(app),
     catchError(crudApi.getOneHandler())
   );
   router.post(
     BASE,
     loadTableContext(app),
+    apiRules(app),
     catchError(crudApi.createOneHandler())
   );
   router.patch(
     `${BASE}/:rowId`,
     loadTableContext(app),
+    apiRules(app),
     catchError(crudApi.updateOneHandler())
   );
   router.delete(
     `${BASE}/:rowId`,
     loadTableContext(app),
+    apiRules(app),
     catchError(crudApi.deleteOneHandler())
   );
 
@@ -66,24 +77,6 @@ class CrudApi {
   getAllHandler() {
     return async (req, res, next) => {
       const { table } = res.locals;
-      // JUST FOR TESTING
-      table.getAllRule = "public";
-
-      // User Access Level
-      const sessionAccessLevel = req.session.hasOwnProperty("user")
-        ? ACCESS_LEVEL[req.session.user.role]
-        : ACCESS_LEVEL["public"];
-
-      // Required Table Access Level
-      const requiredAccessLevel = ACCESS_LEVEL[table.getAllRule];
-      // console.log(sessionAccessLevel, requiredAccessLevel);
-
-      // If the user doesn't have the appropriate access level, boot them.
-      if (requiredAccessLevel > sessionAccessLevel) {
-        throw new ForbiddenError(
-          "You don't have the appropriate access for this table."
-        );
-      }
 
       // Returns the Result
       const rows = await this.app.getDAO().getAll(table.name);

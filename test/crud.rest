@@ -9,7 +9,7 @@ POST http://localhost:3000/api/tables/7e637ce9-68cb-4dec-a7b1-81bb5fe13b6e/rows
 content-type: application/json
 
 {
-  "size": "Extra big", "sex" : "Male"
+  "size": "tiny", "gender" : "gurl"
 }
 ###
 
@@ -17,18 +17,18 @@ POST http://localhost:3000/api/tables/7e637ce9-68cb-4dec-a7b1-81bb5fe13b6e/rows
 content-type: application/json
 
 {
-  "size": "Medium", "sex" : "Undefined"
+  "size": "Medium", "gender" : "unknown"
 }
 ###
 
-PATCH http://localhost:3000/api/tables/7e637ce9-68cb-4dec-a7b1-81bb5fe13b6e/rows/9f2d83cd-4cdd-408b-b714-8e4d6881a48f
+PATCH http://localhost:3000/api/tables/7e637ce9-68cb-4dec-a7b1-81bb5fe13b6e/rows/acc8e899-49f5-46a0-a6ce-e825cc3174aa
 content-type: application/json
 
 {
-  "size": "massive"
+  "size": "Bulbous"
 }
 ###
-DELETE http://localhost:3000/api/tables/7e637ce9-68cb-4dec-a7b1-81bb5fe13b6e/rows/9f2d83cd-4cdd-408b-b714-8e4d6881a48f
+DELETE http://localhost:3000/api/tables/7e637ce9-68cb-4dec-a7b1-81bb5fe13b6e/rows/acc8e899-49f5-46a0-a6ce-e825cc3174aa
 ### deleteOne From todos
 
 GET http://localhost:3000/custom

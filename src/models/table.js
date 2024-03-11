@@ -1,6 +1,8 @@
 import Column from "./column.js";
 import { v4 as uuidv4 } from "uuid";
 
+RULES = ["admin", "creator", "user", "public"];
+
 const DEFAULT_RULE = "public";
 
 class Table {

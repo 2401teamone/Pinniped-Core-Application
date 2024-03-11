@@ -18,7 +18,7 @@ content-type : application/json
   "columns" : [{"name":"species","type":"text"},{"name":"age","type":"text"}]
 }
 
-### Adds a table
+### Adds a table with userId foreign key
 
 PUT http://localhost:3000/api/schema/7e637ce9-68cb-4dec-a7b1-81bb5fe13b6e
 content-type : application/json

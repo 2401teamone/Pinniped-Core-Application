@@ -58,6 +58,17 @@ export class ForbiddenError extends AppError {
   }
 }
 
+export class UnauthenticatedError extends AppError {
+  constructor(message = "Unauthenticated user") {
+    super(
+      message,
+      401,
+      "UNAUTHENTICATED_USER",
+      "You need to be logged in to access this resource."
+    );
+  }
+}
+
 export class ValidationError extends AppError {
   constructor(table) {
     super(
