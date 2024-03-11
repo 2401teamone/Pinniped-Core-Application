@@ -109,7 +109,6 @@ class Table {
         let relatedTable = await app
           .getDAO()
           .findTableById(newColumnOptions.tableId);
-        console.log('RELATED TABLE HERE', relatedTable);
         if (!relatedTable.length) {
           throw new Error('Table relation does not exist');
         }

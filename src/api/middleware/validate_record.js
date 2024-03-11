@@ -8,7 +8,8 @@ function validateRecord() {
       let [isValid, errorMessage] = column.options.validate(req.body[key]);
       if (!isValid) throw new Error(errorMessage);
     }
-    res.end();
+
+    next();
   };
 }
 
