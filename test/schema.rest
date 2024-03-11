@@ -7,7 +7,7 @@ content-type : application/json
 
 {
   "name" : "ElephantSeals",
-  "columns" : [{"name":"size","type":"text"},{"name":"sex","type":"text"}]
+  "columns" : [{"name":"size","type":"text"},{"name":"age","type":"number"}]
 }
 ### Adds a table
 
@@ -20,13 +20,17 @@ content-type : application/json
 }
 
 ### Adds a table
-PUT http://localhost:3000/api/schema
+PUT http://localhost:3000/api/schema/63f4718b-563b-4fee-9184-41e0914d5839
 content-type : application/json
 
 {
-  "id": "2",
-  "name" : "Penguins",
-  "columns" : [{"name":"bigness","type":"text"}]
+  "id": "63f4718b-563b-4fee-9184-41e0914d5839",
+  "name" : "ElephantSeals",
+  "columns" : [
+      {"id":"a7c0c283-3013-4c1a-b0b0-b5576b03e0b0","name":"size","type":"text"}, 
+      {"id": "9fb888b1-3b19-4107-94c1-5b1afc46fe6d", "name": "age","type": "number", "options": {"min": -5, "max": 5}}, 
+      {"name":"newcolumn","type":"text"}
+    ]
 }
 ### Update Column
 
