@@ -1,16 +1,16 @@
-import Column from "./column.js";
-import { v4 as uuidv4 } from "uuid";
+import Column from './column.js';
+import { v4 as uuidv4 } from 'uuid';
 
 class Table {
   static API_RULES = [
-    "getAllRule",
-    "getOneRule",
-    "createRule",
-    "updateRule",
-    "deleteRule",
+    'getAllRule',
+    'getOneRule',
+    'createRule',
+    'updateRule',
+    'deleteRule',
   ];
-  static API_RULE_VALUES = ["public", "user", "creator", "admin"];
-  static DEFAULT_RULE = "public";
+  static API_RULE_VALUES = ['public', 'user', 'creator', 'admin'];
+  static DEFAULT_RULE = 'public';
 
   /**
    * Validates the object, newTable, to ensure it meets the requirements
@@ -22,26 +22,26 @@ class Table {
   static async validateMigration(oldTable, newTable, app) {
     if (!newTable.id) throw new Error("The table doesn't have a valid ID.");
     // Validate ID shape
-    if (!newTable.name) throw new Error("The table must have a name.");
+    if (!newTable.name) throw new Error('The table must have a name.');
 
     if (!oldTable) {
       const existingTable = await app.getDAO().findTableByName(newTable.name);
       if (existingTable.length) {
-        throw new Error("The table name already exists.");
+        throw new Error('The table name already exists.');
       }
     }
 
     if (newTable.columns.length === 0) {
-      throw new Error("The table must have at least one column.");
+      throw new Error('The table must have at least one column.');
     }
     if (!newTable.columns.every((column) => column.id)) {
-      throw new Error("Columns must have IDs.");
+      throw new Error('Columns must have IDs.');
     }
     if (!newTable.columns.every((column) => column.name)) {
-      throw new Error("All columns must have names.");
+      throw new Error('All columns must have names.');
     }
     if (!newTable.columns.every((column) => column.type)) {
-      throw new Error("All columns must have types.");
+      throw new Error('All columns must have types.');
     }
     if (!newTable.columns.every((column) => Column.isValidType(column.type))) {
       throw new Error(
@@ -52,20 +52,20 @@ class Table {
     if (
       newTable.columns.some(
         (column) =>
-          column.name === "id" ||
-          column.name === "created_at" ||
-          column.name === "updated_at"
+          column.name === 'id' ||
+          column.name === 'created_at' ||
+          column.name === 'updated_at'
       )
     ) {
       throw new Error(
-        "Cannot add a column with a name of id, created_at, or updated_at"
+        'Cannot add a column with a name of id, created_at, or updated_at'
       );
     }
 
     let colNames = newTable.columns.map((column) => column.name);
     let setNames = new Set(colNames);
     if (colNames.length !== setNames.size) {
-      throw new Error("All column names must be unique for a single table.");
+      throw new Error('All column names must be unique for a single table.');
     }
 
     Table.API_RULES.forEach((rule) => {
@@ -76,9 +76,9 @@ class Table {
 
     if (oldTable !== null) {
       if (oldTable.id !== newTable.id) {
-        throw new Error("Table ID cannot be changed.");
+        throw new Error('Table ID cannot be changed.');
       }
-      console.log("checking against oldTable");
+      console.log('checking against oldTable');
       // no column type changes
 
       // no relationship
@@ -96,7 +96,7 @@ class Table {
    * @param {object HB} app
    */
   static async migrate(oldTable, newTable, app) {
-    console.log("MIGRATING");
+    console.log('MIGRATING');
     console.log(oldTable, newTable);
 
     const oldTableName = oldTable.name;
@@ -142,7 +142,7 @@ class Table {
 
   constructor({
     id = uuidv4(),
-    name = "",
+    name = '',
     columns = [],
     getAllRule = Table.DEFAULT_RULE,
     getOneRule = Table.DEFAULT_RULE,
@@ -153,7 +153,7 @@ class Table {
     this.id = id;
     this.name = name;
 
-    if (typeof columns === "string") {
+    if (typeof columns === 'string') {
       columns = JSON.parse(columns);
     }
     this.columns = columns.map((column) => new Column({ ...column }));
