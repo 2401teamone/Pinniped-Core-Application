@@ -50,7 +50,7 @@ class DAO {
   async runTransaction(callback) {
     const trx = await this.getDB().transaction();
     try {
-      const result = await callback();
+      const result = await callback(trx);
       await trx.commit();
       return result;
     } catch (e) {
