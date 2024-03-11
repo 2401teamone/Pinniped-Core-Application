@@ -69,7 +69,7 @@ class DAO {
     try {
       const table = await this.getDB()("tablemeta")
         .select("*")
-        .where({ tableName });
+        .where({ name: tableName });
       return table;
     } catch (e) {
       throw new Error(e.message);
@@ -160,6 +160,27 @@ class DAO {
   }
 
   /**
+   * Inserts the inputted newRow into the table, tableName.
+   * If the row already exists, then it updates it instead with the updated properties in newRow.
+   * @param {string} tableName
+   * @param {object} newRow
+   * @param {object Transaction} trx
+   */
+  async upsertOne(tableName, newRow, trx) {
+    try {
+      const upsertedRow = await this.getDB()(tableName)
+        .returning("*")
+        .insert(newRow)
+        .onConflict("id")
+        .merge()
+        .transacting(trx);
+      return upsertedRow;
+    } catch (e) {
+      throw new Error(e.message);
+    }
+  }
+
+  /**
    * Finds the row in tableName based on the rowId,
    * And updates that row based on the properties of newRow.
    * Returns updatedRow.
@@ -191,6 +212,17 @@ class DAO {
     } catch (e) {
       throw new Error(e.message);
     }
+  }
+
+  /**
+   * A modified version of createOne, but inserts an object
+   * Specifically into 'tablemeta'.
+   * @param {id: string, name: string, columns: 'stringJSON'} tableData
+   * @return {object} createdRow
+   */
+  async upsertTableMetaData(tableData, trx) {
+    const upsertedRow = this.upsertOne("tablemeta", tableData, trx);
+    return upsertedRow;
   }
 
   /**
@@ -269,6 +301,7 @@ class DAO {
    * @param {object Transaction} trx
    */
   async dropTable(tableName, trx) {
+    console.log(`Dropping table ${tableName}`);
     await this.getDB().schema.dropTable(tableName).transacting(trx);
   }
 
@@ -279,6 +312,7 @@ class DAO {
    * @param {object Transaction} trx
    */
   async renameTable(tableName, newName, trx) {
+    console.log(`Renaming ${tableName} to ${newName}`);
     await this.getDB().schema.renameTable(tableName, newName).transacting(trx);
   }
 
@@ -291,6 +325,7 @@ class DAO {
   async addColumn(tableName, column, trx) {
     await this.getDB()
       .schema.table(tableName, (table) => {
+        console.log(`Adding column ${column} to ${tableName}`);
         table[column.type](column.name);
       })
       .transacting(trx);
@@ -306,6 +341,7 @@ class DAO {
   async renameColumn(tableName, name, newName, trx) {
     await this.getDB()
       .schema.table(tableName, (table) => {
+        console.log(`Renaming ${tableName}'s column ${name} to ${newName}`);
         table.renameColumn(name, newName);
       })
       .transacting(trx);
