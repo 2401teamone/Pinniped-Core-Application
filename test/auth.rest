@@ -19,6 +19,24 @@ content-type : application/json
 }
 ### Login as user
 
+POST http://localhost:3000/api/auth/register
+content-type : application/json
+
+{
+  "username": "user3",
+  "password": "password3"
+}
+### Creates user 3
+
+POST http://localhost:3000/api/auth/login
+content-type : application/json
+
+{
+  "username": "user3",
+  "password": "password3"
+}
+### Login as user
+
 POST http://localhost:3000/api/auth/logout
 ### Attempts to logout of current user
 

@@ -48,12 +48,12 @@ export class BadRequestError extends AppError {
 }
 
 export class ForbiddenError extends AppError {
-  constructor(message = "Admin privilege is required") {
+  constructor(message = "Access Denied") {
     super(
       message,
       403,
-      "ADMIN_REQUIRED",
-      "You don't have admin privileges to access this resource."
+      "FORBIDDEN",
+      "You don't have authorization to access this resource."
     );
   }
 }

@@ -2,7 +2,7 @@ import catchError from "../../utils/catch_error.js";
 import { ForbiddenError, UnauthenticatedError } from "../../utils/errors.js";
 
 const ACCESS_LEVEL = {
-  admin: 4,
+  admin: 3,
   creator: 2,
   user: 2,
   public: 1, // unauthenticated

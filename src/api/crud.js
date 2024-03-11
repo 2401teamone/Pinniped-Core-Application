@@ -6,11 +6,6 @@ import { BadRequestError, ForbiddenError } from "../utils/errors.js";
 import { v4 as uuidv4 } from "uuid";
 
 const BASE = "/tables/:tableId/rows";
-const ACCESS_LEVEL = {
-  admin: 3,
-  user: 2,
-  public: 1,
-};
 
 /**
  * Creates an Express Router object
@@ -109,6 +104,18 @@ class CrudApi {
       const { rowId } = req.params;
       const row = await this.app.getDAO().getOne(table.name, rowId);
       if (!row.length) throw new BadRequestError();
+
+      //TESTING
+      table.getOneRule = "creator";
+
+      // Row level access control
+      if (
+        table.getOneRule === "creator" &&
+        row[0].userId != req.session.user.id
+      ) {
+        throw new ForbiddenError();
+      }
+
       res.status(200).json({ row });
     };
   }
