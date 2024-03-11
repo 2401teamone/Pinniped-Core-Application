@@ -44,7 +44,8 @@ class SchemaApi {
    */
   getAllTablesHandler() {
     return async (req, res, next) => {
-      const allTableMeta = await this.app.getDAO().getAll("tablemeta");
+      let allTableMeta = await this.app.getDAO().getAll("tablemeta");
+      allTableMeta = allTableMeta.map((table) => new Table(table));
       console.log(allTableMeta);
       res.json(allTableMeta);
     };
@@ -66,12 +67,9 @@ class SchemaApi {
    */
   createTableHandler() {
     return async (req, res, next) => {
-      const { name, columns } = req.body;
-      const newTable = new Table({ name, columns });
-      // Sets a generated UUID as the ID for this newTable.
-      newTable.generateId();
+      const newTable = new Table(req.body);
+      Table.validateMigration(null, newTable, this.app);
 
-      // Transaction
       this.app.getDAO().runTransaction(async (trx) => {
         // Add Metadata to 'tablemeta'
         let newTableMetaData = await this.app.getDAO().addTableMetaData(
@@ -79,6 +77,11 @@ class SchemaApi {
             id: newTable.id,
             name: newTable.name,
             columns: newTable.stringifyColumns(),
+            getAllRule: newTable.getAllRule,
+            getOneRule: newTable.getOneRule,
+            createRule: newTable.createRule,
+            updateRule: newTable.updateRule,
+            deleteRule: newTable.deleteRule,
           },
           trx
         );
@@ -86,7 +89,7 @@ class SchemaApi {
         // Add Table to Sqlite3
         await this.app.getDAO().createTable(newTable, trx);
         console.log(newTable);
-        res.json(newTableMetaData);
+        res.json(newTable);
       });
     };
   }
@@ -100,7 +103,6 @@ class SchemaApi {
    */
   updateTableHandler() {
     return async (req, res, next) => {
-      const { name, columns } = req.body;
       const { id } = req.params;
 
       // Find the specific row (representing a table) in 'tablemeta'.
@@ -114,12 +116,11 @@ class SchemaApi {
 
       // Creates two table instances based on the existing table schema and newly requested table schema.
       const oldTable = new Table(tableFromMeta);
-      const newTable = new Table({ id, name, columns });
-      if (oldTable.id !== newTable.id)
-        throw new BadRequestError("Table ID cannot be changed.");
+      const newTable = new Table(req.body);
+      Table.validateMigration(oldTable, newTable, this.app);
 
-      // Updates the schema in Sqlite3
       await Table.migrate(oldTable, newTable, this.app);
+      console.log(newTable);
       res.json(newTable);
     };
   }

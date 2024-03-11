@@ -84,3 +84,28 @@ content-type : application/json
 
 GET http://localhost:3000/api/schema
 ### GET all rows in the tablemeta table
+
+
+
+### SCHEMA MIGRATION VALIDATION TESTING
+POST http://localhost:3000/api/schema
+content-type : application/json
+
+{
+  "name": "sloths",
+  "columns": [{"name":"size", "type":"text"}, {"name":"favFood", "type":"text"}],
+  "getAllRule": "user",
+  "deleteRule": "admin"
+}
+### Should fail
+PUT http://localhost:3000/api/schema/bb06b4fe-44bb-4d0e-a6ab-7d9439f89289
+content-type : application/json
+
+{
+  "id": "bb06b4fe-44bb-4d0e-a6ab-7d9439f89289",
+  "name": "Icecubes",
+  "columns": [{"id":"04b643c3-fc56-47ba-853c-a249ca1073a1", "name":"size", "type":"text"}, {"id":"14af88a3-942c-48e2-95c2-d2298eb40b63", "name":"favFood", "type":"text"}],
+  "getAllRule": "user",
+  "deleteRule": "admin"
+}
+### Should fail
