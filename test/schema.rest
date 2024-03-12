@@ -92,7 +92,7 @@ POST http://localhost:3000/api/schema
 content-type : application/json
 
 {
-  "name": "sloths17",
+  "name": "TEST",
   "columns": [{"name":"size", "type":"text"}, {"name":"favFood", "type":"text"}],
   "getAllRule": "user",
   "deleteRule": "admin"

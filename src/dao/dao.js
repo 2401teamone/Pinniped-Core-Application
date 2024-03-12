@@ -1,13 +1,14 @@
 import knex from "knex";
 import { DatabaseError, BadRequestError } from "../utils/errors.js";
+import Column from "../models/column.js";
 
 /**
  * DAO (Data Access Object) Class
  * Interacts with Sqlite3 Database through the interface of Knex.
  */
 class DAO {
-  constructor(dbFile) {
-    this.db = this._connect(dbFile);
+  constructor(dbFile, connection) {
+    this.db = connection ? connection : this._connect(dbFile);
   }
 
   /**
@@ -235,11 +236,10 @@ class DAO {
    * @param {id: string, name: string, columns: 'stringJSON'} tableData
    * @return {object} createdRow
    */
-  async addTableMetaData(tableData, trx) {
+  async addTableMetaData(tableData) {
     const createdRow = await this.getDB()("tablemeta")
       .returning("*")
-      .insert(tableData)
-      .transacting(trx);
+      .insert(tableData);
     return createdRow;
   }
 
@@ -264,39 +264,33 @@ class DAO {
    * @param {string} tableId
    * @param {object Transaction} trx
    */
-  async deleteTableMetaData(tableId, trx) {
-    await this.getDB()("tablemeta")
-      .where({ id: tableId })
-      .del()
-      .transacting(trx);
+  async deleteTableMetaData(tableId) {
+    await this.getDB()("tablemeta").where({ id: tableId }).del();
   }
 
   /**
    * Creates a table within the database,
    * Then adds the columns to modify the table's structure.
    * @param {object Table} table
-   * @param {object Transaction} trx
    * @returns {Promise <undefined>}
    */
-  async createTable(table, trx) {
+  async createTable(table) {
     const name = table.name;
-    const columns = table.getColumns();
+    const columns = table.columns;
 
-    return await this.getDB()
-      .schema.createTable(name, (table) => {
-        columns.forEach((column) => {
-          if (!table[column.type]) {
-            throw new DatabaseError();
-          }
-          table[column.type](column.name);
-        });
+    return await this.getDB().schema.createTable(name, (table) => {
+      columns.forEach((column) => {
+        if (!table[column.type]) {
+          throw new DatabaseError();
+        }
+        table[column.type](column.name);
+      });
 
-        table.specificType(
-          "id",
-          "TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL"
-        );
-      })
-      .transacting(trx);
+      table.specificType(
+        "id",
+        "TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL"
+      );
+    });
   }
 
   /**
@@ -304,9 +298,9 @@ class DAO {
    * @param {string} tableName
    * @param {object Transaction} trx
    */
-  async dropTable(tableName, trx) {
+  async dropTable(tableName) {
     console.log(`Dropping table ${tableName}`);
-    await this.getDB().schema.dropTable(tableName).transacting(trx);
+    await this.getDB().schema.dropTable(tableName);
   }
 
   /**

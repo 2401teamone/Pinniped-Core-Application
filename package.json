@@ -5,6 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "start": "node index.js",
     "dev": "nodemon index.js",
     "reset-db": "rm -f hb.db && touch hb.db && npm run seed-data",
     "reset-migrations": "rm -r migrations && sqlite3 hb.db < drop-migrations.sql",

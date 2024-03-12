@@ -70,7 +70,7 @@ class SchemaApi {
       const newTable = new Table(req.body);
       await Table.validateMigration(null, newTable, this.app);
 
-      await Table.createTableMigration(newTable, this.app);
+      await Table.createTableMigration(newTable);
 
       // this.app.getDAO().runTransaction(async (trx) => { // Add Metadata to 'tablemeta'
       //   let newTableMetaData = await this.app.getDAO().addTableMetaData(
