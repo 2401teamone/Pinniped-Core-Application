@@ -12,7 +12,6 @@ export default {
     migrations: {
       tableName: "knex_migrations",
     },
-    debug: true,
   },
 
   staging: {
@@ -23,7 +22,6 @@ export default {
     migrations: {
       tableName: "knex_migrations",
     },
-    debug: true,
   },
 
   production: {
@@ -34,6 +32,5 @@ export default {
     migrations: {
       tableName: "knex_migrations",
     },
-    debug: true,
   },
 };

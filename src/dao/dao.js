@@ -320,6 +320,7 @@ class DAO {
    * @param {object Transaction} trx
    */
   async addColumn(tableName, column) {
+    console.log("adding column: ", column);
     await this.getDB().schema.table(tableName, (table) => {
       console.log(`Adding column ${JSON.stringify(column)} to ${tableName}`);
       table[column.type](column.name);

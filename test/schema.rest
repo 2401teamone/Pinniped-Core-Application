@@ -79,8 +79,13 @@ content-type : application/json
 }
 ### Rename table, rename column, add Column, Delete Column
 
-GET http://localhost:3000/api/schema
+
+
+
+
 ### GET all rows in the tablemeta table
+GET http://localhost:3000/api/schema
+###
 
 
 
@@ -89,8 +94,8 @@ POST http://localhost:3000/api/schema
 content-type : application/json
 
 {
-  "name": "Sloth20",
-  "columns": [{"name":"size", "type":"text"}, {"name":"favFood", "type":"text"}],
+  "name": "JoshTable",
+  "columns": [{"name":"size", "type":"text"}, {"name":"favFood", "type":"text"}, {"name":"favColor", "type":"text"}],
   "getAllRule": "user",
   "deleteRule": "admin"
 }
@@ -98,14 +103,39 @@ content-type : application/json
 DELETE http://localhost:3000/api/schema/86b38250-8043-4586-bc01-5fa471c8eadc
 ###
 
-PUT http://localhost:3000/api/schema/ce35273b-e028-4e0c-ab9f-809257f5658f
+PUT http://localhost:3000/api/schema/b4d5a934-140a-4bc7-9326-145c9638843c
 content-type : application/json
 
-{
-  "id": "ce35273b-e028-4e0c-ab9f-809257f5658f",
-  "name": "sloths18",
-  "columns": [{"id":"0156341b-0b05-434a-a314-8f312bdc5f54", "name":"size", "type":"text"}, {"id":"f2b238c3-7ec9-4cef-b375-6cd8ceb54598","name": "favSloth", "type" : "text"}],
-  "getAllRule": "user",
-  "deleteRule": "admin"
-}
+  {
+    "id": "b4d5a934-140a-4bc7-9326-145c9638843c",
+    "name": "JoshTable",
+    "columns": [
+      {
+        "id": "59c5f51b-865b-4aaa-a2e3-d31457621739",
+        "name": "size",
+        "type": "text",
+        "options": {}
+      },
+      {
+        "id": "f2498a1d-27e8-4bdf-8f95-89942b307770",
+        "name": "favFood",
+        "type": "text",
+        "options": {}
+      },
+      {
+        "id": "f8eb46aa-a158-458a-bc4c-73a1cd9b0bfe",
+        "name": "favColor",
+        "type": "text",
+        "options": {}
+      },
+      {
+        "name":"age", "type" : "text"
+      }
+    ],
+    "getAllRule": "user",
+    "getOneRule": "public",
+    "createRule": "public",
+    "deleteRule": "admin",
+    "updateRule": "public"
+  }
 ### Should fail

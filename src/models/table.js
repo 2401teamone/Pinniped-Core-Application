@@ -223,7 +223,7 @@ class Table {
 
         await dao.createTable(${stringTable});
 
-        await dao.addTableMetaData(${stringTableMetaRow})
+        await dao.addTableMetaData(${stringTableMetaRow});
       }
 
       /**
@@ -340,6 +340,37 @@ class Table {
 
       const dao = new DAO("", knex);
 
+      // Delete Columns (Tested)
+      for (let oldColumn of oldColumns) {
+        if (newColumns.find((newColumn) => oldColumn.id === newColumn.id)) continue;
+        await dao.dropColumn(oldTable.name, oldColumn.name);
+      }
+
+      // Add OR Rename Columns (Renaming Tested, Adding tested)
+      for (let newColumn of newColumns) {
+        let match = oldColumns.find((oldColumn) => oldColumn.id === newColumn.id);
+        if (!match) {
+          await dao.addColumn(oldTable.name, newColumn);
+        }
+        if (match && match.name !== newColumn.name) {
+          await dao.renameColumn(oldTable.name, match.name, newColumn.name);
+        }
+      }
+
+      // sets the table meta to the new table
+      await dao.updateTableMetaData(${stringTableMetaRow})
+    }
+
+    export async function down(knex) {
+      //Run the exact same logic as the up method, but with new and old variables
+      //swapped..
+      const oldTable = ${JSON.stringify(newTable)};
+      const newTable = ${JSON.stringify(this)};
+      const oldColumns = ${JSON.stringify(newColumns)};
+      const newColumns = ${JSON.stringify(oldColumns)};
+
+      const dao = new DAO("", knex);
+
       // Delete Columns
       for (let oldColumn of oldColumns) {
         if (newColumns.find((newColumn) => oldColumn.id === newColumn.id)) continue;
@@ -357,24 +388,9 @@ class Table {
         }
       }
 
-      // sets the table meta to the new table
-      dao.updateTableMetaData(${stringTableMetaRow})
-    }
-
-    export async function down(knex) {
-      //Run the exact same logic as the up method, but with new and old variables
-      //swapped..
-      const oldTable = ${JSON.stringify(newTable)};
-      const newTable = ${JSON.stringify(this)};
-      const oldColumns = ${JSON.stringify(newColumns)};
-      const newColumns = ${JSON.stringify(oldColumns)};
-
-      const dao = new DAO("", knex);
-
       // sets the table meta to the old table
-      dao.updateTableMetaData(${oldStringTableMetaRow})
+      await dao.updateTableMetaData(${oldStringTableMetaRow})
     }
-
    `;
     // // Delete Columns
     // for (let column of oldColumns) {
@@ -393,7 +409,7 @@ class Table {
     //       .getDAO()
     //       .renameColumn(oldTableName, match.name, column.name, trx);
     //   }
-    // }
+    // }      , {"id":"f2b238c3-7ec9-4cef-b375-6cd8ceb54598","name": "favSloth", "type" : "text"}
 
     // // Rename Table - WORKING (on its own)
     // // Run a DDL method on the table in question,

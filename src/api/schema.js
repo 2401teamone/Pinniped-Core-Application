@@ -71,7 +71,7 @@ class SchemaApi {
 
       await Table.validateMigration(null, newTable, this.app);
 
-      await newTable.create();
+      newTable.create();
 
       res.status(200).json({ newTable });
     };
