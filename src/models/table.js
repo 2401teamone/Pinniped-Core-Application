@@ -49,15 +49,8 @@ class Table {
    * @returns {undefined}
    */
   async validate() {
-    const dao = Table.getNewConnection();
-
     if (!this.id) throw new Error("Table doesn't have a valid ID.");
     if (!this.name) throw new Error("The table must have a name.");
-    const existingTable = await dao.findTableByName(this.name);
-    if (existingTable.length) {
-      throw new Error("The table name already exists: ", this.name);
-    }
-
     if (this.columns.length === 0) {
       throw new Error("The table must have at least one column.");
     }
@@ -146,7 +139,13 @@ class Table {
    * @returns {undefined}
    */
   async create() {
-    const db = Tabl.getNewConnection();
+    const dao = new DAO();
+    const existingTable = await dao.findTableByName(this.name);
+    if (existingTable.length) {
+      throw new Error("The table name already exists: ", this.name);
+    }
+
+    const db = Table.getNewConnection();
 
     let filePath = await db.migrate.make(`create_table_${this.name}`);
 
