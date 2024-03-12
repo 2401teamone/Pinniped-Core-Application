@@ -88,61 +88,6 @@ class Table {
     }
   }
 
-  /**
-   * Induces schema changes based on the comparison between the old table and the new table.
-   * It'll loop through the columns property, looking for whether
-   * (Add Column) The column exists in the new table but not the old,
-   * (Delete Column) The column doesn't exist in the new table but in the old,
-   * (Rename Column) The column exists in both, but has a different name in the two tables.
-   * @param {object Table} oldTable
-   * @param {object Table} newTable
-   * @param {object HB} app
-   */
-  static async migrate(oldTable, newTable, app) {
-    console.log("MIGRATING");
-    console.log(oldTable, newTable);
-
-    const oldTableName = oldTable.name;
-    const newTableName = newTable.name;
-    const oldColumns = oldTable.getColumns();
-    const newColumns = newTable.getColumns();
-
-    app.getDAO().runTransaction(async (trx) => {
-      // Delete Columns
-      for (let column of oldColumns) {
-        if (newTable.getColumnById(column.id)) continue;
-        await app.getDAO().dropColumn(oldTable.name, column.name, trx);
-      }
-
-      // Add OR Rename Columns
-      for (let column of newColumns) {
-        let match = oldTable.getColumnById(column.id);
-        if (match === null) {
-          await app.getDAO().addColumn(oldTable.name, column, trx);
-        }
-        if (match && match.name !== column.name) {
-          await app
-            .getDAO()
-            .renameColumn(oldTableName, match.name, column.name, trx);
-        }
-      }
-
-      // Rename Table - WORKING (on its own)
-      // Run a DDL method on the table in question,
-      // updating it's name to match the newTable name.
-      if (oldTable.name !== newTable.name) {
-        await app.getDAO().renameTable(oldTableName, newTableName, trx);
-      }
-
-      await app
-        .getDAO()
-        .updateTableMetaData(
-          { ...newTable, columns: newTable.stringifyColumns() },
-          trx
-        );
-    });
-  }
-
   constructor({
     id = uuidv4(),
     name = "",
@@ -195,9 +140,9 @@ class Table {
   }
 
   /**
-   * Creates a migration file in /migrations and uses migration template to
-   * write `up` and `down` functions to the file. Runs the the `up` method in the
-   * newly created migration file.
+   * Adds the calling table to the database and to the tablemeta
+
+   * Creates and runs migration file using `knex` migrations api and `fs`
    * @returns {undefined}
    */
   async create() {
@@ -212,29 +157,19 @@ class Table {
       columns: this.stringifyColumns(),
     });
 
-    const migrateTemplate = `/**
-      * @param { import("knex").Knex } knex
-      * @returns { Promise<void> }
-      */
+    const migrateTemplate = `
       import DAO from "../src/dao/dao.js";
 
       export async function up(knex) {
         const dao = new DAO("", knex);
-
         await dao.createTable(${stringTable});
-
         await dao.addTableMetaData(${stringTableMetaRow});
       }
 
-      /**
-       * @param { import("knex").Knex } knex
-       * @returns { Promise<void> }
-       */
+
       export async function down(knex) {
         const dao = new DAO("", knex);
-
         await dao.dropTable("${this.name}");
-
         await dao.deleteTableMetaData("${this.id}");
       }
      `;
@@ -243,15 +178,14 @@ class Table {
 
     await db.migrate.up();
 
-    // MUST CLOSE CONNECTION AFTER RUNNING MIGRATIONS OR SOCKET WILL HANG
+    // must close connection after running migrations or socket will hang
     await db.destroy();
   }
 
   /**
-   * Creates a migration file in /migrations and uses migration template to
-   * write `up` and `down` functions to the file. Runs the the `up` method in the
-   * newly created migration file.
-   * @param {object Table} newTable
+   * Drops the calling table from the database, and from tablemeta.
+   *
+   * Creates and runs migration file using `knex` migrations api and `fs`
    * @returns {undefined}
    */
   async drop() {
@@ -266,29 +200,18 @@ class Table {
       columns: this.stringifyColumns(),
     });
 
-    const migrateTemplate = `/**
-        * @param { import("knex").Knex } knex
-        * @returns { Promise<void> }
-        */
+    const migrateTemplate = `
         import DAO from "../src/dao/dao.js";
 
         export async function up(knex) {
           const dao = new DAO("", knex);
-
           await dao.dropTable("${this.name}");
-
           await dao.deleteTableMetaData("${this.id}");
         }
 
-        /**
-         * @param { import("knex").Knex } knex
-         * @returns { Promise<void> }
-         */
         export async function down(knex) {
           const dao = new DAO("", knex);
-
           await dao.createTable(${stringTable});
-
           await dao.addTableMetaData(${stringTableMetaRow})
         }
        `;
@@ -297,29 +220,30 @@ class Table {
 
     await db.migrate.up();
 
-    // MUST CLOSE CONNECTION AFTER RUNNING MIGRATIONS OR SOCKET WILL HANG
+    // must close connection after running migrations or socket will hang
     await db.destroy();
   }
 
   /**
-   * Creates a migration file in /migrations and uses migration template to
-   * write `up` and `down` functions to the file. Runs the the `up` method in the
-   * newly created migration file.
+   * Induces schema changes based on the comparison between the old table and the new table.
+   * It'll loop through the columns property, looking for whether
+   * (Add Column) The column exists in the new table but not the old,
+   * (Delete Column) The column doesn't exist in the new table but in the old,
+   * (Rename Column) The column exists in both, but has a different name in the two tables.
+   *
+   * Creates and runs migration file using `knex` migrations api and `fs`
    * @param {object Table} newTable
    * @returns {undefined}
    */
-
   async updateTo(newTable) {
     const db = this.getNewConnection();
 
-    const oldTableName = this.name;
-    const newTableName = newTable.name;
     const oldColumns = this.getColumns();
     const newColumns = newTable.getColumns();
 
-    let filePath = await db.migrate.make(`update_table_${oldTableName}`);
+    let filePath = await db.migrate.make(`update_table_${this.name}`);
 
-    const stringTableMetaRow = JSON.stringify({
+    const newStringTableMetaRow = JSON.stringify({
       ...newTable,
       columns: newTable.stringifyColumns(),
     });
@@ -357,8 +281,13 @@ class Table {
         }
       }
 
+      // Rename Table (Tested)
+      if (oldTable.name !== newTable.name) {
+        await dao.renameTable(oldTable.name, newTable.name);
+      }
+
       // sets the table meta to the new table
-      await dao.updateTableMetaData(${stringTableMetaRow})
+      await dao.updateTableMetaData(${newStringTableMetaRow})
     }
 
     export async function down(knex) {
@@ -388,46 +317,21 @@ class Table {
         }
       }
 
+      if (oldTable.name !== newTable.name) {
+        await dao.renameTable(oldTable.name, newTable.name);
+      }
+
       // sets the table meta to the old table
       await dao.updateTableMetaData(${oldStringTableMetaRow})
     }
    `;
-    // // Delete Columns
-    // for (let column of oldColumns) {
-    //   if (newTable.getColumnById(column.id)) continue;
-    //   await app.getDAO().dropColumn(oldTableName, column.name, trx);
-    // }
-
-    // // Add OR Rename Columns
-    // for (let column of newColumns) {
-    //   let match = oldTable.getColumnById(column.id);
-    //   if (match === null) {
-    //     await app.getDAO().addColumn(oldTableName, column, trx);
-    //   }
-    //   if (match && match.name !== column.name) {
-    //     await app
-    //       .getDAO()
-    //       .renameColumn(oldTableName, match.name, column.name, trx);
-    //   }
-    // }      , {"id":"f2b238c3-7ec9-4cef-b375-6cd8ceb54598","name": "favSloth", "type" : "text"}
-
-    // // Rename Table - WORKING (on its own)
-    // // Run a DDL method on the table in question,
-    // // updating it's name to match the newTable name.
-    // if (oldTableName !== newTableName) {
-    //   await app.getDAO().renameTable(oldTableName, newTableName, trx);
-    // }
 
     fs.writeFileSync(filePath, migrateTemplate);
 
     await db.migrate.up();
 
-    // await app
-    //   .getDAO()
-    //   .updateTableMetaData(
-    //     { ...newTable, columns: newTable.stringifyColumns() },
-    //     trx
-    //   );
+    // must close connection after running migrations or socket will hang
+    await db.destroy();
   }
 }
 

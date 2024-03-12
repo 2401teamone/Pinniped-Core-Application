@@ -306,11 +306,10 @@ class DAO {
    * Renames the current table, tableName, with newName.
    * @param {string} tableName
    * @param {string} newName
-   * @param {object Transaction} trx
    */
-  async renameTable(tableName, newName, trx) {
+  async renameTable(tableName, newName) {
     console.log(`Renaming ${tableName} to ${newName}`);
-    await this.getDB().schema.renameTable(tableName, newName).transacting(trx);
+    await this.getDB().schema.renameTable(tableName, newName);
   }
 
   /**
