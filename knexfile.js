@@ -9,6 +9,7 @@ export default {
     connection: {
       filename: "./hb.db",
     },
+    useNullAsDefault: true,
     migrations: {
       tableName: "knex_migrations",
     },
@@ -19,6 +20,7 @@ export default {
     connection: {
       filename: "./hb.db",
     },
+    useNullAsDefault: true,
     migrations: {
       tableName: "knex_migrations",
     },
@@ -29,6 +31,7 @@ export default {
     connection: {
       filename: "./hb.db",
     },
+    useNullAsDefault: true,
     migrations: {
       tableName: "knex_migrations",
     },
