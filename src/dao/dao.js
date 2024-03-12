@@ -249,12 +249,11 @@ class DAO {
    * @param {object Transaction} trx
    * @return {object} updatedRow
    */
-  async updateTableMetaData(tableData, trx) {
+  async updateTableMetaData(tableData) {
     const updatedRow = await this.getDB()("tablemeta")
       .returning("*")
       .where({ id: tableData.id })
-      .update(tableData)
-      .transacting(trx);
+      .update(tableData);
     return updatedRow;
   }
 
@@ -320,13 +319,11 @@ class DAO {
    * @param {object Column} column
    * @param {object Transaction} trx
    */
-  async addColumn(tableName, column, trx) {
-    await this.getDB()
-      .schema.table(tableName, (table) => {
-        console.log(`Adding column ${column} to ${tableName}`);
-        table[column.type](column.name);
-      })
-      .transacting(trx);
+  async addColumn(tableName, column) {
+    await this.getDB().schema.table(tableName, (table) => {
+      console.log(`Adding column ${JSON.stringify(column)} to ${tableName}`);
+      table[column.type](column.name);
+    });
   }
 
   /**
@@ -336,13 +333,11 @@ class DAO {
    * @param {string} newName
    * @param {object Transaction} trx
    */
-  async renameColumn(tableName, name, newName, trx) {
-    await this.getDB()
-      .schema.table(tableName, (table) => {
-        console.log(`Renaming ${tableName}'s column ${name} to ${newName}`);
-        table.renameColumn(name, newName);
-      })
-      .transacting(trx);
+  async renameColumn(tableName, name, newName) {
+    await this.getDB().schema.table(tableName, (table) => {
+      console.log(`Renaming ${tableName}'s column ${name} to ${newName}`);
+      table.renameColumn(name, newName);
+    });
   }
 
   /**
@@ -351,13 +346,11 @@ class DAO {
    * @param {string} columnName
    * @param {object Transaction} trx
    */
-  async dropColumn(tableName, columnName, trx) {
-    await this.getDB()
-      .schema.table(tableName, (table) => {
-        console.log("DROPPING COLUMN", columnName, " on", tableName);
-        table.dropColumn(columnName);
-      })
-      .transacting(trx);
+  async dropColumn(tableName, columnName) {
+    await this.getDB().schema.table(tableName, (table) => {
+      console.log("DROPPING COLUMN", columnName, " on", tableName);
+      table.dropColumn(columnName);
+    });
   }
 }
 

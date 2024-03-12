@@ -22,7 +22,7 @@ export default function generateSchemaRouter(app) {
   router.get("/", catchError(schemaApi.getAllTablesHandler()));
   router.post("/", catchError(schemaApi.createTableHandler()));
   router.get("/:tableId", catchError(schemaApi.getTableHandler()));
-  router.put("/:id", catchError(schemaApi.updateTableHandler()));
+  router.put("/:tableId", catchError(schemaApi.updateTableHandler()));
   router.delete("/:tableId", catchError(schemaApi.dropTableHandler()));
 
   return router;
@@ -102,8 +102,10 @@ class SchemaApi {
       const newTable = new Table(req.body);
       Table.validateMigration(oldTable, newTable, this.app);
 
-      await Table.migrate(oldTable, newTable, this.app);
-      console.log(newTable);
+      oldTable.updateTo(newTable);
+
+      // await Table.migrate(oldTable, newTable, this.app);
+      // console.log(newTable);
       res.json(newTable);
     };
   }
@@ -128,11 +130,6 @@ class SchemaApi {
 
       tableToDelete.drop();
 
-      // this.app.getDAO().runTransaction(async (trx) => {
-      //   await this.app.getDAO().dropTable(tableFromMeta.name, trx);
-      //   await this.app.getDAO().deleteTableMetaData(id, trx);
-      //   res.status(204).json({ message: "Table Dropped" });
-      // });
       res.status(204).json({ message: "Table Dropped" });
     };
   }

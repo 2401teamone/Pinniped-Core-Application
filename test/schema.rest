@@ -98,13 +98,13 @@ content-type : application/json
 DELETE http://localhost:3000/api/schema/86b38250-8043-4586-bc01-5fa471c8eadc
 ###
 
-PUT http://localhost:3000/api/schema/bb06b4fe-44bb-4d0e-a6ab-7d9439f89289
+PUT http://localhost:3000/api/schema/ce35273b-e028-4e0c-ab9f-809257f5658f
 content-type : application/json
 
 {
-  "id": "bb06b4fe-44bb-4d0e-a6ab-7d9439f89289",
-  "name": "Icecubes",
-  "columns": [{"id":"04b643c3-fc56-47ba-853c-a249ca1073a1", "name":"size", "type":"text"}, {"id":"14af88a3-942c-48e2-95c2-d2298eb40b63", "name":"favFood", "type":"text"}],
+  "id": "ce35273b-e028-4e0c-ab9f-809257f5658f",
+  "name": "sloths18",
+  "columns": [{"id":"0156341b-0b05-434a-a314-8f312bdc5f54", "name":"size", "type":"text"}, {"id":"f2b238c3-7ec9-4cef-b375-6cd8ceb54598","name": "favSloth", "type" : "text"}],
   "getAllRule": "user",
   "deleteRule": "admin"
 }
