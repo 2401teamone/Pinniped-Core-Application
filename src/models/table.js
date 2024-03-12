@@ -98,17 +98,15 @@ class Table {
         }
 
         let oldColumn = oldTable.getColumnById(column.id);
-        let oldColumnOptions = oldColumn.getOptions();
-        let newColumnOptions = column.getOptions();
         if (oldColumn !== null) {
-          if (oldColumnOptions.tableId !== newColumnOptions.tableId) {
+          if (oldColumn.getOptions().tableId !== column.getOptions().tableId) {
             throw new Error('Table relation cannot be changed');
           }
         }
 
         let relatedTable = await app
           .getDAO()
-          .findTableById(newColumnOptions.tableId);
+          .findTableById(column.getOptions().tableId);
         if (!relatedTable.length) {
           throw new Error('Table relation does not exist');
         }

@@ -97,6 +97,9 @@ class RelationOptions {
       return [false, 'Too many options selected for relation.'];
     if (values.length < this.minSelect)
       return [false, 'Too few options selected for relation.'];
+    for (let id of value) {
+      if (typeof id !== 'string') return [false, 'Invalid relation id.'];
+    }
     return [true, ''];
   }
 }
