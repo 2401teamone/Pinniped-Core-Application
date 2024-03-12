@@ -1,6 +1,3 @@
-DELETE http://localhost:3000/api/schema/111f55ef-cd34-43f0-b608-ad1f11ba1c28
-### Drops a table
-
 POST http://localhost:3000/api/schema
 content-type : application/json
 
@@ -92,12 +89,15 @@ POST http://localhost:3000/api/schema
 content-type : application/json
 
 {
-  "name": "TEST",
+  "name": "Sloth20",
   "columns": [{"name":"size", "type":"text"}, {"name":"favFood", "type":"text"}],
   "getAllRule": "user",
   "deleteRule": "admin"
 }
-### Should fail
+### Drop Sloths 20
+DELETE http://localhost:3000/api/schema/86b38250-8043-4586-bc01-5fa471c8eadc
+###
+
 PUT http://localhost:3000/api/schema/bb06b4fe-44bb-4d0e-a6ab-7d9439f89289
 content-type : application/json
 

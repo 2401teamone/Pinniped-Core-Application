@@ -15,23 +15,22 @@ class Table {
   static API_RULE_VALUES = ["public", "user", "creator", "admin"];
   static DEFAULT_RULE = "public";
 
-  static async createTableMigration(newTable) {
-    let db = knex({
-      client: "better-sqlite3",
-      useNullAsDefault: true,
-      connection: {
-        filename: "hb.db",
-      },
-    });
+  /**
+   * Creates a migration file in /migrations and uses migration template to
+   * write `up` and `down` functions to the file. Runs the the `up` method in the
+   * newly created migration file.
+   * @returns {undefined}
+   */
+  async create() {
+    const db = this.getNewConnection();
 
-    // Creates a migration file and returns the full filepath to the newly created
-    let filePath = await db.migrate.make(`create_${newTable.name}`);
+    let filePath = await db.migrate.make(`create_table_${this.name}`);
 
-    const stringTable = JSON.stringify(newTable);
+    const stringTable = JSON.stringify(this);
 
     const stringTableMetaRow = JSON.stringify({
-      ...newTable,
-      columns: newTable.stringifyColumns(),
+      ...this,
+      columns: this.stringifyColumns(),
     });
 
     const migrateTemplate = `/**
@@ -55,18 +54,72 @@ class Table {
     export async function down(knex) {
       const dao = new DAO("", knex);
 
-      await dao.dropTable("${newTable.name}");
+      await dao.dropTable("${this.name}");
 
-      await dao.deleteTableMetaData("${newTable.id}");
+      await dao.deleteTableMetaData("${this.id}");
     }
    `;
 
-    //this is working
     fs.writeFileSync(filePath, migrateTemplate);
 
-    let result = await db.migrate.up();
+    await db.migrate.up();
 
-    await db.destroy(); // MUST CLOSE CONNECTION AFTER RUNNING MIGRATIONS OR SOCKET WILL HANG
+    // MUST CLOSE CONNECTION AFTER RUNNING MIGRATIONS OR SOCKET WILL HANG
+    await db.destroy();
+  }
+
+  /**
+   * Creates a migration file in /migrations and uses migration template to
+   * write `up` and `down` functions to the file. Runs the the `up` method in the
+   * newly created migration file.
+   * @param {object Table} newTable
+   * @returns {undefined}
+   */
+  async drop() {
+    let db = this.getNewConnection();
+
+    let filePath = await db.migrate.make(`drop_table_${this.name}`);
+
+    const stringTable = JSON.stringify(this);
+
+    const stringTableMetaRow = JSON.stringify({
+      ...this,
+      columns: this.stringifyColumns(),
+    });
+
+    const migrateTemplate = `/**
+      * @param { import("knex").Knex } knex
+      * @returns { Promise<void> }
+      */
+      import DAO from "../src/dao/dao.js";
+
+      export async function up(knex) {
+        const dao = new DAO("", knex);
+
+        await dao.dropTable("${this.name}");
+
+        await dao.deleteTableMetaData("${this.id}");
+      }
+
+      /**
+       * @param { import("knex").Knex } knex
+       * @returns { Promise<void> }
+       */
+      export async function down(knex) {
+        const dao = new DAO("", knex);
+
+        await dao.createTable(${stringTable});
+
+        await dao.addTableMetaData(${stringTableMetaRow})
+      }
+     `;
+
+    fs.writeFileSync(filePath, migrateTemplate);
+
+    await db.migrate.up();
+
+    // MUST CLOSE CONNECTION AFTER RUNNING MIGRATIONS OR SOCKET WILL HANG
+    await db.destroy();
   }
 
   /**
@@ -220,6 +273,10 @@ class Table {
     this.createRule = createRule;
     this.deleteRule = deleteRule;
     this.updateRule = updateRule;
+  }
+
+  getNewConnection() {
+    return new DAO().getDB();
   }
 
   generateId() {

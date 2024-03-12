@@ -68,31 +68,12 @@ class SchemaApi {
   createTableHandler() {
     return async (req, res, next) => {
       const newTable = new Table(req.body);
+
       await Table.validateMigration(null, newTable, this.app);
 
-      await Table.createTableMigration(newTable);
+      await newTable.create();
 
-      // this.app.getDAO().runTransaction(async (trx) => { // Add Metadata to 'tablemeta'
-      //   let newTableMetaData = await this.app.getDAO().addTableMetaData(
-      //     {
-      //       id: newTable.id,
-      //       name: newTable.name,
-      //       columns: newTable.stringifyColumns(),
-      //       getAllRule: newTable.getAllRule,
-      //       getOneRule: newTable.getOneRule,
-      //       createRule: newTable.createRule,
-      //       updateRule: newTable.updateRule,
-      //       deleteRule: newTable.deleteRule,
-      //     },
-      //     trx
-      //   );
-
-      //   // Add Table to Sqlite3
-      //   await this.app.getDAO().createTable(newTable, trx);
-      //   console.log(newTable);
-      //   res.json(newTable);
-      // });
-      res.status(200).json({ message: "test" });
+      res.status(200).json({ newTable });
     };
   }
 
@@ -105,10 +86,10 @@ class SchemaApi {
    */
   updateTableHandler() {
     return async (req, res, next) => {
-      const { id } = req.params;
+      const { tableId } = req.params;
 
       // Find the specific row (representing a table) in 'tablemeta'.
-      let tableFromMeta = await this.app.getDAO().findTableById(id);
+      let tableFromMeta = await this.app.getDAO().findTableById(tableId);
       if (!tableFromMeta)
         throw new BadRequestError("Table not found in metadata table.");
 
@@ -136,17 +117,23 @@ class SchemaApi {
    */
   dropTableHandler() {
     return async (req, res, next) => {
-      const { id } = req.params;
-      let tableFromMeta = await this.app.getDAO().findTableById(id);
+      const { tableId } = req.params;
+      let tableFromMeta = await this.app.getDAO().findTableById(tableId);
+
       if (!tableFromMeta.length)
         throw new BadRequestError("Unable to find the table.");
       tableFromMeta = tableFromMeta[0];
 
-      this.app.getDAO().runTransaction(async (trx) => {
-        await this.app.getDAO().dropTable(tableFromMeta.name, trx);
-        await this.app.getDAO().deleteTableMetaData(id, trx);
-        res.status(204).json({ message: "Table Dropped" });
-      });
+      let tableToDelete = new Table(tableFromMeta);
+
+      tableToDelete.drop();
+
+      // this.app.getDAO().runTransaction(async (trx) => {
+      //   await this.app.getDAO().dropTable(tableFromMeta.name, trx);
+      //   await this.app.getDAO().deleteTableMetaData(id, trx);
+      //   res.status(204).json({ message: "Table Dropped" });
+      // });
+      res.status(204).json({ message: "Table Dropped" });
     };
   }
 }
