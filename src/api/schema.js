@@ -21,9 +21,9 @@ export default function generateSchemaRouter(app) {
   // router.use(adminOnly());
   router.get('/', catchError(schemaApi.getAllTablesHandler()));
   router.post('/', catchError(schemaApi.createTableHandler()));
-  router.get('/:tableId', catchError(schemaApi.getTableHandler()));
+  router.get('/:id', catchError(schemaApi.getTableHandler()));
   router.put('/:id', catchError(schemaApi.updateTableHandler()));
-  router.delete('/:tableId', catchError(schemaApi.dropTableHandler()));
+  router.delete('/:id', catchError(schemaApi.dropTableHandler()));
 
   return router;
 }

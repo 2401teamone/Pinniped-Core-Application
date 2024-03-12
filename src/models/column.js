@@ -29,15 +29,21 @@ class NumberOptions {
 }
 
 class BoolOptions {
+  constructor({}) {}
+
   validate(value) {
-    return typeof value === 'boolean';
+    if (!typeof value === 'boolean') return [false, 'Value must be a boolean.'];
+    return [true, ''];
   }
 }
 
 class DateOptions {
-  constructor({ earliest, latest }) {}
+  constructor({ earliest, latest }) {
+    this.earliest = earliest;
+    this.latest = latest;
+  }
   validate(value) {
-    if (!(value instanceof DateOptions)) return [false, 'Value is not a date.'];
+    // if (!(value instanceof DateOptions)) return [false, 'Value is not a date.'];
     return [true, ''];
   }
 }
@@ -53,7 +59,7 @@ class EmailOptions {
 class UrlOptions {
   validate(value) {
     if (typeof value !== 'string') return [false, 'Value must be a string.'];
-    if (!/^(http|https):\/\/[^ "]+$/.test(value))
+    if (!/^(http|https)?:\/\/[^ "]+$/.test(value))
       return [false, 'Invalid URL.'];
     return [true, ''];
   }
@@ -67,10 +73,10 @@ class SelectOptions {
 
   validate(value) {
     if (!Array.isArray(value)) return [false, 'Value must be an array.'];
-    for (let value of values) {
-      if (!this.options.includes(value)) return [false, 'Invalid option.'];
+    for (let el of value) {
+      if (!this.options.includes(el)) return [false, 'Invalid select option.'];
     }
-    if (this.maxSelect !== undefined && values.length > this.maxSelect)
+    if (this.maxSelect !== undefined && value.length > this.maxSelect)
       return [false, 'Too many options selected.'];
     return [true, ''];
   }
@@ -85,11 +91,12 @@ class RelationOptions {
   }
 
   validate(value) {
-    if (!Array.isArray(value)) return [false, 'Value must be an array.'];
+    if (!Array.isArray(value))
+      return [false, 'Relation value must be an array.'];
     if (values.length > this.maxSelect)
-      return [false, 'Too many options selected.'];
+      return [false, 'Too many options selected for relation.'];
     if (values.length < this.minSelect)
-      return [false, 'Too few options selected.'];
+      return [false, 'Too few options selected for relation.'];
     return [true, ''];
   }
 }
@@ -100,12 +107,17 @@ class JsonOptions {
   }
 
   validate(value) {
+    const size = new TextEncoder().encode(value).length;
+    console.log(value, size, this.maxSize, 'JSON VALUE & SIZE');
+    if (size > this.maxSize) return [false, 'JSON Value is too large.'];
     try {
-      JSON.parse(value);
+      JSON.parse(JSON.stringify(value));
       return [true, ''];
     } catch (err) {
       return [false, 'Value is not a valid JSON.'];
     }
+
+    return [true, ''];
   }
 }
 
@@ -138,14 +150,17 @@ class Column {
     select: {
       sql: 'JSON DEFAULT [] NOT NULL',
       options: SelectOptions,
+      isJson: true,
     },
     relation: {
       sql: "JSON DEFAULT '' NOT NULL",
       options: RelationOptions,
+      isJson: true,
     },
     json: {
       sql: 'JSON DEFAULT NULL',
       options: JsonOptions,
+      isJson: true,
     },
   };
 

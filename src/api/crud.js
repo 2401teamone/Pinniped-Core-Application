@@ -137,7 +137,13 @@ class CrudApi {
       const createdRow = await this.app
         .getDAO()
         .createOne(table.name, { ...req.body, id: uuidv4() });
-      res.status(201).json({ createdRow });
+      res.status(201).json({
+        table: {
+          id: table.id,
+          name: table.name,
+        },
+        rows: [createdRow],
+      });
     };
   }
 
