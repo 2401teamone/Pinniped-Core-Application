@@ -67,13 +67,9 @@ class SchemaApi {
    */
   createTableHandler() {
     return async (req, res, next) => {
-      const newTable = new Table(req.body);
-
-      await Table.validateMigration(null, newTable, this.app);
-
-      newTable.create();
-
-      res.status(200).json({ newTable });
+      const table = new Table(req.body);
+      table.create();
+      res.status(200).json({ table });
     };
   }
 
@@ -100,12 +96,8 @@ class SchemaApi {
       // Creates two table instances based on the existing table schema and newly requested table schema.
       const oldTable = new Table(tableFromMeta);
       const newTable = new Table(req.body);
-      Table.validateMigration(oldTable, newTable, this.app);
 
       oldTable.updateTo(newTable);
-
-      // await Table.migrate(oldTable, newTable, this.app);
-      // console.log(newTable);
       res.json(newTable);
     };
   }

@@ -15,77 +15,8 @@ class Table {
   static API_RULE_VALUES = ["public", "user", "creator", "admin"];
   static DEFAULT_RULE = "public";
 
-  /**
-   * Validates the object, newTable, to ensure it meets the requirements
-   * Before adding the table to the database.
-   * @param {object Table} oldTable
-   * @param {object Table} newTable
-   * @param {object HB} app
-   */
-  static async validateMigration(oldTable, newTable, app) {
-    if (!newTable.id) throw new Error("The table doesn't have a valid ID.");
-    // Validate ID shape
-    if (!newTable.name) throw new Error("The table must have a name.");
-
-    if (!oldTable) {
-      const existingTable = await app.getDAO().findTableByName(newTable.name);
-      if (existingTable.length) {
-        throw new Error("The table name already exists.");
-      }
-    }
-
-    if (newTable.columns.length === 0) {
-      throw new Error("The table must have at least one column.");
-    }
-    if (!newTable.columns.every((column) => column.id)) {
-      throw new Error("Columns must have IDs.");
-    }
-    if (!newTable.columns.every((column) => column.name)) {
-      throw new Error("All columns must have names.");
-    }
-    if (!newTable.columns.every((column) => column.type)) {
-      throw new Error("All columns must have types.");
-    }
-    if (!newTable.columns.every((column) => Column.isValidType(column.type))) {
-      throw new Error(
-        `Invalid type passed: valid types are ${Object.keys(Column.COLUMN_MAP)}`
-      );
-    }
-
-    if (
-      newTable.columns.some(
-        (column) =>
-          column.name === "id" ||
-          column.name === "created_at" ||
-          column.name === "updated_at"
-      )
-    ) {
-      throw new Error(
-        "Cannot add a column with a name of id, created_at, or updated_at"
-      );
-    }
-
-    let colNames = newTable.columns.map((column) => column.name);
-    let setNames = new Set(colNames);
-    if (colNames.length !== setNames.size) {
-      throw new Error("All column names must be unique for a single table.");
-    }
-
-    Table.API_RULES.forEach((rule) => {
-      if (!Table.API_RULE_VALUES.includes(newTable[rule])) {
-        throw new Error(`Invalid ${rule}: ${newTable[rule]}`);
-      }
-    });
-
-    if (oldTable !== null) {
-      if (oldTable.id !== newTable.id) {
-        throw new Error("Table ID cannot be changed.");
-      }
-      console.log("checking against oldTable");
-      // no column type changes
-
-      // no relationship
-    }
+  static getNewConnection() {
+    return new DAO().getDB();
   }
 
   constructor({
@@ -100,21 +31,90 @@ class Table {
   }) {
     this.id = id;
     this.name = name;
-
     if (typeof columns === "string") {
       columns = JSON.parse(columns);
     }
     this.columns = columns.map((column) => new Column({ ...column }));
-
     this.getAllRule = getAllRule;
     this.getOneRule = getOneRule;
     this.createRule = createRule;
     this.deleteRule = deleteRule;
     this.updateRule = updateRule;
+
+    this.validate();
   }
 
-  getNewConnection() {
-    return new DAO().getDB();
+  /**
+   * Validates the table object to match our table structure.
+   * @returns {undefined}
+   */
+  async validate() {
+    const dao = Table.getNewConnection();
+
+    if (!this.id) throw new Error("Table doesn't have a valid ID.");
+    if (!this.name) throw new Error("The table must have a name.");
+    const existingTable = await dao.findTableByName(this.name);
+    if (existingTable.length) {
+      throw new Error("The table name already exists: ", this.name);
+    }
+
+    if (this.columns.length === 0) {
+      throw new Error("The table must have at least one column.");
+    }
+    if (!this.columns.every((column) => column.id)) {
+      throw new Error("Columns must have IDs.");
+    }
+    if (!this.columns.every((column) => column.name)) {
+      throw new Error("All columns must have names.");
+    }
+    if (!this.columns.every((column) => column.type)) {
+      throw new Error("All columns must have types.");
+    }
+    if (!this.columns.every((column) => Column.isValidType(column.type))) {
+      throw new Error(
+        `Invalid type passed: valid types are ${Object.keys(Column.COLUMN_MAP)}`
+      );
+    }
+
+    if (
+      this.columns.some(
+        (column) =>
+          column.name === "id" ||
+          column.name === "created_at" ||
+          column.name === "updated_at"
+      )
+    ) {
+      throw new Error(
+        "Cannot add a column with a name of id, created_at, or updated_at"
+      );
+    }
+
+    let colNames = this.columns.map((column) => column.name);
+    let setNames = new Set(colNames);
+    if (colNames.length !== setNames.size) {
+      throw new Error("All column names must be unique for a single table.");
+    }
+
+    Table.API_RULES.forEach((rule) => {
+      if (!Table.API_RULE_VALUES.includes(this[rule])) {
+        throw new Error(`Invalid ${rule}: ${this[rule]}`);
+      }
+    });
+  }
+
+  /**
+   * Validates the proposed schema changes.
+   * @param {object Table} newTable
+   * @returns {undefined}
+   */
+  async validateUpdateTo(newTable) {
+    /// VALIDATING THE UPDATE
+    if (this.id !== newTable.id) {
+      throw new Error("Table ID cannot be changed.");
+    }
+    // no column type changes
+
+    // no relationship
   }
 
   generateId() {
@@ -146,7 +146,7 @@ class Table {
    * @returns {undefined}
    */
   async create() {
-    const db = this.getNewConnection();
+    const db = Tabl.getNewConnection();
 
     let filePath = await db.migrate.make(`create_table_${this.name}`);
 
@@ -189,7 +189,7 @@ class Table {
    * @returns {undefined}
    */
   async drop() {
-    let db = this.getNewConnection();
+    let db = Table.getNewConnection();
 
     let filePath = await db.migrate.make(`drop_table_${this.name}`);
 
@@ -236,7 +236,9 @@ class Table {
    * @returns {undefined}
    */
   async updateTo(newTable) {
-    const db = this.getNewConnection();
+    this.validateUpdateTo(newTable);
+
+    const db = Table.getNewConnection();
 
     const oldColumns = this.getColumns();
     const newColumns = newTable.getColumns();
