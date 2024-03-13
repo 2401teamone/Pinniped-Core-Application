@@ -1,15 +1,15 @@
 
-GET http://localhost:3000/api/tables/7e637ce9-68cb-4dec-a7b1-81bb5fe13b6e/rows
+GET http://localhost:3000/api/tables/fbe7f769-ceed-4dd7-a2fe-c27df65a2c57/rows
 ### getAll From ElephantSeals
 
 GET http://localhost:3000/api/tables/7e637ce9-68cb-4dec-a7b1-81bb5fe13b6e/rows/raa1d2181831f98
 ### getOne From ElephantSeals
 
-POST http://localhost:3000/api/tables/63f4718b-563b-4fee-9184-41e0914d5839/rows
+POST http://localhost:3000/api/tables/fbe7f769-ceed-4dd7-a2fe-c27df65a2c57/rows
 content-type: application/json
 
 {
-  "size": "Extra big", "age" : 5, "newcolumn": "newvalue"
+  "Bigness": "Extra big", "favFood" : "Pizza", "hometown" : "compton", "favColor" : "taupe"
 }
 ###
 
@@ -21,11 +21,11 @@ content-type: application/json
 }
 ###
 
-PATCH http://localhost:3000/api/tables/7e637ce9-68cb-4dec-a7b1-81bb5fe13b6e/rows/9f2d83cd-4cdd-408b-b714-8e4d6881a48f
+PATCH http://localhost:3000/api/tables/fbe7f769-ceed-4dd7-a2fe-c27df65a2c57/rows/27266678-f248-42d3-9d8a-c451fc80e543
 content-type: application/json
 
 {
-  "size": "massive"
+  "Bigness": "Medium", "hometown" : "Dallas"
 }
 ###
 DELETE http://localhost:3000/api/tables/7e637ce9-68cb-4dec-a7b1-81bb5fe13b6e/rows/9f2d83cd-4cdd-408b-b714-8e4d6881a48f
