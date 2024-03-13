@@ -41,76 +41,6 @@ class Table {
     this.createRule = createRule;
     this.deleteRule = deleteRule;
     this.updateRule = updateRule;
-
-    this.validate();
-  }
-
-  /**
-   * Validates the table object to match our table structure.
-   * @returns {undefined}
-   */
-  validate() {
-    if (!this.id) throw new BadRequestError("Table doesn't have a valid ID.");
-    if (!this.name) throw new BadRequestError("The table must have a name.");
-    if (this.columns.length === 0) {
-      throw new BadRequestError("The table must have at least one column.");
-    }
-    if (!this.columns.every((column) => column.id)) {
-      throw new BadRequestError("Columns must have IDs.");
-    }
-    if (!this.columns.every((column) => column.name)) {
-      throw new BadRequestError("All columns must have names.");
-    }
-    if (!this.columns.every((column) => column.type)) {
-      throw new BadRequestError("All columns must have types.");
-    }
-    if (!this.columns.every((column) => Column.isValidType(column.type))) {
-      throw new BadRequestError(
-        `Invalid type passed: valid types are ${Object.keys(Column.COLUMN_MAP)}`
-      );
-    }
-
-    if (
-      this.columns.some(
-        (column) =>
-          column.name === "id" ||
-          column.name === "created_at" ||
-          column.name === "updated_at"
-      )
-    ) {
-      throw new BadRequestError(
-        "Cannot add a column with a name of id, created_at, or updated_at"
-      );
-    }
-
-    let colNames = this.columns.map((column) => column.name);
-    let setNames = new Set(colNames);
-    if (colNames.length !== setNames.size) {
-      throw new BadRequestError(
-        "All column names must be unique for a single table."
-      );
-    }
-
-    Table.API_RULES.forEach((rule) => {
-      if (!Table.API_RULE_VALUES.includes(this[rule])) {
-        throw new BadRequestError(`Invalid ${rule}: ${this[rule]}`);
-      }
-    });
-  }
-
-  /**
-   * Validates the proposed schema changes.
-   * @param {object Table} newTable
-   * @returns {undefined}
-   */
-  async validateUpdateTo(newTable) {
-    /// VALIDATING THE UPDATE
-    if (this.id !== newTable.id) {
-      throw new BadRequestError("Table ID cannot be changed.");
-    }
-    // no column type changes
-
-    // no relationship
   }
 
   generateId() {
@@ -129,6 +59,16 @@ class Table {
     let foundColumn = this.columns.find((column) => column.id === id);
     if (!foundColumn) return null;
     return foundColumn;
+  }
+
+  getColumnByName(name) {
+    let foundColumn = this.columns.find((column) => column.name === name);
+    if (!foundColumn) return null;
+    return foundColumn;
+  }
+
+  hasColumn(name) {
+    return this.columns.some((column) => column.name === name);
   }
 
   initializeIds() {

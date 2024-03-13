@@ -59,6 +59,7 @@ class DAO {
       return result;
     } catch (e) {
       await trx.rollback();
+      console.log(e.message, "HEREEE");
       throw new Error(e);
     }
   }
@@ -281,19 +282,20 @@ class DAO {
     const columns = table.columns;
     console.log(`Creating table: ${name}`);
 
-    return await this.getDB().schema.createTable(name, (table) => {
-      columns.forEach((column) => {
-        if (!table[column.type]) {
-          throw new DatabaseError();
-        }
-        table[column.type](column.name);
-      });
+    return await this.getDB()
+      .schema.createTable(name, (table) => {
+        table.specificType(
+          "id",
+          "TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL"
+        );
+        table.specificType("created_at", "TIMESTAMP DEFAULT CURRENT_TIMESTAMP");
+        table.specificType("updated_at", "TIMESTAMP DEFAULT CURRENT_TIMESTAMP");
 
-      table.specificType(
-        "id",
-        "TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL"
-      );
-    });
+        columns.forEach((column) => {
+          table.specificType(column.name, Column.COLUMN_MAP[column.type].sql);
+        });
+      })
+      .transacting(trx);
   }
 
   /**
@@ -322,12 +324,13 @@ class DAO {
    * @param {object Column} column
    * @param {object Transaction} trx
    */
-  async addColumn(tableName, column) {
-    console.log("adding column: ", column);
-    await this.getDB().schema.table(tableName, (table) => {
-      console.log(`Adding column ${JSON.stringify(column)} to ${tableName}`);
-      table[column.type](column.name);
-    });
+  async addColumn(tableName, column, trx) {
+    await this.getDB()
+      .schema.table(tableName, (table) => {
+        console.log(`Adding column ${column} to ${tableName}`);
+        table.specificType(column.name, Column.COLUMN_MAP[column.type].sql);
+      })
+      .transacting(trx);
   }
 
   /**
