@@ -1,3 +1,6 @@
 node_modules
 hb.db
+hb.db-shm
+hb.db-wal
 session.db
+migrations

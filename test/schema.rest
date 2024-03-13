@@ -2,10 +2,8 @@ POST http://localhost:3000/api/schema
 content-type : application/json
 
 {
-  "name" : "Penguins",
-  "columns" : [
-    {"name":"size","type":"text"},
-  ]
+  "name" : "Parrots",
+  "columns" : [{"name":"size","type":"text"}]
 }
 ### Adds a table
 
