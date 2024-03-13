@@ -1,6 +1,3 @@
-DELETE http://localhost:3000/api/schema/111f55ef-cd34-43f0-b608-ad1f11ba1c28
-### Drops a table
-
 POST http://localhost:3000/api/schema
 content-type : application/json
 
@@ -82,30 +79,66 @@ content-type : application/json
 }
 ### Rename table, rename column, add Column, Delete Column
 
-GET http://localhost:3000/api/schema
+
+
+
+
 ### GET all rows in the tablemeta table
-
-
+GET http://localhost:3000/api/schema
+###
 
 ### SCHEMA MIGRATION VALIDATION TESTING
+### Create Table
 POST http://localhost:3000/api/schema
 content-type : application/json
 
 {
-  "name": "sloths",
-  "columns": [{"name":"size", "type":"text"}, {"name":"favFood", "type":"text"}],
+  "name": "Octopus",
+  "columns": [{"name":"size", "type":"text"}, {"name":"favFood", "type":"text"}, {"name":"favColor", "type":"text"}],
   "getAllRule": "user",
   "deleteRule": "admin"
 }
-### Should fail
-PUT http://localhost:3000/api/schema/bb06b4fe-44bb-4d0e-a6ab-7d9439f89289
+### Drop Table
+DELETE http://localhost:3000/api/schema/61d53b67-b47d-41af-800d-26e45af4c135
+###
+
+PUT http://localhost:3000/api/schema/fbe7f769-ceed-4dd7-a2fe-c27df65a2c57
 content-type : application/json
 
 {
-  "id": "bb06b4fe-44bb-4d0e-a6ab-7d9439f89289",
-  "name": "Icecubes",
-  "columns": [{"id":"04b643c3-fc56-47ba-853c-a249ca1073a1", "name":"size", "type":"text"}, {"id":"14af88a3-942c-48e2-95c2-d2298eb40b63", "name":"favFood", "type":"text"}],
+  "id": "fbe7f769-ceed-4dd7-a2fe-c27df65a2c57",
+  "name": "ElephantSeals",
+  "columns": [
+    {
+      "id": "e3b22347-699e-40dd-ae76-5849e77e3c55",
+      "name": "Bigness",
+      "type": "text",
+      "options": {}
+    },
+    {
+      "id": "9d622db1-9670-4651-8962-654907dce9e6",
+      "name": "favFood",
+      "type": "text",
+      "options": {}
+    },
+    {
+      "id": "240e6677-6726-4440-9709-6c7f011ebb38",
+      "name": "favColor",
+      "type": "text",
+      "options": {}
+    },
+      {
+      "name": "hometown",
+      "type": "text",
+      "options": {}
+    }
+
+  ],
   "getAllRule": "user",
-  "deleteRule": "admin"
+  "getOneRule": "public",
+  "createRule": "public",
+  "deleteRule": "admin",
+  "updateRule": "public"
 }
+
 ### Should fail

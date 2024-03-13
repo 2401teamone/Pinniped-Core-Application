@@ -22,7 +22,7 @@ export default function generateSchemaRouter(app) {
   router.get("/", catchError(schemaApi.getAllTablesHandler()));
   router.post("/", catchError(schemaApi.createTableHandler()));
   router.get("/:tableId", catchError(schemaApi.getTableHandler()));
-  router.put("/:id", catchError(schemaApi.updateTableHandler()));
+  router.put("/:tableId", catchError(schemaApi.updateTableHandler()));
   router.delete("/:tableId", catchError(schemaApi.dropTableHandler()));
 
   return router;
@@ -67,30 +67,9 @@ class SchemaApi {
    */
   createTableHandler() {
     return async (req, res, next) => {
-      const newTable = new Table(req.body);
-      Table.validateMigration(null, newTable, this.app);
-
-      this.app.getDAO().runTransaction(async (trx) => {
-        // Add Metadata to 'tablemeta'
-        let newTableMetaData = await this.app.getDAO().addTableMetaData(
-          {
-            id: newTable.id,
-            name: newTable.name,
-            columns: newTable.stringifyColumns(),
-            getAllRule: newTable.getAllRule,
-            getOneRule: newTable.getOneRule,
-            createRule: newTable.createRule,
-            updateRule: newTable.updateRule,
-            deleteRule: newTable.deleteRule,
-          },
-          trx
-        );
-
-        // Add Table to Sqlite3
-        await this.app.getDAO().createTable(newTable, trx);
-        console.log(newTable);
-        res.json(newTable);
-      });
+      const table = new Table(req.body);
+      await table.create();
+      res.status(200).json({ table });
     };
   }
 
@@ -103,24 +82,23 @@ class SchemaApi {
    */
   updateTableHandler() {
     return async (req, res, next) => {
-      const { id } = req.params;
+      const { tableId } = req.params;
 
+      console.log(tableId);
       // Find the specific row (representing a table) in 'tablemeta'.
-      let tableFromMeta = await this.app.getDAO().findTableById(id);
-      if (!tableFromMeta)
+      let tableFromMeta = await this.app.getDAO().findTableById(tableId);
+      if (!tableFromMeta.length)
         throw new BadRequestError("Table not found in metadata table.");
 
       tableFromMeta = tableFromMeta[0];
-      tableFromMeta.columns = JSON.parse(tableFromMeta.columns);
       console.log(tableFromMeta, "Table Found in tablemeta");
+      tableFromMeta.columns = JSON.parse(tableFromMeta.columns);
 
       // Creates two table instances based on the existing table schema and newly requested table schema.
       const oldTable = new Table(tableFromMeta);
       const newTable = new Table(req.body);
-      Table.validateMigration(oldTable, newTable, this.app);
 
-      await Table.migrate(oldTable, newTable, this.app);
-      console.log(newTable);
+      await oldTable.updateTo(newTable);
       res.json(newTable);
     };
   }
@@ -134,17 +112,18 @@ class SchemaApi {
    */
   dropTableHandler() {
     return async (req, res, next) => {
-      const { id } = req.params;
-      let tableFromMeta = await this.app.getDAO().findTableById(id);
+      const { tableId } = req.params;
+      let tableFromMeta = await this.app.getDAO().findTableById(tableId);
+
       if (!tableFromMeta.length)
         throw new BadRequestError("Unable to find the table.");
       tableFromMeta = tableFromMeta[0];
 
-      this.app.getDAO().runTransaction(async (trx) => {
-        await this.app.getDAO().dropTable(tableFromMeta.name, trx);
-        await this.app.getDAO().deleteTableMetaData(id, trx);
-        res.status(204).json({ message: "Table Dropped" });
-      });
+      const tableToDelete = new Table(tableFromMeta);
+
+      await tableToDelete.drop();
+
+      res.status(204).json({ message: "Table Dropped" });
     };
   }
 }
