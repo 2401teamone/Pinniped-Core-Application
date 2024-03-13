@@ -11,7 +11,7 @@ POST http://localhost:3000/api/tables/36aa7616-a815-472a-8f79-148eef5b4ef1/rows
 content-type: application/json
 
 {
-  "size": "<script>alert('XSS attack')</script>"
+  "size": "Big"
 }
 ###
 

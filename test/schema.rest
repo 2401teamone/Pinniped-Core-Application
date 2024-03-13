@@ -143,7 +143,7 @@ POST http://localhost:3000/api/schema
 content-type : application/json
 
 {
-  "name": "Octopus",
+  "name": "bear",
   "columns": [{"name":"size", "type":"text"}]
 }
 
@@ -173,16 +173,17 @@ content-type : application/json
   }
 
 ### XSS Attack in Column Name Change
-PUT http://localhost:3000/api/schema/36aa7616-a815-472a-8f79-148eef5b4ef1
+PUT http://localhost:3000/api/schema/09a4f944-5794-430e-b556-eda88d9c681a
 content-type : application/json
 
-  {
-    "id": "36aa7616-a815-472a-8f79-148eef5b4ef1",
-    "name": "MegaOctopus",
+{
+  "table": {
+    "id": "09a4f944-5794-430e-b556-eda88d9c681a",
+    "name": "bear",
     "columns": [
       {
-        "id": "6a6ee214-daea-4ebc-847c-05d070064324",
-        "name": "size",
+        "id": "b7ddc513-b912-4b3b-a0f6-8ea9901036a8",
+        "name": "Bigness",
         "type": "text",
         "options": {
           "minLength": 0,
@@ -196,5 +197,5 @@ content-type : application/json
     "deleteRule": "public",
     "updateRule": "public"
   }
-
+}
 ### Should fail
