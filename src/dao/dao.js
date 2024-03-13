@@ -224,8 +224,8 @@ class DAO {
    * @param {id: string, name: string, columns: 'stringJSON'} tableData
    * @return {object} createdRow
    */
-  async upsertTableMetaData(tableData, trx) {
-    const upsertedRow = this.upsertOne("tablemeta", tableData, trx);
+  async upsertTableMetaData(tableData) {
+    const upsertedRow = this.upsertOne("tablemeta", tableData);
     return upsertedRow;
   }
 

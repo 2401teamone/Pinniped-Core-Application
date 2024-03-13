@@ -1,14 +1,18 @@
 import express from "express";
-import cors from "cors";
 
+//Routers
 import generateCrudRouter from "./crud.js";
 import generateCustomRouter from "./custom.js";
 import generateSchemaRouter from "./schema.js";
 import generateUIRouter from "./ui.js";
 import generateAuthRouter from "./auth.js";
 
+//Middleware
 import errorHandler from "./middleware/error_handler.js";
+import sanitize from "./middleware/sanitize.js";
+import cors from "cors";
 
+//Session
 import session from "express-session";
 import store from "better-sqlite3-session-store";
 import sqlite from "better-sqlite3";
@@ -40,6 +44,7 @@ function initApi(app) {
     })
   );
 
+  server.use(sanitize());
   // server.use(logger)
   // server.use(rateLimiter)
 
