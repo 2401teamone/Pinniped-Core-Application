@@ -19,6 +19,24 @@ content-type : application/json
 }
 ### Login as user
 
+POST http://localhost:3000/api/auth/register
+content-type : application/json
+
+{
+  "username": "user3",
+  "password": "password3"
+}
+### Creates user 3
+
+POST http://localhost:3000/api/auth/login
+content-type : application/json
+
+{
+  "username": "user3",
+  "password": "password3"
+}
+### Login as user
+
 POST http://localhost:3000/api/auth/logout
 ### Attempts to logout of current user
 
@@ -26,8 +44,8 @@ POST http://localhost:3000/api/auth/admin/register
 content-type : application/json
 
 {
-  "username": "test",
-  "password": "password"
+  "username": "admin-joe",
+  "password": "secretpassword"
 }
 
 ### Creates a new admin
@@ -41,3 +59,10 @@ content-type : application/json
 }
 
 ### Logs in an admin
+POST http://localhost:3000/api/auth/admin/login
+content-type : application/json
+
+{
+  "username": "admin-joe",
+  "password": "secretpassword"
+}

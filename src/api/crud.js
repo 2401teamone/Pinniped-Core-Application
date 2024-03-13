@@ -1,16 +1,11 @@
-import { Router } from 'express';
-import loadTableContext from './middleware/load_table_context.js';
-import validateRecord from './middleware/validate_record.js';
-import catchError from '../utils/catch_error.js';
-import { BadRequestError, ForbiddenError } from '../utils/errors.js';
-import { v4 as uuidv4 } from 'uuid';
+import { Router } from "express";
+import loadTableContext from "./middleware/load_table_context.js";
+import apiRules from "./middleware/api_rules.js";
+import catchError from "../utils/catch_error.js";
+import { BadRequestError, ForbiddenError } from "../utils/errors.js";
+import { v4 as uuidv4 } from "uuid";
 
-const BASE = '/tables/:tableId/rows';
-const ACCESS_LEVEL = {
-  admin: 3,
-  user: 2,
-  public: 1,
-};
+const BASE = "/tables/:tableId/rows";
 
 /**
  * Creates an Express Router object
@@ -23,26 +18,35 @@ export default function generateCrudRouter(app) {
   const router = Router();
   const crudApi = new CrudApi(app);
 
-  router.get(BASE, loadTableContext(app), catchError(crudApi.getAllHandler()));
+  router.get(
+    BASE,
+    loadTableContext(app),
+    apiRules(app),
+    catchError(crudApi.getAllHandler())
+  );
+
   router.get(
     `${BASE}/:rowId`,
     loadTableContext(app),
+    apiRules(app),
     catchError(crudApi.getOneHandler())
   );
   router.post(
     BASE,
     loadTableContext(app),
-    validateRecord(),
+    apiRules(app),
     catchError(crudApi.createOneHandler())
   );
   router.patch(
     `${BASE}/:rowId`,
     loadTableContext(app),
+    apiRules(app),
     catchError(crudApi.updateOneHandler())
   );
   router.delete(
     `${BASE}/:rowId`,
     loadTableContext(app),
+    apiRules(app),
     catchError(crudApi.deleteOneHandler())
   );
 
@@ -68,24 +72,6 @@ class CrudApi {
   getAllHandler() {
     return async (req, res, next) => {
       const { table } = res.locals;
-      // JUST FOR TESTING
-      table.getAllRule = 'public';
-
-      // User Access Level
-      const sessionAccessLevel = req.session.hasOwnProperty('user')
-        ? ACCESS_LEVEL[req.session.user.role]
-        : ACCESS_LEVEL['public'];
-
-      // Required Table Access Level
-      const requiredAccessLevel = ACCESS_LEVEL[table.getAllRule];
-      // console.log(sessionAccessLevel, requiredAccessLevel);
-
-      // If the user doesn't have the appropriate access level, boot them.
-      if (requiredAccessLevel > sessionAccessLevel) {
-        throw new ForbiddenError(
-          "You don't have the appropriate access for this table."
-        );
-      }
 
       // Returns the Result
       const rows = await this.app.getDAO().getAll(table.name);
@@ -118,6 +104,18 @@ class CrudApi {
       const { rowId } = req.params;
       const row = await this.app.getDAO().getOne(table.name, rowId);
       if (!row.length) throw new BadRequestError();
+
+      //TESTING
+      table.getOneRule = "creator";
+
+      // Row level access control
+      if (
+        table.getOneRule === "creator" &&
+        row[0].userId != req.session.user.id
+      ) {
+        throw new ForbiddenError();
+      }
+
       res.status(200).json({ row });
     };
   }
