@@ -170,16 +170,14 @@ class DAO {
    * If the row already exists, then it updates it instead with the updated properties in newRow.
    * @param {string} tableName
    * @param {object} newRow
-   * @param {object Transaction} trx
    */
-  async upsertOne(tableName, newRow, trx) {
+  async upsertOne(tableName, newRow) {
     try {
       const upsertedRow = await this.getDB()(tableName)
         .returning("*")
         .insert(newRow)
         .onConflict("id")
-        .merge()
-        .transacting(trx);
+        .merge();
       return upsertedRow;
     } catch (e) {
       throw new Error(e.message);
@@ -264,7 +262,6 @@ class DAO {
    * Deletes a row from the `tablemeta` table
    * Specifically into 'tablemeta'.
    * @param {string} tableId
-   * @param {object Transaction} trx
    */
   async deleteTableMetaData(tableId) {
     console.log(`Deleting tablemeta row with ID :${tableId}`);
@@ -282,26 +279,23 @@ class DAO {
     const columns = table.columns;
     console.log(`Creating table: ${name}`);
 
-    return await this.getDB()
-      .schema.createTable(name, (table) => {
-        table.specificType(
-          "id",
-          "TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL"
-        );
-        table.specificType("created_at", "TIMESTAMP DEFAULT CURRENT_TIMESTAMP");
-        table.specificType("updated_at", "TIMESTAMP DEFAULT CURRENT_TIMESTAMP");
+    return await this.getDB().schema.createTable(name, (table) => {
+      table.specificType(
+        "id",
+        "TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))) NOT NULL"
+      );
+      table.specificType("created_at", "TIMESTAMP DEFAULT CURRENT_TIMESTAMP");
+      table.specificType("updated_at", "TIMESTAMP DEFAULT CURRENT_TIMESTAMP");
 
-        columns.forEach((column) => {
-          table.specificType(column.name, Column.COLUMN_MAP[column.type].sql);
-        });
-      })
-      .transacting(trx);
+      columns.forEach((column) => {
+        table.specificType(column.name, Column.COLUMN_MAP[column.type].sql);
+      });
+    });
   }
 
   /**
    * Drops the specified table from the database.
    * @param {string} tableName
-   * @param {object Transaction} trx
    */
   async dropTable(tableName) {
     console.log(`Dropping Table: ${tableName}`);
@@ -322,15 +316,12 @@ class DAO {
    * Adds the column to the specified table.
    * @param {string} tableName
    * @param {object Column} column
-   * @param {object Transaction} trx
    */
-  async addColumn(tableName, column, trx) {
-    await this.getDB()
-      .schema.table(tableName, (table) => {
-        console.log(`Adding column ${column} to ${tableName}`);
-        table.specificType(column.name, Column.COLUMN_MAP[column.type].sql);
-      })
-      .transacting(trx);
+  async addColumn(tableName, column) {
+    await this.getDB().schema.table(tableName, (table) => {
+      console.log(`Adding column ${JSON.stringify(column)} to ${tableName}`);
+      table.specificType(column.name, Column.COLUMN_MAP[column.type].sql);
+    });
   }
 
   /**
@@ -338,7 +329,6 @@ class DAO {
    * @param {string} tableName
    * @param {string} name
    * @param {string} newName
-   * @param {object Transaction} trx
    */
   async renameColumn(tableName, name, newName) {
     await this.getDB().schema.table(tableName, (table) => {
@@ -351,7 +341,6 @@ class DAO {
    * Drops the column, columnName, in tableName.
    * @param {string} tableName
    * @param {string} columnName
-   * @param {object Transaction} trx
    */
   async dropColumn(tableName, columnName) {
     await this.getDB().schema.table(tableName, (table) => {
