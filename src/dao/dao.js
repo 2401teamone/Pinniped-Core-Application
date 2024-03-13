@@ -237,6 +237,7 @@ class DAO {
    * @return {object} createdRow
    */
   async addTableMetaData(tableData) {
+    console.log(`Adding tablemeta row for : ${tableData.name}`);
     const createdRow = await this.getDB()("tablemeta")
       .returning("*")
       .insert(tableData);
@@ -250,6 +251,7 @@ class DAO {
    * @return {object} updatedRow
    */
   async updateTableMetaData(tableData) {
+    console.log(`Updating tablemeta row for : ${tableData.name}`);
     const updatedRow = await this.getDB()("tablemeta")
       .returning("*")
       .where({ id: tableData.id })
@@ -264,6 +266,7 @@ class DAO {
    * @param {object Transaction} trx
    */
   async deleteTableMetaData(tableId) {
+    console.log(`Deleting tablemeta row with ID :${tableId}`);
     await this.getDB()("tablemeta").where({ id: tableId }).del();
   }
 
@@ -276,6 +279,7 @@ class DAO {
   async createTable(table) {
     const name = table.name;
     const columns = table.columns;
+    console.log(`Creating table: ${name}`);
 
     return await this.getDB().schema.createTable(name, (table) => {
       columns.forEach((column) => {
@@ -298,7 +302,7 @@ class DAO {
    * @param {object Transaction} trx
    */
   async dropTable(tableName) {
-    console.log(`Dropping table ${tableName}`);
+    console.log(`Dropping Table: ${tableName}`);
     await this.getDB().schema.dropTable(tableName);
   }
 

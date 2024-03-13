@@ -68,7 +68,7 @@ class SchemaApi {
   createTableHandler() {
     return async (req, res, next) => {
       const table = new Table(req.body);
-      table.create();
+      await table.create();
       res.status(200).json({ table });
     };
   }
@@ -84,20 +84,21 @@ class SchemaApi {
     return async (req, res, next) => {
       const { tableId } = req.params;
 
+      console.log(tableId);
       // Find the specific row (representing a table) in 'tablemeta'.
       let tableFromMeta = await this.app.getDAO().findTableById(tableId);
-      if (!tableFromMeta)
+      if (!tableFromMeta.length)
         throw new BadRequestError("Table not found in metadata table.");
 
       tableFromMeta = tableFromMeta[0];
-      tableFromMeta.columns = JSON.parse(tableFromMeta.columns);
       console.log(tableFromMeta, "Table Found in tablemeta");
+      tableFromMeta.columns = JSON.parse(tableFromMeta.columns);
 
       // Creates two table instances based on the existing table schema and newly requested table schema.
       const oldTable = new Table(tableFromMeta);
       const newTable = new Table(req.body);
 
-      oldTable.updateTo(newTable);
+      await oldTable.updateTo(newTable);
       res.json(newTable);
     };
   }
@@ -118,9 +119,9 @@ class SchemaApi {
         throw new BadRequestError("Unable to find the table.");
       tableFromMeta = tableFromMeta[0];
 
-      let tableToDelete = new Table(tableFromMeta);
+      const tableToDelete = new Table(tableFromMeta);
 
-      tableToDelete.drop();
+      await tableToDelete.drop();
 
       res.status(204).json({ message: "Table Dropped" });
     };

@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import fs from "fs";
 import knex from "knex";
 import DAO from "../dao/dao.js";
+import { BadRequestError } from "../utils/errors.js";
 
 class Table {
   static API_RULES = [
@@ -48,23 +49,23 @@ class Table {
    * Validates the table object to match our table structure.
    * @returns {undefined}
    */
-  async validate() {
-    if (!this.id) throw new Error("Table doesn't have a valid ID.");
-    if (!this.name) throw new Error("The table must have a name.");
+  validate() {
+    if (!this.id) throw new BadRequestError("Table doesn't have a valid ID.");
+    if (!this.name) throw new BadRequestError("The table must have a name.");
     if (this.columns.length === 0) {
-      throw new Error("The table must have at least one column.");
+      throw new BadRequestError("The table must have at least one column.");
     }
     if (!this.columns.every((column) => column.id)) {
-      throw new Error("Columns must have IDs.");
+      throw new BadRequestError("Columns must have IDs.");
     }
     if (!this.columns.every((column) => column.name)) {
-      throw new Error("All columns must have names.");
+      throw new BadRequestError("All columns must have names.");
     }
     if (!this.columns.every((column) => column.type)) {
-      throw new Error("All columns must have types.");
+      throw new BadRequestError("All columns must have types.");
     }
     if (!this.columns.every((column) => Column.isValidType(column.type))) {
-      throw new Error(
+      throw new BadRequestError(
         `Invalid type passed: valid types are ${Object.keys(Column.COLUMN_MAP)}`
       );
     }
@@ -77,7 +78,7 @@ class Table {
           column.name === "updated_at"
       )
     ) {
-      throw new Error(
+      throw new BadRequestError(
         "Cannot add a column with a name of id, created_at, or updated_at"
       );
     }
@@ -85,12 +86,14 @@ class Table {
     let colNames = this.columns.map((column) => column.name);
     let setNames = new Set(colNames);
     if (colNames.length !== setNames.size) {
-      throw new Error("All column names must be unique for a single table.");
+      throw new BadRequestError(
+        "All column names must be unique for a single table."
+      );
     }
 
     Table.API_RULES.forEach((rule) => {
       if (!Table.API_RULE_VALUES.includes(this[rule])) {
-        throw new Error(`Invalid ${rule}: ${this[rule]}`);
+        throw new BadRequestError(`Invalid ${rule}: ${this[rule]}`);
       }
     });
   }
@@ -103,7 +106,7 @@ class Table {
   async validateUpdateTo(newTable) {
     /// VALIDATING THE UPDATE
     if (this.id !== newTable.id) {
-      throw new Error("Table ID cannot be changed.");
+      throw new BadRequestError("Table ID cannot be changed.");
     }
     // no column type changes
 
@@ -142,7 +145,7 @@ class Table {
     const dao = new DAO();
     const existingTable = await dao.findTableByName(this.name);
     if (existingTable.length) {
-      throw new Error("The table name already exists: ", this.name);
+      throw new BadRequestError("The table name already exists: ", this.name);
     }
 
     const db = Table.getNewConnection();
@@ -235,7 +238,7 @@ class Table {
    * @returns {undefined}
    */
   async updateTo(newTable) {
-    this.validateUpdateTo(newTable);
+    await this.validateUpdateTo(newTable);
 
     const db = Table.getNewConnection();
 

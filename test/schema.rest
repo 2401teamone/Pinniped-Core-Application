@@ -87,47 +87,52 @@ content-type : application/json
 GET http://localhost:3000/api/schema
 ###
 
-
-
 ### SCHEMA MIGRATION VALIDATION TESTING
+### Create Table
 POST http://localhost:3000/api/schema
 content-type : application/json
 
 {
-  "name": "ElephantSeals",
+  "name": "Octopus",
   "columns": [{"name":"size", "type":"text"}, {"name":"favFood", "type":"text"}, {"name":"favColor", "type":"text"}],
   "getAllRule": "user",
   "deleteRule": "admin"
 }
-### Drop Sloths 20
-DELETE http://localhost:3000/api/schema/86b38250-8043-4586-bc01-5fa471c8eadc
+### Drop Table
+DELETE http://localhost:3000/api/schema/61d53b67-b47d-41af-800d-26e45af4c135
 ###
 
-PUT http://localhost:3000/api/schema/df7e1268-b378-43f5-9954-6b9ecaf9a62a
+PUT http://localhost:3000/api/schema/fbe7f769-ceed-4dd7-a2fe-c27df65a2c57
 content-type : application/json
 
 {
-  "id": "df7e1268-b378-43f5-9954-6b9ecaf9a62a",
-  "name": "Pinnipeds",
+  "id": "fbe7f769-ceed-4dd7-a2fe-c27df65a2c57",
+  "name": "ElephantSeals",
   "columns": [
     {
-      "id": "3e0f91d5-6769-4b36-9412-f568741db545",
-      "name": "size",
+      "id": "e3b22347-699e-40dd-ae76-5849e77e3c55",
+      "name": "Bigness",
       "type": "text",
       "options": {}
     },
     {
-      "id": "0c6726c7-9775-451d-8c82-ef990b281a76",
+      "id": "9d622db1-9670-4651-8962-654907dce9e6",
       "name": "favFood",
       "type": "text",
       "options": {}
     },
     {
-      "id": "e0b1571f-290e-4f2d-9cae-59ba6c5b0427",
+      "id": "240e6677-6726-4440-9709-6c7f011ebb38",
       "name": "favColor",
       "type": "text",
       "options": {}
+    },
+      {
+      "name": "hometown",
+      "type": "text",
+      "options": {}
     }
+
   ],
   "getAllRule": "user",
   "getOneRule": "public",
