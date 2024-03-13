@@ -14,7 +14,8 @@ import store from "better-sqlite3-session-store";
 import sqlite from "better-sqlite3";
 
 const SqliteStore = store(session);
-const db = new sqlite("session.db", { verbose: console.log });
+const db = new sqlite("session.db");
+// const db = new sqlite("session.db", { verbose: console.log });
 
 function initApi(app) {
   const server = express();

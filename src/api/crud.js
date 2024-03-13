@@ -129,10 +129,19 @@ class CrudApi {
     return async (req, res, next) => {
       // Need to Validate the Schema of the Request?
       const { table } = res.locals;
+
+      validateRecord(table, req.body);
+
       const createdRow = await this.app
         .getDAO()
         .createOne(table.name, { ...req.body, id: uuidv4() });
-      res.status(201).json({ createdRow });
+      res.status(201).json({
+        table: {
+          id: table.id,
+          name: table.name,
+        },
+        row: createdRow[0],
+      });
     };
   }
 
@@ -148,7 +157,13 @@ class CrudApi {
       const updatedRow = await this.app
         .getDAO()
         .updateOne(table.name, rowId, req.body);
-      res.status(200).json({ updatedRow });
+      res.status(200).json({
+        table: {
+          id: table.id,
+          name: table.name,
+        },
+        row: updatedRow[0],
+      });
     };
   }
 

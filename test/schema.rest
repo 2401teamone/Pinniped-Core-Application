@@ -1,12 +1,11 @@
-DELETE http://localhost:3000/api/schema/b8a11870-1b97-4644-92bb-d7bcaee7ce1c
-### Drops a table
-
 POST http://localhost:3000/api/schema
 content-type : application/json
 
 {
-  "name" : "Seals",
-  "columns" : [{"name":"size","type":"text"},{"name":"sex","type":"text"}]
+  "name" : "Penguins",
+  "columns" : [
+    {"name":"size","type":"text"},
+  ]
 }
 ### Adds a table
 
@@ -14,29 +13,76 @@ POST http://localhost:3000/api/schema
 content-type : application/json
 
 {
-  "name" : "Puffins",
-  "columns" : [{"name":"species","type":"text"},{"name":"age","type":"text"},{"name":"userId","type":"text"}]
+  "name" : "Penguins",
+  "columns" : [{"name":"species","type":"text"},{"name":"age","type":"text"}]
 }
 
-### Adds a table with userId foreign key
-
-PUT http://localhost:3000/api/schema/7e637ce9-68cb-4dec-a7b1-81bb5fe13b6e
+### Adds a table
+PUT http://localhost:3000/api/schema/f582c24a-3ead-411e-b87e-baa50e8722a4
 content-type : application/json
 
 {
-  "id": "7e637ce9-68cb-4dec-a7b1-81bb5fe13b6e",
-  "name" : "ElephantSeals",
-  "columns" : [{"id":"16308ebf-68bb-4319-9ca8-0611b143330d","name":"size","type":"text"},{"name":"gender","type":"text"}]
+  "id": "f582c24a-3ead-411e-b87e-baa50e8722a4",
+  "name": "Penguins",
+  "columns": [
+    {
+      "id": "fc54c2d6-f5c9-4568-8676-0212381565d8",
+      "name": "size",
+      "type": "text",
+      "options": {
+        "maxLength": 10,
+        "minLength": 5
+      }
+    },
+    {
+      "id": "1a81443b-cc38-4d1c-bd9b-90a8e5c89fcf",
+      "name": "age",
+      "type": "number",
+      "options": {
+        "min": -5,
+        "max": 5
+      }
+    },
+    {
+      "id": "1e005e42-a300-4fff-9e5e-15914613d993",
+      "name": "ElephantSealBrothers",
+      "type": "relation",
+      "options": {
+        "tableId": "f197102a-2d7b-4c30-bcba-6c62108e9977"
+      }
+    }
+  ],
+  "getAllRule": "public",
+  "getOneRule": "public",
+  "createRule": "public",
+  "deleteRule": "public",
+  "updateRule": "public"
 }
+
 ### Update Column
 
-PUT http://localhost:3000/api/schema/b14f8abd-fc0e-4eb0-97bd-c57e65690c00
+PUT http://localhost:3000/api/schema/7464f1e2-2da9-42fa-8644-854fa179ffbb
 content-type : application/json
 
 {
-  "id": "b14f8abd-fc0e-4eb0-97bd-c57e65690c00",
-  "name" : "BigSeals",
-  "columns" : [{"id":"fd3fb92d-0e9b-4f55-8633-42a74d0ee228", "name":"size","type":"text"}, {"id":"6840d4bc-10b8-4d37-9847-321dd7fac071","name":"gender","type":"text"}]
+  "id": "7464f1e2-2da9-42fa-8644-854fa179ffbb",
+  "name": "NewOctopus",
+  "columns": [
+    {
+      "id": "fdc30fc7-10fd-48e0-abdc-fd6562f63ec1",
+      "name": "size",
+      "type": "text",
+      "options": {
+        "minLength": 0,
+        "maxLength": 255
+      }
+    }
+  ],
+  "getAllRule": "public",
+  "getOneRule": "public",
+  "createRule": "public",
+  "deleteRule": "public",
+  "updateRule": "public"
 }
 ### Rename Table
 
@@ -61,13 +107,13 @@ content-type : application/json
 ### Add a column
 
 
-PUT http://localhost:3000/api/schema/b14f8abd-fc0e-4eb0-97bd-c57e65690c00
+PUT http://localhost:3000/api/schema/b6d31866-5668-4a92-82e3-a4dc0df24df9
 content-type : application/json
 
 {
-  "id": "b14f8abd-fc0e-4eb0-97bd-c57e65690c00",
+  "id": "b6d31866-5668-4a92-82e3-a4dc0df24df9",
   "name" : "ElephantSeals",
-  "columns" : [{"id":"fd3fb92d-0e9b-4f55-8633-42a74d0ee228", "name":"size","type":"text"}, {"id":"6840d4bc-10b8-4d37-9847-321dd7fac071","name":"gender","type":"text"}]
+  "columns" : [{"id":"cd5b4013-e0d3-4274-a452-ccd621c76bc9", "name":"size","type":"number"}, {"id":"720f534b-423d-4982-a894-8be36d53dce9","name":"sex","type":"text"}]
 }
 ### Rename a column
 
@@ -82,5 +128,41 @@ content-type : application/json
 }
 ### Rename table, rename column, add Column, Delete Column
 
-GET http://localhost:3000/api/schema
+
+
+
+
 ### GET all rows in the tablemeta table
+GET http://localhost:3000/api/schema
+###
+
+### SCHEMA MIGRATION VALIDATION TESTING
+### Create Table
+POST http://localhost:3000/api/schema
+content-type : application/json
+
+{
+  "name": "Octopus",
+  "columns": [{"name":"size", "type":"text"}]
+}
+### Drop Table
+DELETE http://localhost:3000/api/schema/8657b606-1666-4dcb-b8c1-a9e6077283b3
+###
+
+PUT http://localhost:3000/api/schema/8657b606-1666-4dcb-b8c1-a9e6077283b3
+content-type : application/json
+
+{
+  "id": "8657b606-1666-4dcb-b8c1-a9e6077283b3",
+  "name": "Octopus",
+  "columns": [
+    {"id":"d69eba78-b88c-4e19-992f-4d16589908dd","name":"name","type":"text","options":{"minLength":5}}
+  ],
+  "getAllRule": "admin",
+  "getOneRule": "public",
+  "createRule": "public",
+  "deleteRule": "public",
+  "updateRule": "public"
+}
+
+### Should fail

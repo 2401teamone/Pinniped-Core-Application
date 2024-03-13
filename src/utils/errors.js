@@ -37,9 +37,9 @@ export class DatabaseError extends AppError {
 }
 
 export class BadRequestError extends AppError {
-  constructor(table) {
+  constructor(message = "This operation failed due to a bad request") {
     super(
-      "Hmm this operation didn't work",
+      message,
       400,
       "BAD_REQUEST",
       "Failed to execute the request. Probably due to an invalid ID provided."
