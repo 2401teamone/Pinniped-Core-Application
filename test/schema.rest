@@ -4,9 +4,7 @@ content-type : application/json
 {
   "name" : "Penguins",
   "columns" : [
-    {"name":"size","type":"text", "options": {"maxLength": 10}},
-    {"name":"age","type":"number", "options": {"min": -5, "max": 5}},
-    {"name": "ElephantSealBrothers", "type": "relation", "options": {"tableId": "f197102a-2d7b-4c30-bcba-6c62108e9977"}}
+    {"name":"size","type":"text"},
   ]
 }
 ### Adds a table
@@ -63,13 +61,28 @@ content-type : application/json
 
 ### Update Column
 
-PUT http://localhost:3000/api/schema/b14f8abd-fc0e-4eb0-97bd-c57e65690c00
+PUT http://localhost:3000/api/schema/7464f1e2-2da9-42fa-8644-854fa179ffbb
 content-type : application/json
 
 {
-  "id": "b14f8abd-fc0e-4eb0-97bd-c57e65690c00",
-  "name" : "BigSeals",
-  "columns" : [{"id":"fd3fb92d-0e9b-4f55-8633-42a74d0ee228", "name":"size","type":"text"}, {"id":"6840d4bc-10b8-4d37-9847-321dd7fac071","name":"gender","type":"text"}]
+  "id": "7464f1e2-2da9-42fa-8644-854fa179ffbb",
+  "name": "NewOctopus",
+  "columns": [
+    {
+      "id": "fdc30fc7-10fd-48e0-abdc-fd6562f63ec1",
+      "name": "size",
+      "type": "text",
+      "options": {
+        "minLength": 0,
+        "maxLength": 255
+      }
+    }
+  ],
+  "getAllRule": "public",
+  "getOneRule": "public",
+  "createRule": "public",
+  "deleteRule": "public",
+  "updateRule": "public"
 }
 ### Rename Table
 
@@ -130,50 +143,25 @@ content-type : application/json
 
 {
   "name": "Octopus",
-  "columns": [{"name":"size", "type":"text"}, {"name":"favFood", "type":"text"}, {"name":"favColor", "type":"text"}],
-  "getAllRule": "user",
-  "deleteRule": "admin"
+  "columns": [{"name":"size", "type":"text"}]
 }
 ### Drop Table
-DELETE http://localhost:3000/api/schema/61d53b67-b47d-41af-800d-26e45af4c135
+DELETE http://localhost:3000/api/schema/8657b606-1666-4dcb-b8c1-a9e6077283b3
 ###
 
-PUT http://localhost:3000/api/schema/fbe7f769-ceed-4dd7-a2fe-c27df65a2c57
+PUT http://localhost:3000/api/schema/8657b606-1666-4dcb-b8c1-a9e6077283b3
 content-type : application/json
 
 {
-  "id": "fbe7f769-ceed-4dd7-a2fe-c27df65a2c57",
-  "name": "ElephantSeals",
+  "id": "8657b606-1666-4dcb-b8c1-a9e6077283b3",
+  "name": "Octopus",
   "columns": [
-    {
-      "id": "e3b22347-699e-40dd-ae76-5849e77e3c55",
-      "name": "Bigness",
-      "type": "text",
-      "options": {}
-    },
-    {
-      "id": "9d622db1-9670-4651-8962-654907dce9e6",
-      "name": "favFood",
-      "type": "text",
-      "options": {}
-    },
-    {
-      "id": "240e6677-6726-4440-9709-6c7f011ebb38",
-      "name": "favColor",
-      "type": "text",
-      "options": {}
-    },
-      {
-      "name": "hometown",
-      "type": "text",
-      "options": {}
-    }
-
+    {"id":"d69eba78-b88c-4e19-992f-4d16589908dd","name":"name","type":"text","options":{"minLength":5}}
   ],
-  "getAllRule": "user",
+  "getAllRule": "admin",
   "getOneRule": "public",
   "createRule": "public",
-  "deleteRule": "admin",
+  "deleteRule": "public",
   "updateRule": "public"
 }
 

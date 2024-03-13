@@ -1,7 +1,6 @@
 import Column from "./column.js";
 import { v4 as uuidv4 } from "uuid";
 import fs from "fs";
-import knex from "knex";
 import DAO from "../dao/dao.js";
 import { BadRequestError } from "../utils/errors.js";
 
@@ -41,6 +40,101 @@ class Table {
     this.createRule = createRule;
     this.deleteRule = deleteRule;
     this.updateRule = updateRule;
+
+    this.validate();
+  }
+  /**
+   * Validates the table object to match our table structure.
+   * @returns {undefined}
+   */
+  validate() {
+    if (!this.id) throw new BadRequestError("Table doesn't have a valid ID.");
+    if (!this.name) throw new BadRequestError("The table must have a name.");
+    if (this.columns.length === 0) {
+      throw new BadRequestError("The table must have at least one column.");
+    }
+    if (!this.columns.every((column) => column.id)) {
+      throw new BadRequestError("Columns must have IDs.");
+    }
+    if (!this.columns.every((column) => column.name)) {
+      throw new BadRequestError("All columns must have names.");
+    }
+    if (!this.columns.every((column) => column.type)) {
+      throw new BadRequestError("All columns must have types.");
+    }
+    if (!this.columns.every((column) => Column.isValidType(column.type))) {
+      throw new BadRequestError(
+        `Invalid type passed: valid types are ${Object.keys(Column.COLUMN_MAP)}`
+      );
+    }
+
+    if (
+      this.columns.some(
+        (column) =>
+          column.name === "id" ||
+          column.name === "created_at" ||
+          column.name === "updated_at"
+      )
+    ) {
+      throw new BadRequestError(
+        "Cannot add a column with a name of id, created_at, or updated_at"
+      );
+    }
+
+    let colNames = this.columns.map((column) => column.name);
+    let setNames = new Set(colNames);
+    if (colNames.length !== setNames.size) {
+      throw new BadRequestError(
+        "All column names must be unique for a single table."
+      );
+    }
+
+    Table.API_RULES.forEach((rule) => {
+      if (!Table.API_RULE_VALUES.includes(this[rule])) {
+        throw new BadRequestError(`Invalid ${rule}: ${this[rule]}`);
+      }
+    });
+  }
+
+  /**
+   * Validates the proposed schema changes.
+   * @param {object Table} newTable
+   * @returns {undefined}
+   */
+  async validateUpdateTo(newTable) {
+    const dao = new DAO();
+    /// VALIDATING THE UPDATE
+    if (this.id !== newTable.id) {
+      throw new BadRequestError("Table ID cannot be changed.");
+    }
+    // no column type changes
+    for (let column of newTable.columns) {
+      let oldColumn = this.getColumnById(column.id);
+      if (oldColumn === null) continue;
+      if (oldColumn.type !== column.type) {
+        throw new Error(
+          `Column type cannot be changed: ${oldColumn.name} from ${oldColumn.type} to ${column.type}`
+        );
+      }
+    }
+    // no relationship
+    for (let column of newTable.getColumns()) {
+      if (column.type !== "relation") {
+        continue;
+      }
+
+      let oldColumn = this.getColumnById(column.id);
+      if (oldColumn !== null) {
+        if (oldColumn.getOptions().tableId !== column.getOptions().tableId) {
+          throw new Error("Table relation cannot be changed");
+        }
+      }
+
+      let relatedTable = dao.findTableById(column.getOptions().tableId);
+      if (!relatedTable.length) {
+        throw new Error("Table relation does not exist");
+      }
+    }
   }
 
   generateId() {
@@ -108,7 +202,6 @@ class Table {
         await dao.addTableMetaData(${stringTableMetaRow});
       }
 
-
       export async function down(knex) {
         const dao = new DAO("", knex);
         await dao.dropTable("${this.name}");
@@ -132,11 +225,9 @@ class Table {
    */
   async drop() {
     let db = Table.getNewConnection();
-
     let filePath = await db.migrate.make(`drop_table_${this.name}`);
 
     const stringTable = JSON.stringify(this);
-
     const stringTableMetaRow = JSON.stringify({
       ...this,
       columns: this.stringifyColumns(),
@@ -160,9 +251,8 @@ class Table {
 
     fs.writeFileSync(filePath, migrateTemplate);
 
+    // Calls the 'up' function in the migrate template and destroys the connection after running the migration to avoid socket hangup.
     await db.migrate.up();
-
-    // must close connection after running migrations or socket will hang
     await db.destroy();
   }
 
@@ -179,19 +269,15 @@ class Table {
    */
   async updateTo(newTable) {
     await this.validateUpdateTo(newTable);
-
     const db = Table.getNewConnection();
+    let filePath = await db.migrate.make(`update_table_${this.name}`);
 
     const oldColumns = this.getColumns();
     const newColumns = newTable.getColumns();
-
-    let filePath = await db.migrate.make(`update_table_${this.name}`);
-
     const newStringTableMetaRow = JSON.stringify({
       ...newTable,
       columns: newTable.stringifyColumns(),
     });
-
     const oldStringTableMetaRow = JSON.stringify({
       ...this,
       columns: this.stringifyColumns(),
