@@ -8,7 +8,8 @@ import Column from "../models/column.js";
  */
 class DAO {
   constructor(dbFile, connection) {
-    this.db = connection ? connection : this._connect(dbFile);
+    this.sqlite3Connection;
+    this.db = connection ? connection : this._connect(dbFile, this);
   }
 
   /**
@@ -17,18 +18,24 @@ class DAO {
    * @param {string} dbFile
    * @returns {Knex Instance}
    */
-  _connect(dbFile) {
-    return knex({
+  async _connect(dbFile, thisDAO) {
+    let db = knex({
       client: "better-sqlite3",
       useNullAsDefault: true,
       connection: {
         filename: "hb.db",
       },
       debug: true,
-      // pool: {
-      //   min: 0,
-      // },
+      pool: {
+        afterCreate: function (connection, done) {
+          thisDAO.sqlite3Connection = connection;
+          connection.pragma("journal_mode = WAL");
+          done(false, connection);
+        },
+      },
     });
+    await db.client.acquireConnection();
+    return db;
   }
 
   disconnect() {}
