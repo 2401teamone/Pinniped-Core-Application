@@ -24,6 +24,7 @@ class DAO {
       connection: {
         filename: "hb.db",
       },
+      debug: true,
       // pool: {
       //   min: 0,
       // },

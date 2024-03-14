@@ -20,14 +20,29 @@ class AdminAPI {
     this.db = this.openConnection();
   }
 
-  openConnection() {
+  async openConnection() {
     // assures that the better-sqlite3 connection will connect to the app database
-    let dbName = this.app.getDAO().getDB().client.connectionSettings.filename;
-    // creates new better-sqlite3 connection
-    return new Database(dbName);
+    await this.app.getDAO().createOne("hiithere", { name: "something" });
+    let knex = this.app.getDAO().getDB();
+    // creates better-sqlite3 connection
+    // let result = await knex.client.acquireConnection();
+    // console.log(result);
+    // console.log(result2);
+    console.log("this is the knex object: ", knex.context.client.pool);
+    setTimeout(() => {
+      console.log(
+        "this is the knex object after some time: ",
+        knex.context.client.pool
+      );
+    }, 40000);
+    // knex.context.client.pool.used[0].resource < this is the database connection from the pool
+    // console.log(dbName);
+    // return dbName;
+    // return new Database(dbName);
   }
   exportHandler() {
     return async (req, res, next) => {
+      // this.db().prepare("DROP TABLE IF EXISTS hiithere;").run();
       console.log("backing up the db...");
       res.sendStatus(200);
     };
