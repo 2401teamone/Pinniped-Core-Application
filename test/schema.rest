@@ -2,10 +2,8 @@ POST http://localhost:3000/api/schema
 content-type : application/json
 
 {
-  "name" : "Penguins",
-  "columns" : [
-    {"name":"size","type":"text"},
-  ]
+  "name" : "Parrots",
+  "columns" : [{"name":"size","type":"text"}]
 }
 ### Adds a table
 
@@ -144,11 +142,16 @@ content-type : application/json
 
 {
   "name": "bear",
+  "name": "ElephantSeals",
   "columns": [{"name":"size", "type":"text"}]
 }
+### Drop Table
+DELETE http://localhost:3000/api/schema/827a946e-f7dc-4b50-bc50-795d40096af8
+###
 
 ### XSS Attack in Column Name Change
 PUT http://localhost:3000/api/schema/36aa7616-a815-472a-8f79-148eef5b4ef1
+PUT http://localhost:3000/api/schema/5af3576b-27f1-49fc-a993-6b92dbccaf88
 content-type : application/json
 
   {
@@ -171,6 +174,34 @@ content-type : application/json
     "deleteRule": "public",
     "updateRule": "public"
   }
+{
+  "id": "5af3576b-27f1-49fc-a993-6b92dbccaf88",
+  "name": "SouthernElephantSeals",
+  "columns": [
+    {
+      "id": "b9ae9309-f315-440c-94ec-6d71153224e8",
+      "name": "size",
+      "type": "text",
+      "options": {
+        "minLength": 0,
+        "maxLength": 255
+      }
+    },
+    {
+      "name": "Job",
+      "type": "text",
+      "options": {
+        "minLength": 0,
+        "maxLength": 255
+      }
+    }
+  ],
+  "getAllRule": "public",
+  "getOneRule": "public",
+  "createRule": "public",
+  "deleteRule": "public",
+  "updateRule": "public"
+}
 
 ### XSS Attack in Column Name Change
 PUT http://localhost:3000/api/schema/09a4f944-5794-430e-b556-eda88d9c681a

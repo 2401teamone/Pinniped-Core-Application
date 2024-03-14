@@ -24,9 +24,17 @@ class DAO {
       connection: {
         filename: "hb.db",
       },
-      // pool: {
-      //   min: 0,
-      // },
+      pool: {
+        afterCreate: function (connection, done) {
+          connection.pragma("journal_mode = WAL");
+          // console.log(
+          //   "Database Journal Mode: ",
+          //   connection.pragma("journal_mode", { simple: true })
+          // );
+          done();
+        },
+        min: 0,
+      },
     });
   }
 
@@ -277,7 +285,7 @@ class DAO {
   async createTable(table) {
     const name = table.name;
     const columns = table.columns;
-    console.log(`Creating table: ${name}`);
+    console.log(`Creating Table: ${name}`);
 
     return await this.getDB().schema.createTable(name, (table) => {
       table.specificType(
