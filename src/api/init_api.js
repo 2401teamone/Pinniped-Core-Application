@@ -1,4 +1,6 @@
 import express from "express";
+import dotenv from "dotenv";
+dotenv.config();
 
 //Routers
 import generateCrudRouter from "./crud.js";
@@ -35,13 +37,15 @@ function initApi(app) {
           intervalMs: 900000, //ms = 15min
         },
       }),
-      secret: "elephant seal",
+      secret: process.env.SESSION_SECRET || "secret",
       resave: false,
       saveUninitialized: true,
-      cookie: { maxAge: 60 * 60 * 1000 }, // 1 hour
+      cookie: {
+        maxAge: 60 * 60 * 1000, // 1 hour
+        httpOnly: true, //prevent client side JS from reading the cookie
+        secure: false, //set to true when using HTTPS in production
+      },
       // cookie: { maxAge: 30 * 1000 }, // 30 seconds
-      // enable below property when in production and using HTTPS or set up auto config through ENV
-      // cookie: { secure: true }
     })
   );
 
