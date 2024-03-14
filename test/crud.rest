@@ -1,5 +1,5 @@
 
-GET http://localhost:3000/api/tables/fbe7f769-ceed-4dd7-a2fe-c27df65a2c57/rows
+GET http://localhost:3000/api/tables/36aa7616-a815-472a-8f79-148eef5b4ef1/rows
 ### getAll From ElephantSeals
 
 GET http://localhost:3000/api/tables/7e637ce9-68cb-4dec-a7b1-81bb5fe13b6e/rows/raa1d2181831f98
@@ -7,11 +7,11 @@ GET http://localhost:3000/api/tables/7e637ce9-68cb-4dec-a7b1-81bb5fe13b6e/rows/r
 GET http://localhost:3000/api/tables/5a200d36-6cf3-4777-a9bc-2e588358f64b/rows/72b37c1d-a29a-4b7e-848f-6e53b50b37c8
 ### getOne From puffins with creator rule
 
-POST http://localhost:3000/api/tables/fbe7f769-ceed-4dd7-a2fe-c27df65a2c57/rows
+POST http://localhost:3000/api/tables/36aa7616-a815-472a-8f79-148eef5b4ef1/rows
 content-type: application/json
 
 {
-  "Bigness": "Extra big", "favFood" : "Pizza", "hometown" : "compton", "favColor" : "taupe"
+  "size": "Big"
 }
 ###
 
