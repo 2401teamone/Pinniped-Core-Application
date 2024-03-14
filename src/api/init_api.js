@@ -8,6 +8,7 @@ import generateCustomRouter from "./custom.js";
 import generateSchemaRouter from "./schema.js";
 import generateUIRouter from "./ui.js";
 import generateAuthRouter from "./auth.js";
+import generateAdminRouter from "./admin.js";
 
 //Middleware
 import errorHandler from "./middleware/error_handler.js";
@@ -58,12 +59,14 @@ function initApi(app) {
   const authRouter = generateAuthRouter(app);
   const crudRouter = generateCrudRouter(app);
   const schemaRouter = generateSchemaRouter(app);
+  const adminRouter = generateAdminRouter(app);
   const customRouter = generateCustomRouter(app);
   const UIRouter = generateUIRouter(app);
 
   server.use("/api/auth", authRouter);
   server.use("/api", crudRouter);
   server.use("/api/schema", schemaRouter);
+  server.use("/admin", adminRouter);
   server.use("/", customRouter);
   server.use("/ui", UIRouter);
 
