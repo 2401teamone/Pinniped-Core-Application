@@ -5,3 +5,5 @@ hb.db-wal
 session.db
 migrations
 .env
+migrations
+.env

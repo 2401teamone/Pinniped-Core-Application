@@ -1,14 +1,21 @@
 import express from "express";
-import cors from "cors";
+import dotenv from "dotenv";
+dotenv.config();
 
+//Routers
 import generateCrudRouter from "./crud.js";
 import generateCustomRouter from "./custom.js";
 import generateSchemaRouter from "./schema.js";
 import generateUIRouter from "./ui.js";
 import generateAuthRouter from "./auth.js";
 
+//Middleware
 import errorHandler from "./middleware/error_handler.js";
+import sanitize from "./middleware/sanitize.js";
+import setHeaders from "./middleware/set_headers.js";
+import cors from "cors";
 
+//Session
 import session from "express-session";
 import store from "better-sqlite3-session-store";
 import sqlite from "better-sqlite3";
@@ -30,15 +37,20 @@ function initApi(app) {
           intervalMs: 900000, //ms = 15min
         },
       }),
-      secret: "elephant seal",
+      secret: process.env.SESSION_SECRET || "secret",
       resave: false,
       saveUninitialized: true,
-      cookie: { maxAge: 60 * 60 * 1000 }, // 1 hour
+      cookie: {
+        maxAge: 60 * 60 * 1000, // 1 hour
+        httpOnly: true, //prevent client side JS from reading the cookie
+        secure: false, //set to true when using HTTPS in production
+      },
       // cookie: { maxAge: 30 * 1000 }, // 30 seconds
-      // enable below property when in production and using HTTPS or set up auto config through ENV
-      // cookie: { secure: true }
     })
   );
+
+  server.use(sanitize());
+  server.use(setHeaders());
 
   // server.use(logger)
   // server.use(rateLimiter)
