@@ -4,3 +4,4 @@ hb.db-shm
 hb.db-wal
 session.db
 migrations
+.env
