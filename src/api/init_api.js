@@ -1,5 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
+import fs from "fs";
 dotenv.config();
 
 //Routers
@@ -22,6 +23,7 @@ import store from "better-sqlite3-session-store";
 import sqlite from "better-sqlite3";
 
 const SqliteStore = store(session);
+if (!fs.existsSync("pnpd_data")) fs.mkdirSync("pnpd_data");
 const db = new sqlite("pnpd_data/session.db");
 // const db = new sqlite("pnpd_data/session.db", { verbose: console.log });
 

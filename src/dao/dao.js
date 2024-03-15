@@ -1,6 +1,7 @@
 import knex from "knex";
 import { DatabaseError, BadRequestError } from "../utils/errors.js";
 import Column from "../models/column.js";
+import fs from "fs";
 
 /**
  * DAO (Data Access Object) Class
@@ -10,7 +11,6 @@ class DAO {
   constructor(dbFile, connection) {
     this.sqlite3Connection;
     this.db = connection ? connection : this._connect(dbFile, this);
-
   }
 
   /**
@@ -20,6 +20,8 @@ class DAO {
    * @returns {Knex Instance}
    */
   _connect(dbFile, thisDAO) {
+    if (!fs.existsSync("pnpd_data")) fs.mkdirSync("pnpd_data");
+
     let db = knex({
       client: "better-sqlite3",
       useNullAsDefault: true,
@@ -68,9 +70,13 @@ class DAO {
     // matches the filename from the full filepath
     let dbName = this.sqlite3Connection.name.match(/[^\\/]+$/)[0];
 
-    let newName = `pnpd_data/backup/backup_${Date.now()}_${dbName}`;
+    if (!fs.existsSync("pnpd_data/backup")) fs.mkdirSync("pnpd_data/backup");
+
+    let newName = `backup_${Date.now()}_${dbName}`;
+    let newPath = `pnpd_data/backup/${newName}`;
+
     console.log(`Backing up ${dbName} as '${newName}'...`);
-    await this.sqlite3Connection.backup(newName);
+    await this.sqlite3Connection.backup(newPath);
     console.log("Backup Complete!");
   }
 
@@ -118,7 +124,7 @@ class DAO {
    */
   async findTableById(id) {
     try {
-      console.log("this is this ---------", this)
+      console.log("this is this ---------", this);
       const table = await this.getDB()("tablemeta").select("*").where({ id });
       return table;
     } catch (e) {
@@ -151,7 +157,7 @@ class DAO {
   async getAll(tableName) {
     try {
       const rows = await this.getDB()(tableName).select("*");
-      console.log("we made it here!")
+      console.log("we made it here!");
       return rows;
     } catch (e) {
       throw new Error(e.message);

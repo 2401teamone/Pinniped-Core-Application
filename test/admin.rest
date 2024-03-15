@@ -1,10 +1,2 @@
 ### Create a backup of the database
-GET http://localhost:3000/admin/export
-### Import a database
-POST http://localhost:3000/admin/import
-content-type : application/json
-
-{
-  "username": "test",
-  "password": "password"
-}
+GET http://localhost:3000/admin/backup
