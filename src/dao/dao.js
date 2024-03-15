@@ -315,7 +315,7 @@ class DAO {
   async createTable(table) {
     const name = table.name;
     const columns = table.columns;
-    console.log(`Creating table: ${name}`);
+    console.log(`Creating Table: ${name}`);
 
     return await this.getDB().schema.createTable(name, (table) => {
       table.specificType(

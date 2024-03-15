@@ -183,11 +183,9 @@ class Table {
     }
 
     const db = Table.getNewConnection();
-
     let filePath = await db.migrate.make(`create_table_${this.name}`);
 
     const stringTable = JSON.stringify(this);
-
     const stringTableMetaRow = JSON.stringify({
       ...this,
       columns: this.stringifyColumns(),
@@ -211,9 +209,8 @@ class Table {
 
     fs.writeFileSync(filePath, migrateTemplate);
 
+    // Executes migration transaction and destroys the connection after the transaction is successful.
     await db.migrate.up();
-
-    // must close connection after running migrations or socket will hang
     await db.destroy();
   }
 

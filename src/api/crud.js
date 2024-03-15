@@ -1,7 +1,7 @@
 import { Router } from "express";
 import loadTableContext from "./middleware/load_table_context.js";
 import apiRules from "./middleware/api_rules.js";
-import validateRecord from "./middleware/api_rules.js";
+import validateRecord from "./middleware/validate_record.js";
 import catchError from "../utils/catch_error.js";
 import { BadRequestError, ForbiddenError } from "../utils/errors.js";
 import { v4 as uuidv4 } from "uuid";
