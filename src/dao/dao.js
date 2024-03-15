@@ -10,6 +10,7 @@ class DAO {
   constructor(dbFile, connection) {
     this.sqlite3Connection;
     this.db = connection ? connection : this._connect(dbFile, this);
+
   }
 
   /**
@@ -61,8 +62,10 @@ class DAO {
    * @returns {undefined}
    */
   async dbBackup() {
-    // matches the filename from the full filepath
+    // adds a connection to the knex pool so dao has access to the raw sqlite3 connection
     await this.getDB()("tablemeta").select("*");
+
+    // matches the filename from the full filepath
     let dbName = this.sqlite3Connection.name.match(/[^\\/]+$/)[0];
 
     let newName = `pnpd_data/backup/backup_${Date.now()}_${dbName}`;
