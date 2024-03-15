@@ -7,8 +7,7 @@ export default function generateAdminRouter(app) {
   const adminAPI = new AdminAPI(app);
 
   // router.use(adminOnly());
-  router.get("/export", catchError(adminAPI.exportHandler()));
-  router.post("/import", catchError(adminAPI.importHandler()));
+  router.get("/backup", catchError(adminAPI.backupHandler()));
 
   return router;
 }
@@ -18,23 +17,12 @@ class AdminAPI {
     this.app = app;
   }
 
-  exportHandler() {
+  backupHandler() {
     return async (req, res, next) => {
-      let connection = this.app.getDAO().sqlite3Connection;
-      let dbName = connection.name;
-      let newName = `backup_${Date.now()}_${dbName}`;
-      console.log(`Backing up ${dbName} as '${newName}'...`);
-
-      await this.app.getDAO().sqlite3Connection.backup(newName);
-      console.log("Backup Complete!");
+      await this.app.getDAO().dbBackup();
       res.sendStatus(200);
     };
   }
-
-  importHandler() {
-    return async (req, res, next) => {
-      console.log("replacing your database with target database...");
-      res.sendStatus(201);
-    };
-  }
 }
+
+

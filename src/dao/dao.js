@@ -53,6 +53,19 @@ class DAO {
   }
 
   /**
+   * Uses better-sqlite3 connection to run a backup on the same knex connection as main app is using.
+   * @params
+   * @returns {undefined}
+   */
+  async dbBackup() {
+    let dbName = this.sqlite3Connection.name;
+    let newName = `backup_${Date.now()}_${dbName}`;
+    console.log(`Backing up ${dbName} as '${newName}'...`);
+    await this.sqlite3Connection.backup(newName);
+    console.log("Backup Complete!");
+  }
+
+  /**
    * Creates a transaction and invokes the callback given.
    * If the callback is successful, it commits the transaction.
    * Otherwise, it'll rollback the transaction.
