@@ -14,10 +14,7 @@ export default function generateAuthRouter(app) {
   const router = Router();
   const authApi = new AuthApi(app);
 
-  router.get("/", (req, res, next) => {
-    console.log("req.session: ", req.session);
-    res.send(req.session);
-  });
+  router.get("/", catchError(authApi.getSessionHandler())); // Just for testing
 
   router.post("/register", catchError(authApi.registerHandler()));
   router.post("/login", catchError(authApi.loginHandler()));
@@ -37,8 +34,11 @@ class AuthApi {
     return async (req, res, next) => {};
   }
 
-  getSessionsHandler() {
-    return async (req, res, next) => {};
+  getSessionHandler() {
+    return (req, res, next) => {
+      console.log("req.session: ", req.session);
+      res.send(req.session.user);
+    };
   }
 
   /**
@@ -108,6 +108,8 @@ class AuthApi {
     return async (req, res, next) => {
       const { username, password } = req.body;
 
+      console.log("Username Sent: ", username);
+
       // Checks if 'username' exists in 'users'.
       const existingUser = await this.app
         .getDAO()
@@ -163,6 +165,7 @@ class AuthApi {
    */
   logoutHandler() {
     return async (req, res, next) => {
+      console.log("Logging out user: ", req.session.user);
       delete req.session.user;
       res.status(200).json({ message: "User logged out." });
     };

@@ -19,11 +19,11 @@ const API_RULE_KEY = {
 
 /**
  * Use after load_table_context middlewear to check the request details
- * the API rules associated with the requested table, and throw a 403
+ * the API rules associated with the requested table, and throw a 401 or 403
  * error if needed
- * @returns
+ * @returns {function} middleware
  */
-export default function apiRules(app) {
+export default function apiRules() {
   return catchError(async (req, res, next) => {
     //find out what action the user is trying to complete, and associate that with
     //the appropriate API rule
@@ -44,7 +44,6 @@ export default function apiRules(app) {
 
     // Required Table Access Level
     const requiredAccessLevel = ACCESS_LEVEL[table[apiRule]];
-    console.log(sessionAccessLevel, requiredAccessLevel);
 
     // If the user is not authenticated, and needs to be, return a 401 error
     if (
