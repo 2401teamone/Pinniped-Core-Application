@@ -7,9 +7,9 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "reset-db": "rm -f hb.db && touch hb.db && npm run seed-data",
-    "reset-migrations": "rm -r migrations && sqlite3 hb.db < drop-migrations.sql",
-    "seed-data": "sqlite3 hb.db < seed-data.sql",
+    "reset-db": "rm -f pnpd_data/pnpd.db && touch pnpd_data/pnpd.db && npm run seed-data",
+    "reset-migrations": "rm -r pnpd_data/migrations && sqlite3 pnpd_data/pnpd.db < drop-migrations.sql",
+    "seed-data": "sqlite3 pnpd_data/pnpd.db < seed-data.sql",
     "reset-sessions": "rm -f session.db && touch session.db",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
