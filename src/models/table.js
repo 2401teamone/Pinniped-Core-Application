@@ -194,7 +194,7 @@ class Table {
     });
 
     const migrateTemplate = `
-      import DAO from "../src/dao/dao.js";
+      import DAO from "../../src/dao/dao.js";
 
       export async function up(knex) {
         const dao = new DAO("", knex);
@@ -234,7 +234,7 @@ class Table {
     });
 
     const migrateTemplate = `
-        import DAO from "../src/dao/dao.js";
+        import DAO from "../../src/dao/dao.js";
 
         export async function up(knex) {
           const dao = new DAO("", knex);
@@ -284,7 +284,7 @@ class Table {
     });
 
     const migrateTemplate = `
-    import DAO from "../src/dao/dao.js";
+    import DAO from "../../src/dao/dao.js";
 
     export async function up(knex) {
       const oldTable = ${JSON.stringify(this)};

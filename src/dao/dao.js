@@ -18,14 +18,13 @@ class DAO {
    * @param {string} dbFile
    * @returns {Knex Instance}
    */
-  async _connect(dbFile, thisDAO) {
+  _connect(dbFile, thisDAO) {
     let db = knex({
       client: "better-sqlite3",
       useNullAsDefault: true,
       connection: {
-        filename: "hb.db",
+        filename: "pnpd_data/pnpd.db",
       },
-      debug: true,
       pool: {
         afterCreate: function (connection, done) {
           thisDAO.sqlite3Connection = connection;
@@ -33,8 +32,12 @@ class DAO {
           done(false, connection);
         },
       },
+      migrations: {
+        directory: "./pnpd_data/migrations",
+        tableName: "knex_migrations",
+      },
     });
-    await db.client.acquireConnection();
+
     return db;
   }
 
@@ -58,8 +61,11 @@ class DAO {
    * @returns {undefined}
    */
   async dbBackup() {
-    let dbName = this.sqlite3Connection.name;
-    let newName = `backup_${Date.now()}_${dbName}`;
+    // matches the filename from the full filepath
+    await this.getDB()("tablemeta").select("*");
+    let dbName = this.sqlite3Connection.name.match(/[^\\/]+$/)[0];
+
+    let newName = `pnpd_data/backup/backup_${Date.now()}_${dbName}`;
     console.log(`Backing up ${dbName} as '${newName}'...`);
     await this.sqlite3Connection.backup(newName);
     console.log("Backup Complete!");
@@ -109,6 +115,7 @@ class DAO {
    */
   async findTableById(id) {
     try {
+      console.log("this is this ---------", this)
       const table = await this.getDB()("tablemeta").select("*").where({ id });
       return table;
     } catch (e) {
@@ -141,6 +148,7 @@ class DAO {
   async getAll(tableName) {
     try {
       const rows = await this.getDB()(tableName).select("*");
+      console.log("we made it here!")
       return rows;
     } catch (e) {
       throw new Error(e.message);

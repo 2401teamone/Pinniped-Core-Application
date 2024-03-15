@@ -7,10 +7,11 @@ export default {
   development: {
     client: "better-sqlite3",
     connection: {
-      filename: "./hb.db",
+      filename: "pndpd.db",
     },
     useNullAsDefault: true,
     migrations: {
+      directory: "./pnpd_data/migrations",
       tableName: "knex_migrations",
     },
   },
@@ -18,10 +19,11 @@ export default {
   staging: {
     client: "better-sqlite3",
     connection: {
-      filename: "./hb.db",
+      filename: "pndpd.db",
     },
     useNullAsDefault: true,
     migrations: {
+      directory: "./pnpd_data/migrations",
       tableName: "knex_migrations",
     },
   },
@@ -29,10 +31,11 @@ export default {
   production: {
     client: "better-sqlite3",
     connection: {
-      filename: "./hb.db",
+      filename: "pndpd.db",
     },
     useNullAsDefault: true,
     migrations: {
+      directory: "./pnpd_data/migrations",
       tableName: "knex_migrations",
     },
   },
