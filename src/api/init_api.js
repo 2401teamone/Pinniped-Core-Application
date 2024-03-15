@@ -29,8 +29,7 @@ function initApi(app) {
   server.use(express.json());
   server.use(
     cors({
-      origin: "http://localhost:5173",
-      origin: "*",
+      origin: true,
       credentials: true,
     })
   );
