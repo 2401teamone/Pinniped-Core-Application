@@ -2,16 +2,16 @@
   "name": "server",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "./dist/Pinniped.js",
   "type": "module",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
+    "start": "cd dist && node Pinniped.js",
+    "dev": "nodemon server.js",
+    "seed-data": "sqlite3 hb.db < seed-data.sql",
     "reset-db": "rm -f hb.db && touch hb.db && npm run seed-data",
     "reset-migrations": "rm -r migrations && sqlite3 hb.db < drop-migrations.sql",
-    "seed-data": "sqlite3 hb.db < seed-data.sql",
     "reset-sessions": "rm -f session.db && touch session.db",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "npx parcel build server.js"
   },
   "author": "",
   "license": "ISC",
@@ -28,6 +28,7 @@
     "xss": "^1.0.15"
   },
   "devDependencies": {
-    "nodemon": "^3.1.0"
+    "nodemon": "^3.1.0",
+    "parcel": "^2.12.0"
   }
 }
