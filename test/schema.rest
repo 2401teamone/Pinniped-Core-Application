@@ -1,3 +1,6 @@
+GET http://localhost:3000/api/schema
+###
+
 POST http://localhost:3000/api/schema
 content-type : application/json
 

@@ -1,6 +1,7 @@
 import knex from "knex";
 import { DatabaseError, BadRequestError } from "../utils/errors.js";
 import Column from "../models/column.js";
+import fs from "fs";
 
 /**
  * DAO (Data Access Object) Class
@@ -8,7 +9,8 @@ import Column from "../models/column.js";
  */
 class DAO {
   constructor(dbFile, connection) {
-    this.db = connection ? connection : this._connect(dbFile);
+    this.sqlite3Connection;
+    this.db = connection ? connection : this._connect(dbFile, this);
   }
 
   /**
@@ -17,25 +19,29 @@ class DAO {
    * @param {string} dbFile
    * @returns {Knex Instance}
    */
-  _connect(dbFile) {
-    return knex({
+  _connect(dbFile, thisDAO) {
+    if (!fs.existsSync("pnpd_data")) fs.mkdirSync("pnpd_data");
+
+    let db = knex({
       client: "better-sqlite3",
       useNullAsDefault: true,
       connection: {
-        filename: "hb.db",
+        filename: "pnpd_data/pnpd.db",
       },
       pool: {
         afterCreate: function (connection, done) {
+          thisDAO.sqlite3Connection = connection;
           connection.pragma("journal_mode = WAL");
-          // console.log(
-          //   "Database Journal Mode: ",
-          //   connection.pragma("journal_mode", { simple: true })
-          // );
-          done();
+          done(false, connection);
         },
-        min: 0,
+      },
+      migrations: {
+        directory: "./pnpd_data/migrations",
+        tableName: "knex_migrations",
       },
     });
+
+    return db;
   }
 
   disconnect() {}
@@ -50,6 +56,28 @@ class DAO {
    */
   getDB() {
     return this.db;
+  }
+
+  /**
+   * Uses better-sqlite3 connection to run a backup on the same knex connection as main app is using.
+   * @params
+   * @returns {undefined}
+   */
+  async dbBackup() {
+    // adds a connection to the knex pool so dao has access to the raw sqlite3 connection
+    await this.getDB()("tablemeta").select("*");
+
+    // matches the filename from the full filepath
+    let dbName = this.sqlite3Connection.name.match(/[^\\/]+$/)[0];
+
+    if (!fs.existsSync("pnpd_data/backup")) fs.mkdirSync("pnpd_data/backup");
+
+    let newName = `backup_${Date.now()}_${dbName}`;
+    let newPath = `pnpd_data/backup/${newName}`;
+
+    console.log(`Backing up ${dbName} as '${newName}'...`);
+    await this.sqlite3Connection.backup(newPath);
+    console.log("Backup Complete!");
   }
 
   /**
@@ -96,6 +124,7 @@ class DAO {
    */
   async findTableById(id) {
     try {
+      console.log("this is this ---------", this);
       const table = await this.getDB()("tablemeta").select("*").where({ id });
       return table;
     } catch (e) {
@@ -128,6 +157,7 @@ class DAO {
   async getAll(tableName) {
     try {
       const rows = await this.getDB()(tableName).select("*");
+      console.log("we made it here!");
       return rows;
     } catch (e) {
       throw new Error(e.message);

@@ -1,5 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
+import fs from "fs";
 dotenv.config();
 
 //Routers
@@ -8,6 +9,7 @@ import generateCustomRouter from "./custom.js";
 import generateSchemaRouter from "./schema.js";
 import generateUIRouter from "./ui.js";
 import generateAuthRouter from "./auth.js";
+import generateAdminRouter from "./admin.js";
 
 //Middleware
 import errorHandler from "./middleware/error_handler.js";
@@ -21,8 +23,9 @@ import store from "better-sqlite3-session-store";
 import sqlite from "better-sqlite3";
 
 const SqliteStore = store(session);
-const db = new sqlite("session.db");
-// const db = new sqlite("session.db", { verbose: console.log });
+if (!fs.existsSync("pnpd_data")) fs.mkdirSync("pnpd_data");
+const db = new sqlite("pnpd_data/session.db");
+// const db = new sqlite("pnpd_data/session.db", { verbose: console.log });
 
 function initApi(app) {
   const server = express();
@@ -58,12 +61,14 @@ function initApi(app) {
   const authRouter = generateAuthRouter(app);
   const crudRouter = generateCrudRouter(app);
   const schemaRouter = generateSchemaRouter(app);
+  const adminRouter = generateAdminRouter(app);
   const customRouter = generateCustomRouter(app);
   const UIRouter = generateUIRouter(app);
 
   server.use("/api/auth", authRouter);
   server.use("/api", crudRouter);
   server.use("/api/schema", schemaRouter);
+  server.use("/admin", adminRouter);
   server.use("/", customRouter);
   server.use("/ui", UIRouter);
 
