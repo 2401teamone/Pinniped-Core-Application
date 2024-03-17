@@ -47,9 +47,8 @@ function initApi(app) {
       saveUninitialized: true,
       cookie: {
         maxAge: 60 * 60 * 1000, // 1 hour
-        // httpOnly: true, //prevent client side JS from reading the cookie
+        httpOnly: true, //prevent client side JS from reading the cookie
         secure: false, //set to true when using HTTPS in production
-        sameSite: "none", // allows cross origin cookies UPDATE BASED ON CONFIG / DEPLOYEMENT
       },
     })
   );

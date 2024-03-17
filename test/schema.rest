@@ -2,7 +2,7 @@ POST http://localhost:3000/api/schema
 content-type : application/json
 
 {
-  "name" : "Parrots",
+  "name" : "Seals",
   "columns" : [{"name":"size","type":"text"}]
 }
 ### Adds a table
@@ -149,15 +149,15 @@ DELETE http://localhost:3000/api/schema/827a946e-f7dc-4b50-bc50-795d40096af8
 ###
 
 ### XSS Attack in Column Name Change
-PUT http://localhost:3000/api/schema/9c589bca-a2b7-41ea-89b7-73e01c002f1d
+PUT http://localhost:3000/api/schema/faa94702-d390-4125-be16-649a278071e3
 content-type : application/json
 
-  {
-    "id": "9c589bca-a2b7-41ea-89b7-73e01c002f1d",
+{
+    "id": "faa94702-d390-4125-be16-649a278071e3",
     "name": "Seals",
     "columns": [
       {
-        "id": "b75cef3c-2a25-44de-8062-e580d6704fff",
+        "id": "a6794855-1442-4b47-a901-0cd5461f2fbd",
         "name": "size",
         "type": "text",
         "options": {
