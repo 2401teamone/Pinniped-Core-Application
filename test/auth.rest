@@ -1,0 +1,69 @@
+### GET the current session
+GET http://localhost:3000/api/auth
+
+### Creates a new user
+POST http://localhost:3000/api/auth/register
+content-type : application/json
+
+{
+  "username": "test",
+  "password": "password"
+}
+
+### Login as user
+POST http://localhost:3000/api/auth/login
+content-type : application/json
+
+{
+  "username": "test",
+  "password": "password"
+}
+
+### Creates user 3
+POST http://localhost:3000/api/auth/register
+content-type : application/json
+
+{
+  "username": "user3",
+  "password": "password3"
+}
+
+### Login as user
+POST http://localhost:3000/api/auth/login
+content-type : application/json
+
+{
+  "username": "user3",
+  "password": "password3"
+}
+
+
+### Attempts to logout of current user
+POST http://localhost:3000/api/auth/logout
+
+### Creates a new admin
+POST http://localhost:3000/api/auth/admin/register
+content-type : application/json
+
+{
+  "username": "<Hi! I'm an admin>",
+  "password": "secretpassword"
+}
+
+### Logs in an admin
+POST http://localhost:3000/api/auth/admin/login
+content-type : application/json
+
+{
+  "username": "test",
+  "password": "password"
+}
+
+### Logs in as admin-joe
+POST http://localhost:3000/api/auth/admin/login
+content-type : application/json
+
+{
+  "username": "admin-joe",
+  "password": "secretpassword"
+}

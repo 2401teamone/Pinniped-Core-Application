@@ -1,6 +1,6 @@
 {
   "name": "pinniped",
-  "version": "0.1",
+  "version": "0.1.2",
   "description": "Easy-to-deploy Node backend server.",
   "keywords": [
     "backend",
@@ -38,7 +38,7 @@
       "eail": "treesjones3@gmail.com"
     }
   ],
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "bcrypt": "^5.1.1",
     "better-sqlite3": "^9.4.3",

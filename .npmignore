@@ -5,3 +5,4 @@ Dockerfile
 test
 pnpd_data
 index.js
+.DS_Store

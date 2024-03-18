@@ -89,4 +89,12 @@ class Pinniped {
   }
 }
 
-export default Pinniped.createApp;
+// const pnpd = {
+//   createApp: Pinniped.createApp,
+//   MigrationDao: DAO,
+// };
+
+// export default pnpd;
+
+export const MigrationDao = DAO;
+export const pnpd = Pinniped.createApp;
