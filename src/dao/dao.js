@@ -63,7 +63,9 @@ class DAO {
    */
   async getRawSqliteConnection() {
     // adds a connection to the knex pool so dao has access to the raw sqlite3 connection
-    await this.getDB()("sqlite_master").select("*").limit(1);
+    if (!this.sqlite3Connection) {
+      await this.getDB()("sqlite_master").select("*").limit(1);
+    }
     return this.sqlite3Connection;
   }
 
