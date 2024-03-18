@@ -1,6 +1,6 @@
-import Pinniped from "./src/Pinniped/Pinniped.js";
+import { pnpd } from "./src/Pinniped/Pinniped.js";
 
-const app = Pinniped();
+const app = pnpd();
 
 // Extensibility Invocations
 

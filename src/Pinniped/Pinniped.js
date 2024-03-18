@@ -84,17 +84,11 @@ class Pinniped {
   start(port) {
     const server = initApi(this);
     server.listen(port, () => {
+      console.log(`Admin UI available at http://localhost:${port}/_`);
       console.log(`App listening at http://localhost:${port}`);
     });
   }
 }
-
-// const pnpd = {
-//   createApp: Pinniped.createApp,
-//   MigrationDao: DAO,
-// };
-
-// export default pnpd;
 
 export const MigrationDao = DAO;
 export const pnpd = Pinniped.createApp;

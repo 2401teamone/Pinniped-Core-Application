@@ -1,6 +1,6 @@
 {
   "name": "pinniped",
-  "version": "0.1.2",
+  "version": "0.1.5",
   "description": "Easy-to-deploy Node backend server.",
   "keywords": [
     "backend",
@@ -48,6 +48,7 @@
     "express": "^4.18.3",
     "express-session": "^1.18.0",
     "knex": "^3.1.0",
+    "pinniped": "^0.1.4",
     "uuid": "^9.0.1",
     "xss": "^1.0.15"
   },
