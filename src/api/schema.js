@@ -1,11 +1,11 @@
-import { Router } from "express";
-import { v4 as uuidv4 } from "uuid";
+import { Router } from 'express';
+import { v4 as uuidv4 } from 'uuid';
 
-import Table from "../models/table.js";
-import loadTableContext from "./middleware/load_table_context.js";
-import adminOnly from "./middleware/admin_only.js";
-import catchError from "../utils/catch_error.js";
-import { BadRequestError } from "../utils/errors.js";
+import Table from '../models/table.js';
+import loadTableContext from './middleware/load_table_context.js';
+import adminOnly from './middleware/admin_only.js';
+import catchError from '../utils/catch_error.js';
+import { BadRequestError } from '../utils/errors.js';
 
 /**
  * Creates an Express Router object
@@ -19,11 +19,11 @@ export default function generateSchemaRouter(app) {
   const schemaApi = new SchemaApi(app);
 
   // router.use(adminOnly());
-  router.get("/", catchError(schemaApi.getAllTablesHandler()));
-  router.post("/", catchError(schemaApi.createTableHandler()));
-  router.get("/:tableId", catchError(schemaApi.getTableHandler()));
-  router.put("/:tableId", catchError(schemaApi.updateTableHandler()));
-  router.delete("/:tableId", catchError(schemaApi.dropTableHandler()));
+  router.get('/', catchError(schemaApi.getAllTablesHandler()));
+  router.post('/', catchError(schemaApi.createTableHandler()));
+  router.get('/:tableId', catchError(schemaApi.getTableHandler()));
+  router.put('/:tableId', catchError(schemaApi.updateTableHandler()));
+  router.delete('/:tableId', catchError(schemaApi.dropTableHandler()));
 
   return router;
 }
@@ -44,7 +44,7 @@ class SchemaApi {
    */
   getAllTablesHandler() {
     return async (req, res, next) => {
-      let allTableMeta = await this.app.getDAO().getAll("tablemeta");
+      let allTableMeta = await this.app.getDAO().getAll('tablemeta');
       allTableMeta = allTableMeta.map((table) => new Table(table));
       console.log(allTableMeta);
       res.json(allTableMeta);
@@ -88,10 +88,10 @@ class SchemaApi {
       // Find the specific row (representing a table) in 'tablemeta'.
       let tableFromMeta = await this.app.getDAO().findTableById(tableId);
       if (!tableFromMeta.length)
-        throw new BadRequestError("Table not found in metadata table.");
+        throw new BadRequestError('Table not found in metadata table.');
 
       tableFromMeta = tableFromMeta[0];
-      console.log(tableFromMeta, "Table Found in tablemeta");
+      console.log(tableFromMeta, 'Table Found in tablemeta');
       tableFromMeta.columns = JSON.parse(tableFromMeta.columns);
 
       // Creates two table instances based on the existing table schema and newly requested table schema.
@@ -99,7 +99,7 @@ class SchemaApi {
       const newTable = new Table(req.body);
 
       await oldTable.updateTo(newTable);
-      res.json(newTable);
+      res.json({ table: newTable });
     };
   }
 
@@ -116,14 +116,14 @@ class SchemaApi {
       let tableFromMeta = await this.app.getDAO().findTableById(tableId);
 
       if (!tableFromMeta.length)
-        throw new BadRequestError("Unable to find the table.");
+        throw new BadRequestError('Unable to find the table.');
       tableFromMeta = tableFromMeta[0];
 
       const tableToDelete = new Table(tableFromMeta);
 
       await tableToDelete.drop();
 
-      res.status(204).json({ message: "Table Dropped" });
+      res.status(204).json({ message: 'Table Dropped' });
     };
   }
 }
