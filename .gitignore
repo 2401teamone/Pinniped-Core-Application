@@ -3,8 +3,8 @@ node_modules
 .env
 dist
 
-hb.db
-hb.db-shm
-hb.db-wal
+pnpd.db
+pnpd.db-shm
+pnpd.db-wal
 session.db
 migrations
