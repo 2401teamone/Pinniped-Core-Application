@@ -65,7 +65,7 @@ class DAO {
    */
   async dbBackup() {
     // adds a connection to the knex pool so dao has access to the raw sqlite3 connection
-    await this.getDB()("tablemeta").select("*");
+    await this.getDB()("sqlite_master").select("*").limit(1);
 
     // matches the filename from the full filepath
     let dbName = this.sqlite3Connection.name.match(/[^\\/]+$/)[0];
