@@ -1,12 +1,14 @@
-import { Router } from "express";
-import loadTableContext from "./middleware/load_table_context.js";
-import apiRules from "./middleware/api_rules.js";
-import validateRecord from "./middleware/validate_record.js";
-import catchError from "../utils/catch_error.js";
-import { BadRequestError, ForbiddenError } from "../utils/errors.js";
-import { v4 as uuidv4 } from "uuid";
+import { Router } from 'express';
+import loadTableContext from './middleware/load_table_context.js';
+import apiRules from './middleware/api_rules.js';
+import validateRecord from './middleware/validate_record.js';
+import stringifyJsonColumns from './middleware/stringify_json.js';
+import parseJsonColumns from '../utils/parse_json_columns.js';
+import catchError from '../utils/catch_error.js';
+import { BadRequestError, ForbiddenError } from '../utils/errors.js';
+import { v4 as uuidv4 } from 'uuid';
 
-const BASE = "/tables/:tableId/rows";
+const BASE = '/tables/:tableId/rows';
 
 /**
  * Creates an Express Router object
@@ -36,12 +38,16 @@ export default function generateCrudRouter(app) {
     BASE,
     loadTableContext(app),
     apiRules(app),
+    validateRecord(),
+    stringifyJsonColumns(),
     catchError(crudApi.createOneHandler())
   );
   router.patch(
     `${BASE}/:rowId`,
     loadTableContext(app),
     apiRules(app),
+    validateRecord(),
+    stringifyJsonColumns(),
     catchError(crudApi.updateOneHandler())
   );
   router.delete(
@@ -78,6 +84,8 @@ class CrudApi {
 
       // Returns the Result
       const rows = await this.app.getDAO().getAll(table.name);
+      parseJsonColumns(table, rows);
+
       const event = {
         table,
         rows,
@@ -86,6 +94,7 @@ class CrudApi {
       this.app.onGetAllRows().trigger(event);
 
       if (event.res.finished) return null;
+
       res.status(200).json({
         table: {
           id: table.id,
@@ -106,6 +115,7 @@ class CrudApi {
       const { table } = res.locals;
       const { rowId } = req.params;
       const row = await this.app.getDAO().getOne(table.name, rowId);
+      parseJsonColumns(table, row);
       if (!row.length) throw new BadRequestError();
 
       //TESTING
@@ -113,7 +123,7 @@ class CrudApi {
 
       // Row level access control
       if (
-        table.getOneRule === "creator" &&
+        table.getOneRule === 'creator' &&
         row[0].userId != req.session.user.id
       ) {
         throw new ForbiddenError();
@@ -133,11 +143,12 @@ class CrudApi {
       // Need to Validate the Schema of the Request?
       const { table } = res.locals;
 
-      validateRecord(table, req.body);
+      // validateRecord(table, req.body);
 
       const createdRow = await this.app
         .getDAO()
         .createOne(table.name, { ...req.body, id: uuidv4() });
+      parseJsonColumns(table, createdRow);
       res.status(201).json({
         table: {
           id: table.id,
@@ -160,6 +171,7 @@ class CrudApi {
       const updatedRow = await this.app
         .getDAO()
         .updateOne(table.name, rowId, req.body);
+      parseJsonColumns(table, updatedRow);
       res.status(200).json({
         table: {
           id: table.id,
