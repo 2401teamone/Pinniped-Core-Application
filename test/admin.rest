@@ -1,2 +1,0 @@
-### Create a backup of the database
-GET http://localhost:3000/admin/backup
