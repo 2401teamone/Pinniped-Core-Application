@@ -74,6 +74,8 @@ class CrudApi {
     return async (req, res, next) => {
       const { table } = res.locals;
 
+      console.log(req.session.user);
+
       // Returns the Result
       const rows = await this.app.getDAO().getAll(table.name);
       const event = {
@@ -107,7 +109,7 @@ class CrudApi {
       if (!row.length) throw new BadRequestError();
 
       //TESTING
-      table.getOneRule = "creator";
+      // table.getOneRule = "creator";
 
       // Row level access control
       if (

@@ -1,4 +1,3 @@
-import xss from "xss";
 import catchError from "../../utils/catch_error.js";
 
 export default function setHeaders() {

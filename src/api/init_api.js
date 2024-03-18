@@ -30,7 +30,12 @@ const db = new sqlite("pnpd_data/session.db");
 function initApi(app) {
   const server = express();
   server.use(express.json());
-  server.use(cors());
+  server.use(
+    cors({
+      origin: true,
+      credentials: true,
+    })
+  );
   server.use(
     session({
       store: new SqliteStore({
@@ -48,7 +53,6 @@ function initApi(app) {
         httpOnly: true, //prevent client side JS from reading the cookie
         secure: false, //set to true when using HTTPS in production
       },
-      // cookie: { maxAge: 30 * 1000 }, // 30 seconds
     })
   );
 
