@@ -129,26 +129,32 @@ class Column {
     text: {
       sql: "TEXT DEFAULT '' NOT NULL",
       options: TextOptions,
+      isJson: false,
     },
     number: {
       sql: 'NUMERIC DEFAULT 0 NOT NULL',
       options: NumberOptions,
+      isJson: false,
     },
     bool: {
       sql: 'BOOLEAN DEFAULT false NOT NULL',
       options: BoolOptions,
+      isJson: false,
     },
     date: {
       sql: "TEXT DEFAULT '' NOT NULL",
       options: DateOptions,
+      isJson: false,
     },
     email: {
       sql: "TEXT DEFAULT '' NOT NULL",
       options: EmailOptions,
+      isJson: false,
     },
     url: {
       sql: "TEXT DEFAULT '' NOT NULL",
       options: UrlOptions,
+      isJson: false,
     },
     select: {
       sql: 'JSON DEFAULT [] NOT NULL',
@@ -158,7 +164,7 @@ class Column {
     relation: {
       sql: "JSON DEFAULT '' NOT NULL",
       options: RelationOptions,
-      isJson: true,
+      isJson: false,
     },
     json: {
       sql: 'JSON DEFAULT NULL',
