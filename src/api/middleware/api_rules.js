@@ -35,7 +35,7 @@ export default function apiRules() {
 
     const { table } = res.locals;
     // // JUST FOR TESTING
-    table.updateRule = 'admin';
+    // table.updateRule = 'admin';
 
     // User Access Level
     const sessionAccessLevel = req.session.hasOwnProperty('user')
@@ -43,8 +43,7 @@ export default function apiRules() {
       : ACCESS_LEVEL['public'];
 
     // Required Table Access Level
-    // const requiredAccessLevel = ACCESS_LEVEL[table[apiRule]];
-    const requiredAccessLevel = 1;
+    const requiredAccessLevel = ACCESS_LEVEL[table[apiRule]];
 
     // If the user is not authenticated, and needs to be, return a 401 error
     if (
