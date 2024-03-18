@@ -59,16 +59,24 @@ class DAO {
   }
 
   /**
+   * @returns {object better-sqlite3 connection}
+   */
+  async getRawSqliteConnection() {
+    // adds a connection to the knex pool so dao has access to the raw sqlite3 connection
+    await this.getDB()("sqlite_master").select("*").limit(1);
+    return this.sqlite3Connection;
+  }
+
+  /**
    * Uses better-sqlite3 connection to run a backup on the same knex connection as main app is using.
    * @params
    * @returns {undefined}
    */
   async dbBackup() {
-    // adds a connection to the knex pool so dao has access to the raw sqlite3 connection
-    await this.getDB()("sqlite_master").select("*").limit(1);
+    let connection = await this.getRawSqliteConnection();
 
     // matches the filename from the full filepath
-    let dbName = this.sqlite3Connection.name.match(/[^\\/]+$/)[0];
+    let dbName = connection.name.match(/[^\\/]+$/)[0];
 
     if (!fs.existsSync("pnpd_data/backup")) fs.mkdirSync("pnpd_data/backup");
 
@@ -76,7 +84,7 @@ class DAO {
     let newPath = `pnpd_data/backup/${newName}`;
 
     console.log(`Backing up ${dbName} as '${newName}'...`);
-    await this.sqlite3Connection.backup(newPath);
+    await connection.backup(newPath);
     console.log("Backup Complete!");
   }
 
