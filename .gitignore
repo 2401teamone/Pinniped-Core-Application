@@ -1,3 +1,10 @@
 node_modules
+.parcel-cache
 .env
-pnpd_data
+dist
+
+pnpd.db
+pnpd.db-shm
+pnpd.db-wal
+session.db
+migrations

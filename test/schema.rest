@@ -11,13 +11,12 @@ content-type : application/json
 ### Adds a table
 
 POST http://localhost:3000/api/schema
-content-type : application/json
+content-type: application/json
 
 {
-  "name" : "Penguins",
-  "columns" : [{"name":"species","type":"text"},{"name":"age","type":"text"}]
+  "name": "Animals",
+  "columns": [{"name":"species","type":"text"}]
 }
-
 ### Adds a table
 PUT http://localhost:3000/api/schema/f582c24a-3ead-411e-b87e-baa50e8722a4
 content-type : application/json
