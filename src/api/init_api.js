@@ -28,7 +28,15 @@ const db = new sqlite("pnpd_data/session.db");
 function initApi(app) {
   const server = express();
 
-  server.use("/_", express.static("node_modules/pinniped/ui"));
+  server.use(
+    "/_",
+    express.static(
+      fs.existsSync("node_modules/pinniped/ui")
+        ? "node_modules/pinniped/ui"
+        : "ui"
+    )
+  );
+  // server.use("/_", express.static("ui"));
   server.use(express.json());
   server.use(
     cors({

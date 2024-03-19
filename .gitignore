@@ -4,6 +4,7 @@ node_modules
 dist
 .DS_Store
 
+backup
 pnpd.db
 pnpd.db-shm
 pnpd.db-wal
