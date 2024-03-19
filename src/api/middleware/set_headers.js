@@ -15,6 +15,9 @@ export default function setHeaders() {
     // Set X-Frame-Options header to prevent clickjacking attacks
     res.setHeader("X-Frame-Options", "DENY");
 
+    // Set Strict-Transport-Security header to prevent packet sniffing attacks for the recommended duration of 2 years.
+    res.setHeader("Strict-Transport-Security", "max-age=63072000");
+
     next();
   });
 }
