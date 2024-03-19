@@ -41,14 +41,11 @@ class DAO {
       },
     });
 
-    console.log("Database connection established.");
-
     return db;
   }
 
-  disconnect() {
-    this.getDB().destroy();
-    console.log("Database connection closed.");
+  async disconnect() {
+    await this.getDB().destroy();
   }
 
   /**

@@ -1,10 +1,11 @@
 import initApi from "../api/init_api.js";
 import DAO from "../dao/dao.js";
 import EventEmitter from "events";
+import handleProcessEvents from "../utils/handle_process_events.js";
 import { InvalidCustomRouteError } from "../utils/errors.js";
 
 /**
- * HB (HomeBase) Class
+ * Pinniped Class
  * Runs the application of the backend.
  * Offers extensibility of custom routes.
  */
@@ -81,8 +82,16 @@ class Pinniped {
     return this.DAO;
   }
 
+  /**
+   * Starts the server on the given port, and registers process event handlers.
+   * @param {number} port
+   */
+
   start(port) {
+    handleProcessEvents(this);
+
     const server = initApi(this);
+
     server.listen(port, () => {
       console.log(`Admin UI available at http://localhost:${port}/_`);
       console.log(`App listening at http://localhost:${port}`);
