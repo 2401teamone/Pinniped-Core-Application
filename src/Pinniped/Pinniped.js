@@ -1,7 +1,7 @@
 import initApi from "../api/init_api.js";
 import DAO from "../dao/dao.js";
 import EventEmitter from "events";
-import handleProcessEvents from "../utils/handle_process_events.js";
+import registerProcessListeners from "../utils/register_process_listeners.js";
 import { InvalidCustomRouteError } from "../utils/errors.js";
 
 /**
@@ -88,7 +88,7 @@ class Pinniped {
    */
 
   start(port) {
-    handleProcessEvents(this);
+    registerProcessListeners(this);
 
     const server = initApi(this);
 

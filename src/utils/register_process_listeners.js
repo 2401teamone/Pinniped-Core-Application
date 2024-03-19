@@ -6,7 +6,7 @@ import process from "process";
  * @param {object} app - The Pinniped application instance.
  * @returns {undefined}
  */
-const handleProcessEvents = (app) => {
+const registerProcessListeners = (app) => {
   /**
    * Closes the database connection and exits the process with a status code of 0.
    * @returns {Promise<void>}
@@ -39,4 +39,4 @@ const handleProcessEvents = (app) => {
   process.on("uncaughtException", errorExit);
 };
 
-export default handleProcessEvents;
+export default registerProcessListeners;
