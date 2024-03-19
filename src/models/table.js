@@ -192,10 +192,10 @@ class Table {
     });
 
     const migrateTemplate = `
-      import DAO from "../../src/dao/dao.js";
+      import { MigrationDao } from "pinniped";
 
       export async function up(knex) {
-        const dao = new DAO("", knex);
+        const dao = new MigrationDao("", knex);
         await dao.createTable(${stringTable});
         await dao.addTableMetaData(${stringTableMetaRow});
       }
@@ -231,10 +231,10 @@ class Table {
     });
 
     const migrateTemplate = `
-        import DAO from "../../src/dao/dao.js";
+        import { MigrationDao } from "pinniped";
 
         export async function up(knex) {
-          const dao = new DAO("", knex);
+          const dao = new MigrationDao("", knex);
           await dao.dropTable("${this.name}");
           await dao.deleteTableMetaData("${this.id}");
         }
@@ -281,7 +281,7 @@ class Table {
     });
 
     const migrateTemplate = `
-    import DAO from "../../src/dao/dao.js";
+    import { MigrationDao } from "pinniped";
 
     export async function up(knex) {
       const oldTable = ${JSON.stringify(this)};
@@ -289,7 +289,7 @@ class Table {
       const oldColumns = ${JSON.stringify(oldColumns)};
       const newColumns = ${JSON.stringify(newColumns)};
 
-      const dao = new DAO("", knex);
+      const dao = new MigrationDao("", knex);
 
       // Delete Columns (Tested)
       for (let oldColumn of oldColumns) {
@@ -325,7 +325,7 @@ class Table {
       const oldColumns = ${JSON.stringify(newColumns)};
       const newColumns = ${JSON.stringify(oldColumns)};
 
-      const dao = new DAO("", knex);
+      const dao = new MigrationDao("", knex);
 
       // Delete Columns
       for (let oldColumn of oldColumns) {

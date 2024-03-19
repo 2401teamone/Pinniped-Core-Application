@@ -2,7 +2,9 @@ node_modules
 .parcel-cache
 .env
 dist
+.DS_Store
 
+backup
 pnpd.db
 pnpd.db-shm
 pnpd.db-wal

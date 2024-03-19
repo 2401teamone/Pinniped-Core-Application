@@ -1,22 +1,44 @@
 {
-  "name": "server",
-  "version": "1.0.0",
-  "description": "",
-  "main": "./dist/Pinniped.js",
+  "name": "pinniped",
+  "version": "0.1.8",
+  "description": "Easy-to-deploy Node backend server.",
+  "keywords": [
+    "backend",
+    "sqlite3",
+    "node"
+  ],
+  "main": "./src/Pinniped/Pinniped.js",
   "type": "module",
   "scripts": {
-    "start": "node server.js",
+    "start": "node index.js",
     "prod": "node ./dist/Pinniped.js",
-    "dev": "nodemon server.js",
+    "dev": "nodemon index.js",
     "reset-db": "rm -f pnpd_data/pnpd.db && touch pnpd_data/pnpd.db && npm run seed-data",
-    "reset-migrations": "rm -r pnpd_data/migrations && sqlite3 pnpd_data/pnpd.db < drop-migrations.sql",
-    "seed-data": "sqlite3 pnpd_data/pnpd.db < seed-data.sql",
-    "reset-sessions": "rm -f session.db && touch session.db",
-    "build": "npx parcel build server.js && npm run build-cleanup",
+    "reset-sessions": "rm -f pnpd_data/session.db && touch pnpd_data/session.db",
+    "reset-migrations": "rm -r pnpd_data/migrations && sqlite3 pnpd_data/pnpd.db < pnpd_data/drop-migrations.sql",
+    "seed-data": "sqlite3 pnpd_data/pnpd.db < pnpd_data/seed-data.sql",
+    "build": "npx parcel build index.js && npm run build-cleanup",
     "build-cleanup": "rm -rf .parcel-cache"
   },
-  "author": "",
-  "license": "ISC",
+  "contributors": [
+    {
+      "name": "Alan Cho",
+      "email": "alancho397@gmail.com"
+    },
+    {
+      "name": "Jonathan Hurd",
+      "email": "hurd.jonathan@gmail.com"
+    },
+    {
+      "name": "Josh Lakenan",
+      "email": "joshlakenan@gmail.com"
+    },
+    {
+      "name": "Trevor Rees-Jones",
+      "eail": "treesjones3@gmail.com"
+    }
+  ],
+  "license": "MIT",
   "dependencies": {
     "bcrypt": "^5.1.1",
     "better-sqlite3": "^9.4.3",
@@ -26,6 +48,7 @@
     "express": "^4.18.3",
     "express-session": "^1.18.0",
     "knex": "^3.1.0",
+    "pinniped": "^0.1.8",
     "uuid": "^9.0.1",
     "xss": "^1.0.15"
   },

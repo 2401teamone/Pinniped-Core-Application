@@ -7,7 +7,6 @@ dotenv.config();
 import generateCrudRouter from "./crud.js";
 import generateCustomRouter from "./custom.js";
 import generateSchemaRouter from "./schema.js";
-import generateUIRouter from "./ui.js";
 import generateAuthRouter from "./auth.js";
 import generateAdminRouter from "./admin.js";
 
@@ -25,10 +24,19 @@ import sqlite from "better-sqlite3";
 const SqliteStore = store(session);
 if (!fs.existsSync("pnpd_data")) fs.mkdirSync("pnpd_data");
 const db = new sqlite("pnpd_data/session.db");
-// const db = new sqlite("pnpd_data/session.db", { verbose: console.log });
 
 function initApi(app) {
   const server = express();
+
+  server.use(
+    "/_",
+    express.static(
+      fs.existsSync("node_modules/pinniped/ui")
+        ? "node_modules/pinniped/ui"
+        : "ui"
+    )
+  );
+  // server.use("/_", express.static("ui"));
   server.use(express.json());
   server.use(
     cors({
@@ -67,14 +75,12 @@ function initApi(app) {
   const schemaRouter = generateSchemaRouter(app);
   const adminRouter = generateAdminRouter(app);
   const customRouter = generateCustomRouter(app);
-  const UIRouter = generateUIRouter(app);
 
   server.use("/api/auth", authRouter);
   server.use("/api", crudRouter);
   server.use("/api/schema", schemaRouter);
   server.use("/admin", adminRouter);
   server.use("/", customRouter);
-  server.use("/ui", UIRouter);
 
   server.get("*", (req, res, next) => {
     res.send("Page does not exist");

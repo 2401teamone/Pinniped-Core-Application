@@ -105,7 +105,6 @@ class DAO {
       return result;
     } catch (e) {
       await trx.rollback();
-      console.log(e.message, "HEREEE");
       throw new Error(e);
     }
   }
@@ -134,7 +133,6 @@ class DAO {
    */
   async findTableById(id) {
     try {
-      console.log("this is this ---------", this);
       const table = await this.getDB()("tablemeta").select("*").where({ id });
       return table;
     } catch (e) {
@@ -167,7 +165,6 @@ class DAO {
   async getAll(tableName) {
     try {
       const rows = await this.getDB()(tableName).select("*");
-      console.log("we made it here!");
       return rows;
     } catch (e) {
       throw new Error(e.message);

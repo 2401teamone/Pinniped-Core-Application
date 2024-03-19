@@ -8,9 +8,9 @@ import { InvalidCustomRouteError } from "../utils/errors.js";
  * Runs the application of the backend.
  * Offers extensibility of custom routes.
  */
-class HB {
+class Pinniped {
   static createApp(config) {
-    return new HB(config);
+    return new Pinniped(config);
   }
 
   constructor(config) {
@@ -84,9 +84,11 @@ class HB {
   start(port) {
     const server = initApi(this);
     server.listen(port, () => {
+      console.log(`Admin UI available at http://localhost:${port}/_`);
       console.log(`App listening at http://localhost:${port}`);
     });
   }
 }
 
-export default HB;
+export const MigrationDao = DAO;
+export const pnpd = Pinniped.createApp;
