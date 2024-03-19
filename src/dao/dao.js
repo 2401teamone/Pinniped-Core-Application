@@ -41,10 +41,15 @@ class DAO {
       },
     });
 
+    console.log("Database connection established.");
+
     return db;
   }
 
-  disconnect() {}
+  disconnect() {
+    this.getDB().destroy();
+    console.log("Database connection closed.");
+  }
 
   /**
    * Obtains the Knex instance that connected to the database.

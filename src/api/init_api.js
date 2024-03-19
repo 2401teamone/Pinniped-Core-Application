@@ -36,7 +36,7 @@ function initApi(app) {
         : "ui"
     )
   );
-  // server.use("/_", express.static("ui"));
+
   server.use(express.json());
   server.use(
     cors({
