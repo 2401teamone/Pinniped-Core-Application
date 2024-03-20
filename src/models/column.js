@@ -83,23 +83,12 @@ class SelectOptions {
 }
 
 class RelationOptions {
-  constructor({ tableId, cascade = 'delete', maxSelect = 1, minSelect = 0 }) {
+  constructor({ tableId, cascadeDelete = true }) {
     this.tableId = tableId;
-    this.cascade = cascade;
-    this.maxSelect = maxSelect;
-    this.minSelect = minSelect;
+    this.cascadeDelete = cascadeDelete;
   }
 
   validate(value) {
-    if (!Array.isArray(value))
-      return [false, 'Relation value must be an array.'];
-    if (values.length > this.maxSelect)
-      return [false, 'Too many options selected for relation.'];
-    if (values.length < this.minSelect)
-      return [false, 'Too few options selected for relation.'];
-    for (let id of value) {
-      if (typeof id !== 'string') return [false, 'Invalid relation id.'];
-    }
     return [true, ''];
   }
 }
