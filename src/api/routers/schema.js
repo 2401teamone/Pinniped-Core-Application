@@ -20,9 +20,8 @@ export default function generateSchemaRouter(app) {
   // router.use(adminOnly());
   router.get('/', catchError(schemaApi.getAllTablesHandler()));
   router.post('/', catchError(schemaApi.createTableHandler()));
-  router.get('/:tableId', catchError(schemaApi.getTableHandler()));
-  router.put('/:tableId', catchError(schemaApi.updateTableHandler()));
-  router.delete('/:tableId', catchError(schemaApi.dropTableHandler()));
+  router.put('/:tableId', loadTableContext(app), catchError(schemaApi.updateTableHandler()));
+  router.delete('/:tableId', loadTableContext(app), catchError(schemaApi.dropTableHandler()));
 
   return router;
 }
@@ -50,14 +49,6 @@ class SchemaApi {
     };
   }
 
-  getTableHandler() {
-    return async (req, res, next) => {
-      // get all tables from _tables table via app.getDao().getAllTables()
-      // Instantiate each table instance
-      // get table and instanciate new table instance that has things like: name, rules, schema columns, etc.
-    };
-  }
-
   /**
    * Returns a handler function that creates a table to the database.
    * It adds the metadata of the new table to 'tablemeta',
@@ -81,20 +72,7 @@ class SchemaApi {
    */
   updateTableHandler() {
     return async (req, res, next) => {
-      const { tableId } = req.params;
-
-      console.log(tableId);
-      // Find the specific row (representing a table) in 'tablemeta'.
-      let tableFromMeta = await this.app.getDAO().findTableById(tableId);
-      if (!tableFromMeta.length)
-        throw new BadRequestError('Table not found in metadata table.');
-
-      tableFromMeta = tableFromMeta[0];
-      console.log(tableFromMeta, 'Table Found in tablemeta');
-      tableFromMeta.columns = JSON.parse(tableFromMeta.columns);
-
-      // Creates two table instances based on the existing table schema and newly requested table schema.
-      const oldTable = new Table(tableFromMeta);
+      const oldTable = res.locals.table;
       const newTable = new Table(req.body);
 
       await oldTable.updateTo(newTable);
@@ -111,15 +89,7 @@ class SchemaApi {
    */
   dropTableHandler() {
     return async (req, res, next) => {
-      const { tableId } = req.params;
-      let tableFromMeta = await this.app.getDAO().findTableById(tableId);
-
-      if (!tableFromMeta.length)
-        throw new BadRequestError('Unable to find the table.');
-      tableFromMeta = tableFromMeta[0];
-
-      const tableToDelete = new Table(tableFromMeta);
-
+      const tableToDelete = res.locals.table;
       await tableToDelete.drop();
 
       res.status(204).json({ message: 'Table Dropped' });
