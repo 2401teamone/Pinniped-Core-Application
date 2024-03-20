@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import generateUuid from '../utils/generate_uuid.js';
 
 class TextOptions {
   constructor({ minLength = 0, maxLength = 255 }) {
@@ -83,23 +83,12 @@ class SelectOptions {
 }
 
 class RelationOptions {
-  constructor({ tableId, cascade = 'delete', maxSelect = 1, minSelect = 0 }) {
+  constructor({ tableId, cascadeDelete = true }) {
     this.tableId = tableId;
-    this.cascade = cascade;
-    this.maxSelect = maxSelect;
-    this.minSelect = minSelect;
+    this.cascadeDelete = cascadeDelete;
   }
 
   validate(value) {
-    if (!Array.isArray(value))
-      return [false, 'Relation value must be an array.'];
-    if (values.length > this.maxSelect)
-      return [false, 'Too many options selected for relation.'];
-    if (values.length < this.minSelect)
-      return [false, 'Too few options selected for relation.'];
-    for (let id of value) {
-      if (typeof id !== 'string') return [false, 'Invalid relation id.'];
-    }
     return [true, ''];
   }
 }
@@ -111,7 +100,7 @@ class JsonOptions {
 
   validate(value) {
     const size = new TextEncoder().encode(value).length;
-    console.log(value, size, this.maxSize, 'JSON VALUE & SIZE');
+    
     if (size > this.maxSize) return [false, 'JSON Value is too large.'];
     try {
       JSON.parse(JSON.stringify(value));
@@ -177,15 +166,16 @@ class Column {
     return Object.keys(Column.COLUMN_MAP).includes(type);
   }
 
-  constructor({ id = uuidv4(), name, type, options = {} }) {
+  constructor({ id = generateUuid(), name, type, required = false, options = {} }) {
     this.id = id;
     this.name = name;
     this.type = type;
+    this.required = required
     this.options = new Column.COLUMN_MAP[type].options(options);
   }
 
   generateId() {
-    this.id = uuidv4();
+    this.id = generateUuid();
   }
 
   getOptions() {

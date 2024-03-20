@@ -11,14 +11,14 @@ CREATE TABLE tablemeta
 
 DROP TABLE IF EXISTS users;
 CREATE TABLE users (
-  id INTEGER PRIMARY KEY,
+  id TEXT PRIMARY KEY,
   username TEXT UNIQUE,
   password TEXT,
   role TEXT DEFAULT 'user');
 
 DROP TABLE IF EXISTS _admins;
 CREATE TABLE _admins (
-  id INTEGER PRIMARY KEY,
+  id TEXT PRIMARY KEY,
   username TEXT UNIQUE,
   password TEXT,
   role TEXT DEFAULT 'admin');

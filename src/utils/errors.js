@@ -14,28 +14,6 @@ class AppError extends Error {
   }
 }
 
-export class TableNotFoundError extends AppError {
-  constructor(tableId) {
-    super(
-      `Table with an id of ${tableId} was not found`,
-      404,
-      "TABLE_NOT_FOUND",
-      `Table not found.  You've likely attempted to access a table that does not exist within the database`
-    );
-  }
-}
-
-export class DatabaseError extends AppError {
-  constructor(message = "Database error") {
-    super(
-      message,
-      404,
-      "DATABASE_ERROR",
-      "The database encountered an error.  Don't look at us"
-    );
-  }
-}
-
 export class BadRequestError extends AppError {
   constructor(message = "This operation failed due to a bad request") {
     super(
@@ -43,6 +21,17 @@ export class BadRequestError extends AppError {
       400,
       "BAD_REQUEST",
       "Failed to execute the request. Probably due to an invalid ID provided."
+      );
+    }
+  }
+  
+export class TableNotFoundError extends AppError {
+  constructor(tableId) {
+    super(
+      `Table with an id of ${tableId} was not found`,
+      404,
+      "TABLE_NOT_FOUND",
+      `Table not found.  You've likely attempted to access a table that does not exist within the database.`
     );
   }
 }
@@ -69,28 +58,6 @@ export class UnauthenticatedError extends AppError {
   }
 }
 
-export class ValidationError extends AppError {
-  constructor(table) {
-    super(
-      `Validation failed for this attempt`,
-      402,
-      "INVALID_REQUEST",
-      `You likely provided data that is not compatible with the ${table} table`
-    );
-  }
-}
-
-export class InvalidCustomRouteError extends AppError {
-  constructor(message) {
-    super(
-      message,
-      402,
-      "INVALID_CUSTOM_ROUTE",
-      "Your provided method, path, and/or handler were invalid per the custom route requirements.  Please visit our documentation to learn more."
-    );
-  }
-}
-
 export class AuthenticationError extends AppError {
   constructor(message = "Authentication Error") {
     super(
@@ -98,6 +65,17 @@ export class AuthenticationError extends AppError {
       400,
       "AUTH_ERROR",
       `Please try again with updated credentials.`
-    );
+      );
+    }
   }
-}
+
+  export class InvalidCustomRouteError extends AppError {
+    constructor(message) {
+      super(
+        message,
+        400,
+        "INVALID_CUSTOM_ROUTE",
+        "Your provided method, path, and/or handler were invalid per the custom route requirements.  Please visit our documentation to learn more."
+      );
+    }
+  }

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import catchError from "../utils/catch_error.js";
+import catchError from "../../utils/catch_error.js";
 
 export default function generateCustomRouter(app) {
   const router = Router();

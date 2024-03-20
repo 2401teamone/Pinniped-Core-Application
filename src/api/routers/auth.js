@@ -1,7 +1,8 @@
 import bcrypt from "bcrypt";
 import { Router } from "express";
-import catchError from "../utils/catch_error.js";
-import { AuthenticationError } from "../utils/errors.js";
+import catchError from "../../utils/catch_error.js";
+import { AuthenticationError } from "../../utils/errors.js";
+import generateUuid from "../../utils/generate_uuid.js";
 
 /**
  * Creates an Express Router object
@@ -14,13 +15,13 @@ export default function generateAuthRouter(app) {
   const router = Router();
   const authApi = new AuthApi(app);
 
-  router.get("/", catchError(authApi.getSessionHandler())); // Just for testing
-
+  router.get("/", catchError(authApi.getUserHandler()));
   router.post("/register", catchError(authApi.registerHandler()));
   router.post("/login", catchError(authApi.loginHandler()));
   router.post("/admin/register", catchError(authApi.registerAdminHandler()));
   router.post("/admin/login", catchError(authApi.loginAdminHandler()));
   router.post("/logout", catchError(authApi.logoutHandler()));
+  router.get("/admin/registered", catchError(authApi.adminExistsHandler()));
 
   return router;
 }
@@ -30,14 +31,9 @@ class AuthApi {
     this.app = app;
   }
 
-  getCurrentUser() {
-    return async (req, res, next) => {};
-  }
-
-  getSessionHandler() {
+  getUserHandler() {
     return (req, res, next) => {
-      console.log("req.session: ", req.session);
-      res.send(req.session.user);
+      res.status(200).json({ user: req.session.user });
     };
   }
 
@@ -62,7 +58,7 @@ class AuthApi {
       const hashedPassword = await bcrypt.hash(password, 10);
       const createdUser = await this.app
         .getDAO()
-        .createOne("users", { username, password: hashedPassword });
+        .createOne("users", {id: generateUuid(),  username, password: hashedPassword });
 
       console.log("User created :", createdUser[0]);
       res.status(201).json({ username });
@@ -89,7 +85,7 @@ class AuthApi {
       const hashedPassword = await bcrypt.hash(password, 10);
       const createdAdmin = await this.app
         .getDAO()
-        .createOne("_admins", { username, password: hashedPassword });
+        .createOne("_admins", {id: generateUuid(), username, password: hashedPassword });
 
       console.log("Admin created :", createdAdmin[0]);
       res.status(201).json({ username });
@@ -108,24 +104,19 @@ class AuthApi {
     return async (req, res, next) => {
       const { username, password } = req.body;
 
-      console.log("Username Sent: ", username);
-
-      // Checks if 'username' exists in 'users'.
       const existingUser = await this.app
         .getDAO()
         .search("users", { username });
       if (!existingUser.length) throw new AuthenticationError();
 
-      // Hashes the inputted password, and sees if it's equal to the hashed password in 'users'.
       const match = await bcrypt.compare(password, existingUser[0].password);
       if (!match) throw new AuthenticationError();
 
-      // Sets the session's user to the found user.
       req.session.user = existingUser[0];
       delete req.session.user.password;
 
       console.log("Logged in user: ", req.session.user);
-      res.status(200).json({ message: "User logged in successfully." });
+      res.status(200).json({ user: req.session.user });
     };
   }
 
@@ -140,22 +131,19 @@ class AuthApi {
     return async (req, res, next) => {
       const { username, password } = req.body;
 
-      // Check if the 'username' exists in '_admins'.
       const existingAdmin = await this.app
         .getDAO()
         .search("_admins", { username });
       if (!existingAdmin.length) throw new AuthenticationError();
 
-      // Hashes the inputted password and compares it with the hashed password in '_admins'.
       const match = await bcrypt.compare(password, existingAdmin[0].password);
       if (!match) throw new AuthenticationError();
 
-      // Sets the session's user to the found admin.
       req.session.user = existingAdmin[0];
       delete req.session.user.password;
 
       console.log("logged in admin: ", req.session.user);
-      res.status(200).json({ message: "Admin logged in successfully." });
+      res.status(200).json({ admin: req.session.user });
     };
   }
 
@@ -168,6 +156,20 @@ class AuthApi {
       console.log("Logging out user: ", req.session.user);
       delete req.session.user;
       res.status(200).json({ message: "User logged out." });
+    };
+  }
+  /**
+   * Checks if there is an admin in the _admins table
+   * @returns {function} 
+   */
+  adminExistsHandler() {
+    return async (req, res, next) => {
+      const existingAdmin = await this.app.getDAO().getAll('_admins');
+      if (existingAdmin.length) {
+        res.status(200).json({ registered: true });
+      } else {
+        res.status(200).json({ registered: false });
+      }
     };
   }
 }

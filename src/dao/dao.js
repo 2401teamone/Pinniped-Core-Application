@@ -1,5 +1,5 @@
 import knex from "knex";
-import { DatabaseError, BadRequestError } from "../utils/errors.js";
+import { BadRequestError } from "../utils/errors.js";
 import Column from "../models/column.js";
 import fs from "fs";
 
@@ -8,18 +8,17 @@ import fs from "fs";
  * Interacts with Sqlite3 Database through the interface of Knex.
  */
 class DAO {
-  constructor(dbFile, connection) {
+  constructor(connection) {
     this.sqlite3Connection;
-    this.db = connection ? connection : this._connect(dbFile, this);
+    this.db = connection ? connection : this._connect(this);
   }
 
   /**
    * Connects to the Better-Sqlite3 Database with Knex.
    * Allows for queries to be chained to the returned Knex instance.
-   * @param {string} dbFile
    * @returns {Knex Instance}
    */
-  _connect(dbFile, thisDAO) {
+  _connect(thisDAO) {
     if (!fs.existsSync("pnpd_data")) fs.mkdirSync("pnpd_data");
 
     let db = knex({
@@ -150,13 +149,8 @@ class DAO {
    * @returns {object[]} rows
    */
   async search(tableName, fields) {
-    try {
-      console.log(tableName, fields, "SEARCHING");
-      const rows = await this.getDB()(tableName).select("*").where(fields);
-      return rows;
-    } catch (e) {
-      throw new Error(e.message);
-    }
+    const rows = await this.getDB()(tableName).select("*").where(fields);
+    return rows;
   }
 
   /**
@@ -184,9 +178,7 @@ class DAO {
           .limit(limit);
         return rows;
       } else {
-        const rows = await this.getDB()(tableName)
-          .select("*")
-          .orderBy(sortBy, order);
+        const rows = await this.getDB()(tableName);
         return rows;
       }
     } catch (e) {
@@ -204,14 +196,10 @@ class DAO {
    * @returns {object[]} row
    */
   async getOne(tableName, rowId) {
-    try {
-      const row = await this.getDB()(tableName)
-        .select("*")
-        .where({ id: rowId });
-      return row;
-    } catch (e) {
-      throw new Error(e.message);
-    }
+    const row = await this.getDB()(tableName)
+      .select("*")
+      .where({ id: rowId });
+    return row;
   }
 
   /**
@@ -220,38 +208,17 @@ class DAO {
    * @returns {object[]} newRow
    */
   async createOne(tableName, newRow) {
-    console.log(newRow);
     try {
       const createdRow = await this.getDB()(tableName)
         .returning("*")
         .insert(newRow);
       return createdRow;
     } catch (e) {
-      console.log(e);
       if (e.message.slice(0, 11) === "insert into") {
         throw new BadRequestError();
       } else {
         throw new Error(e.message);
       }
-    }
-  }
-
-  /**
-   * Inserts the inputted newRow into the table, tableName.
-   * If the row already exists, then it updates it instead with the updated properties in newRow.
-   * @param {string} tableName
-   * @param {object} newRow
-   */
-  async upsertOne(tableName, newRow) {
-    try {
-      const upsertedRow = await this.getDB()(tableName)
-        .returning("*")
-        .insert(newRow)
-        .onConflict("id")
-        .merge();
-      return upsertedRow;
-    } catch (e) {
-      throw new Error(e.message);
     }
   }
 
@@ -265,15 +232,11 @@ class DAO {
    * @returns {object} updatedRow
    */
   async updateOne(tableName, rowId, newRow) {
-    try {
-      const updatedRow = await this.getDB()(tableName)
-        .returning("*")
-        .where({ id: rowId })
-        .update(newRow);
-      return updatedRow;
-    } catch (e) {
-      throw new Error(e.message);
-    }
+    const updatedRow = await this.getDB()(tableName)
+      .returning("*")
+      .where({ id: rowId })
+      .update(newRow);
+    return updatedRow;
   }
 
   /**
@@ -282,22 +245,7 @@ class DAO {
    * @param {string} rowId
    */
   async deleteOne(tableName, rowId) {
-    try {
-      await this.getDB()(tableName).where({ id: rowId }).del();
-    } catch (e) {
-      throw new Error(e.message);
-    }
-  }
-
-  /**
-   * A modified version of createOne, but inserts an object
-   * Specifically into 'tablemeta'.
-   * @param {id: string, name: string, columns: 'stringJSON'} tableData
-   * @return {object} createdRow
-   */
-  async upsertTableMetaData(tableData) {
-    const upsertedRow = this.upsertOne("tablemeta", tableData);
-    return upsertedRow;
+    await this.getDB()(tableName).where({ id: rowId }).del();
   }
 
   /**
@@ -307,7 +255,7 @@ class DAO {
    * @return {object} createdRow
    */
   async addTableMetaData(tableData) {
-    console.log(`Adding tablemeta row for : ${tableData.name}`);
+    console.log(`Adding tablemeta row for: ${tableData.name}`);
     const createdRow = await this.getDB()("tablemeta")
       .returning("*")
       .insert(tableData);
@@ -321,7 +269,7 @@ class DAO {
    * @return {object} updatedRow
    */
   async updateTableMetaData(tableData) {
-    console.log(`Updating tablemeta row for : ${tableData.name}`);
+    console.log(`Updating tablemeta row for: ${tableData.name}`);
     const updatedRow = await this.getDB()("tablemeta")
       .returning("*")
       .where({ id: tableData.id })

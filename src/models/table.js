@@ -1,5 +1,5 @@
 import Column from "./column.js";
-import { v4 as uuidv4 } from "uuid";
+import generateUuid from "../utils/generate_uuid.js";
 import fs from "fs";
 import DAO from "../dao/dao.js";
 import { BadRequestError } from "../utils/errors.js";
@@ -20,7 +20,7 @@ class Table {
   }
 
   constructor({
-    id = uuidv4(),
+    id = generateUuid(),
     name = "",
     columns = [],
     getAllRule = Table.DEFAULT_RULE,
@@ -97,15 +97,32 @@ class Table {
   }
 
   /**
+   * Validates the table name to ensure it's unique.
+   * @returns {undefined}
+   * @throws {BadRequestError} if the table name already exists.
+   */
+  async tableNameAvailable() {
+    const dao = new DAO();
+    const existingTable = await dao.findTableByName(this.name);
+    if (existingTable.length) {
+      throw new BadRequestError("The table name already exists: ", this.name);
+    }
+  }
+
+  
+  /**
    * Validates the proposed schema changes.
    * @param {object Table} newTable
    * @returns {undefined}
    */
   async validateUpdateTo(newTable) {
-    const dao = new DAO();
-    /// VALIDATING THE UPDATE
+    // validating the update
     if (this.id !== newTable.id) {
       throw new BadRequestError("Table ID cannot be changed.");
+    }
+
+    if (this.name !== newTable.name) {
+      await newTable.tableNameAvailable();
     }
     // no column type changes
     for (let column of newTable.columns) {
@@ -130,15 +147,11 @@ class Table {
         }
       }
 
-      let relatedTable = dao.findTableById(column.getOptions().tableId);
+      let relatedTable = await dao.findTableById(column.getOptions().tableId);
       if (!relatedTable.length) {
         throw new Error("Table relation does not exist");
       }
     }
-  }
-
-  generateId() {
-    this.id = uuidv4();
   }
 
   getColumns() {
@@ -176,11 +189,7 @@ class Table {
    * @returns {undefined}
    */
   async create() {
-    const dao = new DAO();
-    const existingTable = await dao.findTableByName(this.name);
-    if (existingTable.length) {
-      throw new BadRequestError("The table name already exists: ", this.name);
-    }
+    await this.tableNameAvailable();
 
     const db = Table.getNewConnection();
     let filePath = await db.migrate.make(`create_table_${this.name}`);
@@ -195,13 +204,13 @@ class Table {
       import { MigrationDao } from "pinniped";
 
       export async function up(knex) {
-        const dao = new MigrationDao("", knex);
+        const dao = new MigrationDao(knex);
         await dao.createTable(${stringTable});
         await dao.addTableMetaData(${stringTableMetaRow});
       }
 
       export async function down(knex) {
-        const dao = new DAO("", knex);
+        const dao = new DAO(knex);
         await dao.dropTable("${this.name}");
         await dao.deleteTableMetaData("${this.id}");
       }
@@ -234,13 +243,13 @@ class Table {
         import { MigrationDao } from "pinniped";
 
         export async function up(knex) {
-          const dao = new MigrationDao("", knex);
+          const dao = new MigrationDao(knex);
           await dao.dropTable("${this.name}");
           await dao.deleteTableMetaData("${this.id}");
         }
 
         export async function down(knex) {
-          const dao = new DAO("", knex);
+          const dao = new DAO(knex);
           await dao.createTable(${stringTable});
           await dao.addTableMetaData(${stringTableMetaRow})
         }
@@ -289,7 +298,7 @@ class Table {
       const oldColumns = ${JSON.stringify(oldColumns)};
       const newColumns = ${JSON.stringify(newColumns)};
 
-      const dao = new MigrationDao("", knex);
+      const dao = new MigrationDao(knex);
 
       // Delete Columns (Tested)
       for (let oldColumn of oldColumns) {
@@ -325,7 +334,7 @@ class Table {
       const oldColumns = ${JSON.stringify(newColumns)};
       const newColumns = ${JSON.stringify(oldColumns)};
 
-      const dao = new MigrationDao("", knex);
+      const dao = new MigrationDao(knex);
 
       // Delete Columns
       for (let oldColumn of oldColumns) {

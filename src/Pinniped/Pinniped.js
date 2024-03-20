@@ -55,6 +55,7 @@ class Pinniped {
    */
   onGetAllRows(...tables) {
     const EVENT_NAME = "GET_ALL_ROWS";
+    
     return {
       add: (handler) => {
         this.events.on(EVENT_NAME, (event) => {
@@ -93,8 +94,9 @@ class Pinniped {
     const server = initApi(this);
 
     server.listen(port, () => {
-      console.log(`Admin UI available at http://localhost:${port}/_`);
-      console.log(`App listening at http://localhost:${port}`);
+      console.log(`\nServer started at: http://localhost:${port}`);
+      console.log(`├─ REST API: http://localhost:${port}/api`);
+      console.log(`└─ Admin UI: http://localhost:${port}/_/\n`)
     });
   }
 }

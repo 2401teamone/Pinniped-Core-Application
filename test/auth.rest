@@ -46,8 +46,8 @@ POST http://localhost:3000/api/auth/admin/register
 content-type : application/json
 
 {
-  "username": "<Hi! I'm an admin>",
-  "password": "secretpassword"
+  "username": "admin",
+  "password": "password"
 }
 
 ### Logs in an admin
@@ -55,7 +55,7 @@ POST http://localhost:3000/api/auth/admin/login
 content-type : application/json
 
 {
-  "username": "test",
+  "username": "admin",
   "password": "password"
 }
 

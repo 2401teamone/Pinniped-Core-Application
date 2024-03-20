@@ -4,11 +4,11 @@ import fs from "fs";
 dotenv.config();
 
 //Routers
-import generateCrudRouter from "./crud.js";
-import generateCustomRouter from "./custom.js";
-import generateSchemaRouter from "./schema.js";
-import generateAuthRouter from "./auth.js";
-import generateAdminRouter from "./admin.js";
+import generateCrudRouter from "./routers/crud.js";
+import generateCustomRouter from "./routers/custom.js";
+import generateSchemaRouter from "./routers/schema.js";
+import generateAuthRouter from "./routers/auth.js";
+import generateAdminRouter from "./routers/admin.js";
 
 //Middleware
 import errorHandler from "./middleware/error_handler.js";
@@ -67,9 +67,6 @@ function initApi(app) {
   server.use(sanitize());
   server.use(setHeaders());
 
-  // server.use(logger)
-  // server.use(rateLimiter)
-
   const authRouter = generateAuthRouter(app);
   const crudRouter = generateCrudRouter(app);
   const schemaRouter = generateSchemaRouter(app);
@@ -77,9 +74,9 @@ function initApi(app) {
   const customRouter = generateCustomRouter(app);
 
   server.use("/api/auth", authRouter);
-  server.use("/api", crudRouter);
+  server.use("/api/tables", crudRouter);
   server.use("/api/schema", schemaRouter);
-  server.use("/admin", adminRouter);
+  server.use("/api/admin", adminRouter);
   server.use("/", customRouter);
 
   server.get("*", (req, res, next) => {

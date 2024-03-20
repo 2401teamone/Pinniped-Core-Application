@@ -1,6 +1,6 @@
 import { Router } from "express";
-import catchError from "../utils/catch_error.js";
-import adminOnly from "./middleware/admin_only.js";
+import catchError from "../../utils/catch_error.js";
+import adminOnly from "../middleware/admin_only.js";
 
 export default function generateAdminRouter(app) {
   const router = Router();
