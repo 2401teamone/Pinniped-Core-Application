@@ -5,6 +5,7 @@ import loadTableContext from '../middleware/load_table_context.js';
 import adminOnly from '../middleware/admin_only.js';
 import catchError from '../../utils/catch_error.js';
 import { BadRequestError } from '../../utils/errors.js';
+import ResponseData from "../../models/response_data.js"
 
 /**
  * Creates an Express Router object
@@ -44,8 +45,7 @@ class SchemaApi {
     return async (req, res, next) => {
       let allTableMeta = await this.app.getDAO().getAll('tablemeta');
       allTableMeta = allTableMeta.map((table) => new Table(table));
-      console.log(allTableMeta);
-      res.json(allTableMeta);
+      res.json({ tables: allTableMeta });
     };
   }
 
@@ -92,7 +92,7 @@ class SchemaApi {
       const tableToDelete = res.locals.table;
       await tableToDelete.drop();
 
-      res.status(204).json({ message: 'Table Dropped' });
+      res.status(204).end();
     };
   }
 }

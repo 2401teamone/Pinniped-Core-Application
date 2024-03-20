@@ -7,6 +7,8 @@ import parseJsonColumns from "../../utils/parse_json_columns.js";
 import catchError from "../../utils/catch_error.js";
 import { BadRequestError, ForbiddenError } from "../../utils/errors.js";
 import generateUuid from "../../utils/generate_uuid.js";
+import ResponseData from "../../models/response_data.js"
+
 const BASE = "/:tableId/rows";
 
 /**
@@ -82,25 +84,18 @@ class CrudApi {
       const rows = await this.app
         .getDAO()
         .getAll(table.name, pageNum, limit, sortBy, order);
+      
       parseJsonColumns(table, rows);
 
-      const event = {
-        table,
-        rows,
-        res,
-      };
+      const responseData = new ResponseData(table, rows, res)
 
-      this.app.onGetAllRows().trigger(event);
+      // Fire the onGetAllRows event
+      this.app.onGetAllRows().trigger(responseData);
 
-      if (event.res.finished) return null;
+      // If a registered event handler sends a response to the client, early return.
+      if (responseData.responseSent()) return null;
 
-      res.status(200).json({
-        table: {
-          id: table.id,
-          name: table.name,
-        },
-        rows: event.rows,
-      });
+      res.status(200).json(responseData.formatAllResponse());
     };
   }
 
@@ -126,7 +121,11 @@ class CrudApi {
         throw new ForbiddenError();
       }
 
-      res.status(200).json({ row });
+      const responseData = new ResponseData(table, row, res);
+      
+      if (responseData.responseSent()) return null;
+
+      res.status(200).json(responseData.formatOneResponse());
     };
   }
 
@@ -144,14 +143,12 @@ class CrudApi {
         .createOne(table.name, { ...req.body, id: generateUuid() });
 
       parseJsonColumns(table, createdRow);
+
+      const responseData = new ResponseData(table, createdRow, res);
+
+      if (responseData.responseSent()) return null;
       
-      res.status(201).json({
-        table: {
-          id: table.id,
-          name: table.name,
-        },
-        row: createdRow[0],
-      });
+      res.status(201).json(responseData.formatOneResponse());
     };
   }
 
@@ -164,17 +161,18 @@ class CrudApi {
     return async (req, res, next) => {
       const { table } = res.locals;
       const { rowId } = req.params;
+      
       const updatedRow = await this.app
         .getDAO()
         .updateOne(table.name, rowId, req.body);
+      
       parseJsonColumns(table, updatedRow);
-      res.status(200).json({
-        table: {
-          id: table.id,
-          name: table.name,
-        },
-        row: updatedRow[0],
-      });
+
+      const responseData = new ResponseData(table, updatedRow, res);
+
+      if (responseData.responseSent()) return null;
+      
+      res.status(200).json(responseData.formatOneResponse());
     };
   }
 
@@ -187,7 +185,13 @@ class CrudApi {
     return async (req, res, next) => {
       const { table } = res.locals;
       const { rowId } = req.params;
+
       await this.app.getDAO().deleteOne(table.name, rowId);
+
+      const responseData = new ResponseData(table, [], res);
+
+      if (responseData.responseSent()) return null;
+
       res.status(204).end();
     };
   }
