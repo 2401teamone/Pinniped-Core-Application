@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import generateUuid from '../utils/generate_uuid.js';
 
 class TextOptions {
   constructor({ minLength = 0, maxLength = 255 }) {
@@ -177,7 +177,7 @@ class Column {
     return Object.keys(Column.COLUMN_MAP).includes(type);
   }
 
-  constructor({ id = uuidv4(), name, type, options = {} }) {
+  constructor({ id = generateUuid(), name, type, options = {} }) {
     this.id = id;
     this.name = name;
     this.type = type;
@@ -185,7 +185,7 @@ class Column {
   }
 
   generateId() {
-    this.id = uuidv4();
+    this.id = generateUuid();
   }
 
   getOptions() {

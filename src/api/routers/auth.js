@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import { Router } from "express";
 import catchError from "../../utils/catch_error.js";
 import { AuthenticationError } from "../../utils/errors.js";
+import generateUuid from "../../utils/generate_uuid.js";
 
 /**
  * Creates an Express Router object
@@ -63,7 +64,7 @@ class AuthApi {
       const hashedPassword = await bcrypt.hash(password, 10);
       const createdUser = await this.app
         .getDAO()
-        .createOne("users", { username, password: hashedPassword });
+        .createOne("users", {id: generateUuid(),  username, password: hashedPassword });
 
       console.log("User created :", createdUser[0]);
       res.status(201).json({ username });
@@ -90,7 +91,7 @@ class AuthApi {
       const hashedPassword = await bcrypt.hash(password, 10);
       const createdAdmin = await this.app
         .getDAO()
-        .createOne("_admins", { username, password: hashedPassword });
+        .createOne("_admins", {id: generateUuid(), username, password: hashedPassword });
 
       console.log("Admin created :", createdAdmin[0]);
       res.status(201).json({ username });

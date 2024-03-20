@@ -6,8 +6,7 @@ import stringifyJsonColumns from "../middleware/stringify_json.js";
 import parseJsonColumns from "../../utils/parse_json_columns.js";
 import catchError from "../../utils/catch_error.js";
 import { BadRequestError, ForbiddenError } from "../../utils/errors.js";
-import { v4 as uuidv4 } from "uuid";
-
+import generateUuid from "../../utils/generate_uuid.js";
 const BASE = "/:tableId/rows";
 
 /**
@@ -147,7 +146,7 @@ class CrudApi {
 
       const createdRow = await this.app
         .getDAO()
-        .createOne(table.name, { ...req.body, id: uuidv4() });
+        .createOne(table.name, { ...req.body, id: generateUuid() });
       parseJsonColumns(table, createdRow);
       res.status(201).json({
         table: {

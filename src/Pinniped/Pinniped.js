@@ -55,6 +55,7 @@ class Pinniped {
    */
   onGetAllRows(...tables) {
     const EVENT_NAME = "GET_ALL_ROWS";
+    
     return {
       add: (handler) => {
         this.events.on(EVENT_NAME, (event) => {

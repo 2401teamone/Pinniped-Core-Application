@@ -1,5 +1,5 @@
 import Column from "./column.js";
-import { v4 as uuidv4 } from "uuid";
+import generateUuid from "../utils/generate_uuid.js";
 import fs from "fs";
 import DAO from "../dao/dao.js";
 import { BadRequestError } from "../utils/errors.js";
@@ -20,7 +20,7 @@ class Table {
   }
 
   constructor({
-    id = uuidv4(),
+    id = generateUuid(),
     name = "",
     columns = [],
     getAllRule = Table.DEFAULT_RULE,

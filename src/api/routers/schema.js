@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import { v4 as uuidv4 } from 'uuid';
 
 import Table from '../../models/table.js';
 import loadTableContext from '../middleware/load_table_context.js';
