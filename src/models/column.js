@@ -166,10 +166,11 @@ class Column {
     return Object.keys(Column.COLUMN_MAP).includes(type);
   }
 
-  constructor({ id = generateUuid(), name, type, options = {} }) {
+  constructor({ id = generateUuid(), name, type, required = false, options = {} }) {
     this.id = id;
     this.name = name;
     this.type = type;
+    this.required = required
     this.options = new Column.COLUMN_MAP[type].options(options);
   }
 

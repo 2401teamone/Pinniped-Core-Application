@@ -1,5 +1,5 @@
 import knex from "knex";
-import { DatabaseError, BadRequestError } from "../utils/errors.js";
+import { BadRequestError } from "../utils/errors.js";
 import Column from "../models/column.js";
 import fs from "fs";
 
@@ -234,25 +234,6 @@ class DAO {
   }
 
   /**
-   * Inserts the inputted newRow into the table, tableName.
-   * If the row already exists, then it updates it instead with the updated properties in newRow.
-   * @param {string} tableName
-   * @param {object} newRow
-   */
-  async upsertOne(tableName, newRow) {
-    try {
-      const upsertedRow = await this.getDB()(tableName)
-        .returning("*")
-        .insert(newRow)
-        .onConflict("id")
-        .merge();
-      return upsertedRow;
-    } catch (e) {
-      throw new Error(e.message);
-    }
-  }
-
-  /**
    * Finds the row in tableName based on the rowId,
    * And updates that row based on the properties of newRow.
    * Returns updatedRow.
@@ -284,17 +265,6 @@ class DAO {
     } catch (e) {
       throw new Error(e.message);
     }
-  }
-
-  /**
-   * A modified version of createOne, but inserts an object
-   * Specifically into 'tablemeta'.
-   * @param {id: string, name: string, columns: 'stringJSON'} tableData
-   * @return {object} createdRow
-   */
-  async upsertTableMetaData(tableData) {
-    const upsertedRow = this.upsertOne("tablemeta", tableData);
-    return upsertedRow;
   }
 
   /**
