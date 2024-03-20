@@ -94,8 +94,9 @@ class Pinniped {
     const server = initApi(this);
 
     server.listen(port, () => {
-      console.log(`Admin UI available at http://localhost:${port}/_`);
-      console.log(`App listening at http://localhost:${port}`);
+      console.log(`\nServer started at: http://localhost:${port}`);
+      console.log(`├─ REST API: http://localhost:${port}/api`);
+      console.log(`└─ Admin UI: http://localhost:${port}/_/\n`)
     });
   }
 }

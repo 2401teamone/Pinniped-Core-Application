@@ -33,7 +33,6 @@ class AuthApi {
 
   getUserHandler() {
     return (req, res, next) => {
-      console.log("req.session: ", req.session);
       res.status(200).json({ user: req.session.user });
     };
   }
@@ -105,24 +104,19 @@ class AuthApi {
     return async (req, res, next) => {
       const { username, password } = req.body;
 
-      console.log("Username Sent: ", username);
-
-      // Checks if 'username' exists in 'users'.
       const existingUser = await this.app
         .getDAO()
         .search("users", { username });
       if (!existingUser.length) throw new AuthenticationError();
 
-      // Hashes the inputted password, and sees if it's equal to the hashed password in 'users'.
       const match = await bcrypt.compare(password, existingUser[0].password);
       if (!match) throw new AuthenticationError();
 
-      // Sets the session's user to the found user.
       req.session.user = existingUser[0];
       delete req.session.user.password;
 
       console.log("Logged in user: ", req.session.user);
-      res.status(200).json({ message: "User logged in successfully." });
+      res.status(200).json({ user: req.session.user });
     };
   }
 
@@ -137,17 +131,14 @@ class AuthApi {
     return async (req, res, next) => {
       const { username, password } = req.body;
 
-      // Check if the 'username' exists in '_admins'.
       const existingAdmin = await this.app
         .getDAO()
         .search("_admins", { username });
       if (!existingAdmin.length) throw new AuthenticationError();
 
-      // Hashes the inputted password and compares it with the hashed password in '_admins'.
       const match = await bcrypt.compare(password, existingAdmin[0].password);
       if (!match) throw new AuthenticationError();
 
-      // Sets the session's user to the found admin.
       req.session.user = existingAdmin[0];
       delete req.session.user.password;
 
@@ -167,7 +158,10 @@ class AuthApi {
       res.status(200).json({ message: "User logged out." });
     };
   }
-
+  /**
+   * Checks if there is an admin in the _admins table
+   * @returns {function} 
+   */
   adminExistsHandler() {
     return async (req, res, next) => {
       const existingAdmin = await this.app.getDAO().getAll('_admins');

@@ -100,7 +100,7 @@ class JsonOptions {
 
   validate(value) {
     const size = new TextEncoder().encode(value).length;
-    console.log(value, size, this.maxSize, 'JSON VALUE & SIZE');
+    
     if (size > this.maxSize) return [false, 'JSON Value is too large.'];
     try {
       JSON.parse(JSON.stringify(value));

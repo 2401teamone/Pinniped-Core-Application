@@ -149,13 +149,8 @@ class DAO {
    * @returns {object[]} rows
    */
   async search(tableName, fields) {
-    try {
-      console.log(tableName, fields, "SEARCHING");
-      const rows = await this.getDB()(tableName).select("*").where(fields);
-      return rows;
-    } catch (e) {
-      throw new Error(e.message);
-    }
+    const rows = await this.getDB()(tableName).select("*").where(fields);
+    return rows;
   }
 
   /**
@@ -201,14 +196,10 @@ class DAO {
    * @returns {object[]} row
    */
   async getOne(tableName, rowId) {
-    try {
-      const row = await this.getDB()(tableName)
-        .select("*")
-        .where({ id: rowId });
-      return row;
-    } catch (e) {
-      throw new Error(e.message);
-    }
+    const row = await this.getDB()(tableName)
+      .select("*")
+      .where({ id: rowId });
+    return row;
   }
 
   /**
@@ -217,14 +208,12 @@ class DAO {
    * @returns {object[]} newRow
    */
   async createOne(tableName, newRow) {
-    console.log(newRow);
     try {
       const createdRow = await this.getDB()(tableName)
         .returning("*")
         .insert(newRow);
       return createdRow;
     } catch (e) {
-      console.log(e);
       if (e.message.slice(0, 11) === "insert into") {
         throw new BadRequestError();
       } else {
@@ -243,15 +232,11 @@ class DAO {
    * @returns {object} updatedRow
    */
   async updateOne(tableName, rowId, newRow) {
-    try {
-      const updatedRow = await this.getDB()(tableName)
-        .returning("*")
-        .where({ id: rowId })
-        .update(newRow);
-      return updatedRow;
-    } catch (e) {
-      throw new Error(e.message);
-    }
+    const updatedRow = await this.getDB()(tableName)
+      .returning("*")
+      .where({ id: rowId })
+      .update(newRow);
+    return updatedRow;
   }
 
   /**
@@ -260,11 +245,7 @@ class DAO {
    * @param {string} rowId
    */
   async deleteOne(tableName, rowId) {
-    try {
-      await this.getDB()(tableName).where({ id: rowId }).del();
-    } catch (e) {
-      throw new Error(e.message);
-    }
+    await this.getDB()(tableName).where({ id: rowId }).del();
   }
 
   /**
@@ -274,7 +255,7 @@ class DAO {
    * @return {object} createdRow
    */
   async addTableMetaData(tableData) {
-    console.log(`Adding tablemeta row for : ${tableData.name}`);
+    console.log(`Adding tablemeta row for: ${tableData.name}`);
     const createdRow = await this.getDB()("tablemeta")
       .returning("*")
       .insert(tableData);
@@ -288,7 +269,7 @@ class DAO {
    * @return {object} updatedRow
    */
   async updateTableMetaData(tableData) {
-    console.log(`Updating tablemeta row for : ${tableData.name}`);
+    console.log(`Updating tablemeta row for: ${tableData.name}`);
     const updatedRow = await this.getDB()("tablemeta")
       .returning("*")
       .where({ id: tableData.id })
