@@ -97,15 +97,32 @@ class Table {
   }
 
   /**
+   * Validates the table name to ensure it's unique.
+   * @returns {undefined}
+   * @throws {BadRequestError} if the table name already exists.
+   */
+  async tableNameAvailable() {
+    const dao = new DAO();
+    const existingTable = await dao.findTableByName(this.name);
+    if (existingTable.length) {
+      throw new BadRequestError("The table name already exists: ", this.name);
+    }
+  }
+
+  
+  /**
    * Validates the proposed schema changes.
    * @param {object Table} newTable
    * @returns {undefined}
    */
   async validateUpdateTo(newTable) {
-    const dao = new DAO();
-    /// VALIDATING THE UPDATE
+    // validating the update
     if (this.id !== newTable.id) {
       throw new BadRequestError("Table ID cannot be changed.");
+    }
+
+    if (this.name !== newTable.name) {
+      await newTable.tableNameAvailable();
     }
     // no column type changes
     for (let column of newTable.columns) {
@@ -135,10 +152,6 @@ class Table {
         throw new Error("Table relation does not exist");
       }
     }
-  }
-
-  generateId() {
-    this.id = uuidv4();
   }
 
   getColumns() {
@@ -176,11 +189,7 @@ class Table {
    * @returns {undefined}
    */
   async create() {
-    const dao = new DAO();
-    const existingTable = await dao.findTableByName(this.name);
-    if (existingTable.length) {
-      throw new BadRequestError("The table name already exists: ", this.name);
-    }
+    await this.tableNameAvailable();
 
     const db = Table.getNewConnection();
     let filePath = await db.migrate.make(`create_table_${this.name}`);

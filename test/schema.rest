@@ -66,29 +66,38 @@ content-type : application/json
 
 ### Update Column
 
-PUT http://localhost:3000/api/schema/7464f1e2-2da9-42fa-8644-854fa179ffbb
+PUT http://localhost:3000/api/schema/8f26794e99ad75
 content-type : application/json
 
-{
-  "id": "7464f1e2-2da9-42fa-8644-854fa179ffbb",
-  "name": "NewOctopus",
-  "columns": [
-    {
-      "id": "fdc30fc7-10fd-48e0-abdc-fd6562f63ec1",
-      "name": "size",
-      "type": "text",
-      "options": {
-        "minLength": 0,
-        "maxLength": 255
+ {
+    "id": "8f26794e99ad75",
+    "name": "Penguins",
+    "columns": [
+      {
+        "id": "5ebf8eacfff5a3",
+        "name": "Size",
+        "type": "text",
+        "options": {
+          "minLength": 0,
+          "maxLength": 255
+        }
+      },
+      {
+        "id": "0e0f2bcd3882b2",
+        "name": "Coolness",
+        "type": "text",
+        "options": {
+          "minLength": 0,
+          "maxLength": 255
+        }
       }
-    }
-  ],
-  "getAllRule": "public",
-  "getOneRule": "public",
-  "createRule": "public",
-  "deleteRule": "public",
-  "updateRule": "public"
-}
+    ],
+    "getAllRule": "admin",
+    "getOneRule": "admin",
+    "createRule": "admin",
+    "deleteRule": "admin",
+    "updateRule": "admin"
+  }
 ### Rename Table
 
 PUT http://localhost:3000/api/schema/b14f8abd-fc0e-4eb0-97bd-c57e65690c00
