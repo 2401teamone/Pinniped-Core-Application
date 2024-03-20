@@ -21,7 +21,7 @@ export default function generateAuthRouter(app) {
   router.post("/admin/register", catchError(authApi.registerAdminHandler()));
   router.post("/admin/login", catchError(authApi.loginAdminHandler()));
   router.post("/logout", catchError(authApi.logoutHandler()));
-  router.get("/admin/registered", catchError(authApi.checkIfAdminHasRegistered()));
+  router.get("/admin/registered", catchError(authApi.adminExistsHandler()));
 
   return router;
 }
@@ -168,7 +168,7 @@ class AuthApi {
     };
   }
 
-  checkIfAdminHasRegistered() {
+  adminExistsHandler() {
     return async (req, res, next) => {
       const existingAdmin = await this.app.getDAO().getAll('_admins');
       if (existingAdmin.length) {

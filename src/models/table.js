@@ -147,7 +147,7 @@ class Table {
         }
       }
 
-      let relatedTable = dao.findTableById(column.getOptions().tableId);
+      let relatedTable = await dao.findTableById(column.getOptions().tableId);
       if (!relatedTable.length) {
         throw new Error("Table relation does not exist");
       }
