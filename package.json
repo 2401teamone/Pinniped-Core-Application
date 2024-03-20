@@ -1,6 +1,6 @@
 {
   "name": "pinniped",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Easy-to-deploy Node backend server.",
   "keywords": [
     "backend",
