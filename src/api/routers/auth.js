@@ -21,6 +21,7 @@ export default function generateAuthRouter(app) {
   router.post("/admin/register", catchError(authApi.registerAdminHandler()));
   router.post("/admin/login", catchError(authApi.loginAdminHandler()));
   router.post("/logout", catchError(authApi.logoutHandler()));
+  router.get("/admin/registered", catchError(authApi.checkIfAdminHasRegistered()));
 
   return router;
 }
@@ -37,7 +38,7 @@ class AuthApi {
   getSessionHandler() {
     return (req, res, next) => {
       console.log("req.session: ", req.session);
-      res.send(req.session.user);
+      res.status(200).json({ user: req.session.user });
     };
   }
 
@@ -155,7 +156,7 @@ class AuthApi {
       delete req.session.user.password;
 
       console.log("logged in admin: ", req.session.user);
-      res.status(200).json({ message: "Admin logged in successfully." });
+      res.status(200).json({ admin: req.session.user });
     };
   }
 
@@ -168,6 +169,17 @@ class AuthApi {
       console.log("Logging out user: ", req.session.user);
       delete req.session.user;
       res.status(200).json({ message: "User logged out." });
+    };
+  }
+
+  checkIfAdminHasRegistered() {
+    return async (req, res, next) => {
+      const existingAdmin = await this.app.getDAO().getAll('_admins');
+      if (existingAdmin.length) {
+        res.status(200).json({ registered: true });
+      } else {
+        res.status(200).json({ registered: false });
+      }
     };
   }
 }
