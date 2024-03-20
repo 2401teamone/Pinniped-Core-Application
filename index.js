@@ -11,7 +11,7 @@ app.addRoute("GET", "/custom", (req, res, next) => {
 
 // add event-driven functionality
 app.onGetAllRows().add((event) => {
-  console.log("Triggered event: onGetAllRows");
+  // console.log("Triggered event: onGetAllRows");
 });
 
 app.start(3000);

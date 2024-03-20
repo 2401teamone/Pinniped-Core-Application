@@ -162,10 +162,19 @@ class DAO {
    * @param {string} tableName
    * @returns {object[]} rows
    */
-  async getAll(tableName) {
+  async getAll(tableName, pageNum, limit, sort = "asc") {
     try {
-      const rows = await this.getDB()(tableName).select("*");
-      return rows;
+      if (pageNum && limit) {
+        const rows = await this.getDB()(tableName)
+          .select("*")
+          .orderBy("created_at", sort)
+          .offset((pageNum - 1) * limit)
+          .limit(limit);
+        return rows;
+      } else {
+        const rows = await this.getDB()(tableName).select("*");
+        return rows;
+      }
     } catch (e) {
       throw new Error(e.message);
     }

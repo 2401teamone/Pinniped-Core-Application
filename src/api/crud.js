@@ -1,14 +1,14 @@
-import { Router } from 'express';
-import loadTableContext from './middleware/load_table_context.js';
-import apiRules from './middleware/api_rules.js';
-import validateRecord from './middleware/validate_record.js';
-import stringifyJsonColumns from './middleware/stringify_json.js';
-import parseJsonColumns from '../utils/parse_json_columns.js';
-import catchError from '../utils/catch_error.js';
-import { BadRequestError, ForbiddenError } from '../utils/errors.js';
-import { v4 as uuidv4 } from 'uuid';
+import { Router } from "express";
+import loadTableContext from "./middleware/load_table_context.js";
+import apiRules from "./middleware/api_rules.js";
+import validateRecord from "./middleware/validate_record.js";
+import stringifyJsonColumns from "./middleware/stringify_json.js";
+import parseJsonColumns from "../utils/parse_json_columns.js";
+import catchError from "../utils/catch_error.js";
+import { BadRequestError, ForbiddenError } from "../utils/errors.js";
+import { v4 as uuidv4 } from "uuid";
 
-const BASE = '/tables/:tableId/rows';
+const BASE = "/tables/:tableId/rows";
 
 /**
  * Creates an Express Router object
@@ -79,11 +79,11 @@ class CrudApi {
   getAllHandler() {
     return async (req, res, next) => {
       const { table } = res.locals;
+      const { pageNum, limit, sort } = {};
 
-      console.log(req.session.user);
-
-      // Returns the Result
-      const rows = await this.app.getDAO().getAll(table.name);
+      const rows = await this.app
+        .getDAO()
+        .getAll(table.name, pageNum, limit, sort);
       parseJsonColumns(table, rows);
 
       const event = {
@@ -123,7 +123,7 @@ class CrudApi {
 
       // Row level access control
       if (
-        table.getOneRule === 'creator' &&
+        table.getOneRule === "creator" &&
         row[0].userId != req.session.user.id
       ) {
         throw new ForbiddenError();
