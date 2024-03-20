@@ -116,6 +116,7 @@ class Table {
    * @returns {undefined}
    */
   async validateUpdateTo(newTable) {
+    const dao = new DAO();
     // validating the update
     if (this.id !== newTable.id) {
       throw new BadRequestError("Table ID cannot be changed.");
@@ -201,7 +202,8 @@ class Table {
     });
 
     const migrateTemplate = `
-      import { MigrationDao } from "pinniped";
+      // import { MigrationDao } from "pinniped";
+      import { MigrationDao } from "../../src/Pinniped/Pinniped.js";
 
       export async function up(knex) {
         const dao = new MigrationDao(knex);
@@ -240,7 +242,8 @@ class Table {
     });
 
     const migrateTemplate = `
-        import { MigrationDao } from "pinniped";
+        // import { MigrationDao } from "pinniped";
+        import { MigrationDao } from "../../src/Pinniped/Pinniped.js";
 
         export async function up(knex) {
           const dao = new MigrationDao(knex);
@@ -290,7 +293,8 @@ class Table {
     });
 
     const migrateTemplate = `
-    import { MigrationDao } from "pinniped";
+    // import { MigrationDao } from "pinniped";
+    import { MigrationDao } from "../../src/Pinniped/Pinniped.js";
 
     export async function up(knex) {
       const oldTable = ${JSON.stringify(this)};

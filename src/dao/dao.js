@@ -31,6 +31,7 @@ class DAO {
         afterCreate: function (connection, done) {
           thisDAO.sqlite3Connection = connection;
           connection.pragma("journal_mode = WAL");
+          connection.pragma("foreign_keys = ON");
           done(false, connection);
         },
       },
@@ -214,6 +215,7 @@ class DAO {
         .insert(newRow);
       return createdRow;
     } catch (e) {
+      console.log(e)
       if (e.message.slice(0, 11) === "insert into") {
         throw new BadRequestError();
       } else {
@@ -307,7 +309,16 @@ class DAO {
       table.specificType("updated_at", "TIMESTAMP DEFAULT CURRENT_TIMESTAMP");
 
       columns.forEach((column) => {
-        table.specificType(column.name, Column.COLUMN_MAP[column.type].sql);
+        if (column.type === "relation") {
+          table.specificType(column.name, "TEXT");
+          table.foreign(column.name)
+          .references("id")
+          .inTable(column.options.tableName)
+          .onDelete('CASCADE')
+          .onUpdate('CASCADE');
+        } else {
+          table.specificType(column.name, Column.COLUMN_MAP[column.type].sql);
+        }
       });
     });
   }
