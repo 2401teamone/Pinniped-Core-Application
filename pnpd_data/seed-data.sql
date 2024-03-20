@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS tablemeta;
 CREATE TABLE tablemeta
-  (id TEXT PRIMARY KEY,
+  (id TEXT PRIMARY KEY DEFAULT ('r'||lower(hex(randomblob(7)))),
   name TEXT UNIQUE NOT NULL,
   columns TEXT NOT NULL,
   getAllRule TEXT DEFAULT 'public',
