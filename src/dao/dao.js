@@ -158,15 +158,39 @@ class DAO {
   }
 
   /**
-   * Returns all the rows from the specific queried table.
-   * @param {string} tableName
+   * Returns all the requested rows from the specific queried table.
+   * @param {string} tableName - name of the table
+   * @param {number} [pageNum] - page number of the results
+   * @param {number} [limit] - number of rows to return
+   * @param {string} [sortBy="created_at"] - column to sort by
+   * @param {string} [order="asc"] - asc or desc
    * @returns {object[]} rows
    */
-  async getAll(tableName) {
+  async getAll(
+    tableName,
+    pageNum,
+    limit,
+    sortBy = "created_at",
+    order = "asc"
+  ) {
     try {
-      const rows = await this.getDB()(tableName).select("*");
-      return rows;
+      if (pageNum && limit) {
+        const rows = await this.getDB()(tableName)
+          .select("*")
+          .orderBy(sortBy, order)
+          .offset((pageNum - 1) * limit)
+          .limit(limit);
+        return rows;
+      } else {
+        const rows = await this.getDB()(tableName)
+          .select("*")
+          .orderBy(sortBy, order);
+        return rows;
+      }
     } catch (e) {
+      if (e.message.includes("no such column")) {
+        throw new BadRequestError("orderBy column does not exist");
+      }
       throw new Error(e.message);
     }
   }

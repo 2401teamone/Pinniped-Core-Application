@@ -26,9 +26,9 @@ export class TableNotFoundError extends AppError {
 }
 
 export class DatabaseError extends AppError {
-  constructor() {
+  constructor(message = "Database error") {
     super(
-      `Database error`,
+      message,
       404,
       "DATABASE_ERROR",
       "The database encountered an error.  Don't look at us"
