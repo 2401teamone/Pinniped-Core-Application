@@ -184,9 +184,7 @@ class DAO {
           .limit(limit);
         return rows;
       } else {
-        const rows = await this.getDB()(tableName)
-          .select("*")
-          .orderBy(sortBy, order);
+        const rows = await this.getDB()(tableName);
         return rows;
       }
     } catch (e) {

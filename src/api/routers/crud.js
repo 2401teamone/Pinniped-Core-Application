@@ -1,14 +1,14 @@
 import { Router } from "express";
-import loadTableContext from "./middleware/load_table_context.js";
-import apiRules from "./middleware/api_rules.js";
-import validateRecord from "./middleware/validate_record.js";
-import stringifyJsonColumns from "./middleware/stringify_json.js";
-import parseJsonColumns from "../utils/parse_json_columns.js";
-import catchError from "../utils/catch_error.js";
-import { BadRequestError, ForbiddenError } from "../utils/errors.js";
+import loadTableContext from "../middleware/load_table_context.js";
+import apiRules from "../middleware/api_rules.js";
+import validateRecord from "../middleware/validate_record.js";
+import stringifyJsonColumns from "../middleware/stringify_json.js";
+import parseJsonColumns from "../../utils/parse_json_columns.js";
+import catchError from "../../utils/catch_error.js";
+import { BadRequestError, ForbiddenError } from "../../utils/errors.js";
 import { v4 as uuidv4 } from "uuid";
 
-const BASE = "/tables/:tableId/rows";
+const BASE = "/:tableId/rows";
 
 /**
  * Creates an Express Router object

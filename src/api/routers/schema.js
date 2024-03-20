@@ -1,11 +1,11 @@
 import { Router } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 
-import Table from '../models/table.js';
-import loadTableContext from './middleware/load_table_context.js';
-import adminOnly from './middleware/admin_only.js';
-import catchError from '../utils/catch_error.js';
-import { BadRequestError } from '../utils/errors.js';
+import Table from '../../models/table.js';
+import loadTableContext from '../middleware/load_table_context.js';
+import adminOnly from '../middleware/admin_only.js';
+import catchError from '../../utils/catch_error.js';
+import { BadRequestError } from '../../utils/errors.js';
 
 /**
  * Creates an Express Router object

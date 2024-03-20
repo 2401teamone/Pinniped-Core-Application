@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import { Router } from "express";
-import catchError from "../utils/catch_error.js";
-import { AuthenticationError } from "../utils/errors.js";
+import catchError from "../../utils/catch_error.js";
+import { AuthenticationError } from "../../utils/errors.js";
 
 /**
  * Creates an Express Router object
