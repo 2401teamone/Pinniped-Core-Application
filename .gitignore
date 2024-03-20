@@ -5,8 +5,10 @@ dist
 .DS_Store
 
 backup
+pnpd_data
 pnpd.db
 pnpd.db-shm
 pnpd.db-wal
 session.db
 migrations
+package-lock.json

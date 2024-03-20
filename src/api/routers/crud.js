@@ -7,7 +7,8 @@ import parseJsonColumns from "../../utils/parse_json_columns.js";
 import catchError from "../../utils/catch_error.js";
 import { BadRequestError, ForbiddenError } from "../../utils/errors.js";
 import generateUuid from "../../utils/generate_uuid.js";
-import ResponseData from "../../models/response_data.js"
+import ResponseData from "../../models/response_data.js";
+import creatorAuthCheck from "../../utils/row_auth.js";
 
 const BASE = "/:tableId/rows";
 
@@ -84,10 +85,10 @@ class CrudApi {
       const rows = await this.app
         .getDAO()
         .getAll(table.name, pageNum, limit, sortBy, order);
-      
+
       parseJsonColumns(table, rows);
 
-      const responseData = new ResponseData(table, rows, res)
+      const responseData = new ResponseData(table, rows, res);
 
       // Fire the onGetAllRows event
       this.app.onGetAllRows().trigger(responseData);
@@ -108,21 +109,16 @@ class CrudApi {
     return async (req, res, next) => {
       const { table } = res.locals;
       const { rowId } = req.params;
-      
+
       const row = await this.app.getDAO().getOne(table.name, rowId);
       if (!row.length) throw new BadRequestError();
-      
+
+      creatorAuthCheck(req.session.user, res, row);
+
       parseJsonColumns(table, row);
 
-      if (
-        table.getOneRule === "creator" &&
-        row[0].userId != req.session.user.id
-      ) {
-        throw new ForbiddenError();
-      }
-
       const responseData = new ResponseData(table, row, res);
-      
+
       if (responseData.responseSent()) return null;
 
       res.status(200).json(responseData.formatOneResponse());
@@ -147,7 +143,7 @@ class CrudApi {
       const responseData = new ResponseData(table, createdRow, res);
 
       if (responseData.responseSent()) return null;
-      
+
       res.status(201).json(responseData.formatOneResponse());
     };
   }
@@ -161,17 +157,17 @@ class CrudApi {
     return async (req, res, next) => {
       const { table } = res.locals;
       const { rowId } = req.params;
-      
+
       const updatedRow = await this.app
         .getDAO()
         .updateOne(table.name, rowId, req.body);
-      
+
       parseJsonColumns(table, updatedRow);
 
       const responseData = new ResponseData(table, updatedRow, res);
 
       if (responseData.responseSent()) return null;
-      
+
       res.status(200).json(responseData.formatOneResponse());
     };
   }

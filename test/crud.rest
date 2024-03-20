@@ -2,7 +2,7 @@
 GET http://localhost:3000/api/tables/52b22193-a0f1-4346-8f17-ccb0c2b4f7d5/rows
 ### getAll From ElephantSeals
 
-GET http://localhost:3000/api/tables/7e637ce9-68cb-4dec-a7b1-81bb5fe13b6e/rows/raa1d2181831f98
+GET http://localhost:3000/api/tables/4869fb56fd381a/rows/3abde3770d64f7
 ### getOne From ElephantSeals
 GET http://localhost:3000/api/tables/5a200d36-6cf3-4777-a9bc-2e588358f64b/rows/72b37c1d-a29a-4b7e-848f-6e53b50b37c8
 ### getOne From puffins with creator rule
