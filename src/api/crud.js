@@ -79,11 +79,11 @@ class CrudApi {
   getAllHandler() {
     return async (req, res, next) => {
       const { table } = res.locals;
-      const { pageNum, limit, sort } = {};
+      const { pageNum, limit, sortBy, order } = req.query;
 
       const rows = await this.app
         .getDAO()
-        .getAll(table.name, pageNum, limit, sort);
+        .getAll(table.name, pageNum, limit, sortBy, order);
       parseJsonColumns(table, rows);
 
       const event = {
