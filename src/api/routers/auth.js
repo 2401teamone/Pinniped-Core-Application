@@ -15,8 +15,7 @@ export default function generateAuthRouter(app) {
   const router = Router();
   const authApi = new AuthApi(app);
 
-  router.get("/", catchError(authApi.getSessionHandler())); // Just for testing
-
+  router.get("/", catchError(authApi.getUserHandler()));
   router.post("/register", catchError(authApi.registerHandler()));
   router.post("/login", catchError(authApi.loginHandler()));
   router.post("/admin/register", catchError(authApi.registerAdminHandler()));
@@ -32,11 +31,7 @@ class AuthApi {
     this.app = app;
   }
 
-  getCurrentUser() {
-    return async (req, res, next) => {};
-  }
-
-  getSessionHandler() {
+  getUserHandler() {
     return (req, res, next) => {
       console.log("req.session: ", req.session);
       res.status(200).json({ user: req.session.user });

@@ -26,7 +26,6 @@ export default function generateCrudRouter(app) {
     apiRules(app),
     catchError(crudApi.getAllHandler())
   );
-
   router.get(
     `${BASE}/:rowId`,
     loadTableContext(app),
@@ -90,6 +89,7 @@ class CrudApi {
         rows,
         res,
       };
+
       this.app.onGetAllRows().trigger(event);
 
       if (event.res.finished) return null;
@@ -113,14 +113,12 @@ class CrudApi {
     return async (req, res, next) => {
       const { table } = res.locals;
       const { rowId } = req.params;
+      
       const row = await this.app.getDAO().getOne(table.name, rowId);
-      parseJsonColumns(table, row);
       if (!row.length) throw new BadRequestError();
+      
+      parseJsonColumns(table, row);
 
-      //TESTING
-      // table.getOneRule = "creator";
-
-      // Row level access control
       if (
         table.getOneRule === "creator" &&
         row[0].userId != req.session.user.id
@@ -139,15 +137,14 @@ class CrudApi {
    */
   createOneHandler() {
     return async (req, res, next) => {
-      // Need to Validate the Schema of the Request?
       const { table } = res.locals;
-
-      // validateRecord(table, req.body);
 
       const createdRow = await this.app
         .getDAO()
         .createOne(table.name, { ...req.body, id: generateUuid() });
+
       parseJsonColumns(table, createdRow);
+      
       res.status(201).json({
         table: {
           id: table.id,
