@@ -83,8 +83,9 @@ class SelectOptions {
 }
 
 class RelationOptions {
-  constructor({ tableId, cascadeDelete = true }) {
+  constructor({ tableId, tableName, cascadeDelete = true }) {
     this.tableId = tableId;
+    this.tableName = tableName;
     this.cascadeDelete = cascadeDelete;
   }
 
@@ -151,7 +152,6 @@ class Column {
       isJson: true,
     },
     relation: {
-      sql: "JSON DEFAULT '' NOT NULL",
       options: RelationOptions,
       isJson: false,
     },
