@@ -44,7 +44,9 @@ class DAO {
     return db;
   }
 
-  disconnect() {}
+  async disconnect() {
+    await this.getDB().destroy();
+  }
 
   /**
    * Obtains the Knex instance that connected to the database.
