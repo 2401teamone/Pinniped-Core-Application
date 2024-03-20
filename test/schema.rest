@@ -6,7 +6,12 @@ content-type : application/json
 
 {
   "name" : "Bears",
-  "columns" : [{"name":"size","type":"text"}, {"name":"type", "type":"text"}]
+  "columns" : [{"name":"size","type":"text"}, {"name":"type", "type":"text"}],
+  "getAllRule": "public",
+  "getOneRule": "public",
+  "createRule": "public",
+  "deleteRule": "public",
+  "updateRule": "public"
 }
 ### Adds a table
 

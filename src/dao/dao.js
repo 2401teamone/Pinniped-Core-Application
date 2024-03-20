@@ -8,18 +8,17 @@ import fs from "fs";
  * Interacts with Sqlite3 Database through the interface of Knex.
  */
 class DAO {
-  constructor(dbFile, connection) {
+  constructor(connection) {
     this.sqlite3Connection;
-    this.db = connection ? connection : this._connect(dbFile, this);
+    this.db = connection ? connection : this._connect(this);
   }
 
   /**
    * Connects to the Better-Sqlite3 Database with Knex.
    * Allows for queries to be chained to the returned Knex instance.
-   * @param {string} dbFile
    * @returns {Knex Instance}
    */
-  _connect(dbFile, thisDAO) {
+  _connect(thisDAO) {
     if (!fs.existsSync("pnpd_data")) fs.mkdirSync("pnpd_data");
 
     let db = knex({
