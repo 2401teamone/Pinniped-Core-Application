@@ -15,6 +15,9 @@ export default function setHeaders() {
     // Set X-Frame-Options header to prevent clickjacking attacks
     res.setHeader("X-Frame-Options", "DENY");
 
+    // Set Content-Security-Policy header to ensure that all content comes from the site's own origin.
+    res.setHeader("Content-Security-Policy", "'self'");
+
     next();
   });
 }
