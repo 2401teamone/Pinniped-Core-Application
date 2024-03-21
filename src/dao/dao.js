@@ -307,17 +307,7 @@ class DAO {
       table.specificType("updated_at", "TIMESTAMP DEFAULT CURRENT_TIMESTAMP");
 
       columns.forEach((column) => {
-        if (column.type === "relation") {
-          table.specificType(column.name, "TEXT");
-          table
-            .foreign(column.name)
-            .references("id")
-            .inTable(column.options.tableName)
-            .onDelete(column.options.cascadeDelete ? "CASCADE" : "SET NULL")
-            .onUpdate("CASCADE");
-        } else {
-          table.specificType(column.name, Column.COLUMN_MAP[column.type].sql);
-        }
+        this._addColumnPerSpecs(column, table);
       });
     });
   }
@@ -349,17 +339,7 @@ class DAO {
   async addColumn(tableName, column) {
     console.log(`Adding column ${JSON.stringify(column)} to ${tableName}`);
     await this.getDB().schema.table(tableName, (table) => {
-      if (column.type === "relation") {
-        table.specificType(column.name, "TEXT");
-        table
-          .foreign(column.name)
-          .references("id")
-          .inTable(column.options.tableName)
-          .onDelete(column.options.cascadeDelete ? "CASCADE" : "SET NULL")
-          .onUpdate("CASCADE");
-      } else {
-        table.specificType(column.name, Column.COLUMN_MAP[column.type].sql);
-      }
+      this._addColumnPerSpecs(column, table);
     });
   }
 
@@ -386,6 +366,33 @@ class DAO {
       console.log("DROPPING COLUMN", columnName, " on", tableName);
       table.dropColumn(columnName);
     });
+  }
+
+  /**
+   * Internal method. Conditionally adds the specific column onto the table object received. Used in both createTable and addColumn.
+   * @param {object Column} column
+   * @param {object knex table instance} table
+   */
+  _addColumnPerSpecs(column, table) {
+    if (column.type === "relation") {
+      table.specificType(column.name, "TEXT");
+      table
+        .foreign(column.name)
+        .references("id")
+        .inTable(column.options.tableName)
+        .onDelete(column.options.cascadeDelete ? "CASCADE" : "SET NULL")
+        .onUpdate("CASCADE");
+    } else if (column.type === "creator") {
+      table.specificType("creator_id", "TEXT");
+      table
+        .foreign("creator_id")
+        .references("id")
+        .inTable("users")
+        .onDelete(column.options.cascadeDelete ? "CASCADE" : "SET NULL")
+        .onUpdate("CASCADE");
+    } else {
+      table.specificType(column.name, Column.COLUMN_MAP[column.type].sql);
+    }
   }
 }
 

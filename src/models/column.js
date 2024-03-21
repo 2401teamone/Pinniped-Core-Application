@@ -114,6 +114,14 @@ class JsonOptions {
   }
 }
 
+class CreatorOptions {
+  constructor({}) {}
+
+  validate(value) {
+    return [true, ""];
+  }
+}
+
 class Column {
   static COLUMN_MAP = {
     text: {
@@ -159,6 +167,10 @@ class Column {
       sql: "JSON DEFAULT NULL",
       options: JsonOptions,
       isJson: true,
+    },
+    creator: {
+      options: CreatorOptions,
+      isJson: false,
     },
   };
 
