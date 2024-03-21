@@ -1,11 +1,11 @@
-import { Router } from 'express';
+import { Router } from "express";
 
-import Table from '../../models/table.js';
-import loadTableContext from '../middleware/load_table_context.js';
-import adminOnly from '../middleware/admin_only.js';
-import catchError from '../../utils/catch_error.js';
-import { BadRequestError } from '../../utils/errors.js';
-import ResponseData from "../../models/response_data.js"
+import Table from "../../models/table.js";
+import loadTableContext from "../middleware/load_table_context.js";
+import adminOnly from "../middleware/admin_only.js";
+import catchError from "../../utils/catch_error.js";
+import { BadRequestError } from "../../utils/errors.js";
+import ResponseData from "../../models/response_data.js";
 
 /**
  * Creates an Express Router object
@@ -19,10 +19,18 @@ export default function generateSchemaRouter(app) {
   const schemaApi = new SchemaApi(app);
 
   // router.use(adminOnly());
-  router.get('/', catchError(schemaApi.getAllTablesHandler()));
-  router.post('/', catchError(schemaApi.createTableHandler()));
-  router.put('/:tableId', loadTableContext(app), catchError(schemaApi.updateTableHandler()));
-  router.delete('/:tableId', loadTableContext(app), catchError(schemaApi.dropTableHandler()));
+  router.get("/", catchError(schemaApi.getAllTablesHandler()));
+  router.post("/", catchError(schemaApi.createTableHandler()));
+  router.put(
+    "/:tableId",
+    loadTableContext(app),
+    catchError(schemaApi.updateTableHandler())
+  );
+  router.delete(
+    "/:tableId",
+    loadTableContext(app),
+    catchError(schemaApi.dropTableHandler())
+  );
 
   return router;
 }
@@ -43,7 +51,7 @@ class SchemaApi {
    */
   getAllTablesHandler() {
     return async (req, res, next) => {
-      let allTableMeta = await this.app.getDAO().getAll('tablemeta');
+      let allTableMeta = await this.app.getDAO().getAll("tablemeta");
       allTableMeta = allTableMeta.map((table) => new Table(table));
       res.json({ tables: allTableMeta });
     };
