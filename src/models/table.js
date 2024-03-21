@@ -47,7 +47,9 @@ class Table {
    * Validates the table object to match our table structure.
    * @returns {undefined}
    */
-  validate() {
+  async validate() {
+    const dao = new DAO();
+
     if (!this.id) throw new BadRequestError("Table doesn't have a valid ID.");
     if (!this.name) throw new BadRequestError("The table must have a name.");
     if (this.columns.length === 0) {
@@ -94,6 +96,17 @@ class Table {
         throw new BadRequestError(`Invalid ${rule}: ${this[rule]}`);
       }
     });
+
+    for (let column of this.columns) {
+      if (column.type !== "relation") continue;
+
+      let relatedTable = await dao.findTableById(column.getOptions().tableId);
+      if (!relatedTable.length) {
+        throw new Error("Table relation does not exist");
+      }
+
+      column.options.tableName = relatedTable[0].name;
+    }
   }
 
   /**
@@ -109,7 +122,6 @@ class Table {
     }
   }
 
-  
   /**
    * Validates the proposed schema changes.
    * @param {object Table} newTable
@@ -152,6 +164,8 @@ class Table {
       if (!relatedTable.length) {
         throw new Error("Table relation does not exist");
       }
+
+      column.options.tableName = relatedTable[0].name;
     }
   }
 

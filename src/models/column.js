@@ -1,4 +1,4 @@
-import generateUuid from '../utils/generate_uuid.js';
+import generateUuid from "../utils/generate_uuid.js";
 
 class TextOptions {
   constructor({ minLength = 0, maxLength = 255 }) {
@@ -7,10 +7,10 @@ class TextOptions {
   }
 
   validate(value) {
-    if (typeof value !== 'string') return [false, 'Value must be a string.'];
-    if (value.length < this.minLength) return [false, 'Value is too short.'];
-    if (value.length > this.maxLength) return [false, 'Value is too long.'];
-    return [true, ''];
+    if (typeof value !== "string") return [false, "Value must be a string."];
+    if (value.length < this.minLength) return [false, "Value is too short."];
+    if (value.length > this.maxLength) return [false, "Value is too long."];
+    return [true, ""];
   }
 }
 
@@ -21,10 +21,10 @@ class NumberOptions {
   }
 
   validate(value) {
-    if (typeof value !== 'number') return [false, 'Value must be a number.'];
-    if (value < this.min) return [false, 'Value is too small.'];
-    if (value > this.max) return [false, 'Value is too large.'];
-    return [true, ''];
+    if (typeof value !== "number") return [false, "Value must be a number."];
+    if (value < this.min) return [false, "Value is too small."];
+    if (value > this.max) return [false, "Value is too large."];
+    return [true, ""];
   }
 }
 
@@ -32,8 +32,8 @@ class BoolOptions {
   constructor({}) {}
 
   validate(value) {
-    if (!typeof value === 'boolean') return [false, 'Value must be a boolean.'];
-    return [true, ''];
+    if (!typeof value === "boolean") return [false, "Value must be a boolean."];
+    return [true, ""];
   }
 }
 
@@ -44,24 +44,24 @@ class DateOptions {
   }
   validate(value) {
     // if (!(value instanceof DateOptions)) return [false, 'Value is not a date.'];
-    return [true, ''];
+    return [true, ""];
   }
 }
 
 class EmailOptions {
   validate(value) {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
-      return [false, 'Invalid email address.'];
-    return [true, ''];
+      return [false, "Invalid email address."];
+    return [true, ""];
   }
 }
 
 class UrlOptions {
   validate(value) {
-    if (typeof value !== 'string') return [false, 'Value must be a string.'];
+    if (typeof value !== "string") return [false, "Value must be a string."];
     if (!/^(http|https)?:\/\/[^ "]+$/.test(value))
-      return [false, 'Invalid URL.'];
-    return [true, ''];
+      return [false, "Invalid URL."];
+    return [true, ""];
   }
 }
 
@@ -72,13 +72,13 @@ class SelectOptions {
   }
 
   validate(value) {
-    if (!Array.isArray(value)) return [false, 'Value must be an array.'];
+    if (!Array.isArray(value)) return [false, "Value must be an array."];
     for (let el of value) {
-      if (!this.options.includes(el)) return [false, 'Invalid select option.'];
+      if (!this.options.includes(el)) return [false, "Invalid select option."];
     }
     if (this.maxSelect !== undefined && value.length > this.maxSelect)
-      return [false, 'Too many options selected.'];
-    return [true, ''];
+      return [false, "Too many options selected."];
+    return [true, ""];
   }
 }
 
@@ -90,7 +90,7 @@ class RelationOptions {
   }
 
   validate(value) {
-    return [true, ''];
+    return [true, ""];
   }
 }
 
@@ -101,16 +101,24 @@ class JsonOptions {
 
   validate(value) {
     const size = new TextEncoder().encode(value).length;
-    
-    if (size > this.maxSize) return [false, 'JSON Value is too large.'];
+
+    if (size > this.maxSize) return [false, "JSON Value is too large."];
     try {
       JSON.parse(JSON.stringify(value));
-      return [true, ''];
+      return [true, ""];
     } catch (err) {
-      return [false, 'Value is not a valid JSON.'];
+      return [false, "Value is not a valid JSON."];
     }
 
-    return [true, ''];
+    return [true, ""];
+  }
+}
+
+class CreatorOptions {
+  constructor({}) {}
+
+  validate(value) {
+    return [true, ""];
   }
 }
 
@@ -122,12 +130,12 @@ class Column {
       isJson: false,
     },
     number: {
-      sql: 'NUMERIC DEFAULT 0 NOT NULL',
+      sql: "NUMERIC DEFAULT 0 NOT NULL",
       options: NumberOptions,
       isJson: false,
     },
     bool: {
-      sql: 'BOOLEAN DEFAULT false NOT NULL',
+      sql: "BOOLEAN DEFAULT false NOT NULL",
       options: BoolOptions,
       isJson: false,
     },
@@ -147,7 +155,7 @@ class Column {
       isJson: false,
     },
     select: {
-      sql: 'JSON DEFAULT [] NOT NULL',
+      sql: "JSON DEFAULT [] NOT NULL",
       options: SelectOptions,
       isJson: true,
     },
@@ -156,9 +164,13 @@ class Column {
       isJson: false,
     },
     json: {
-      sql: 'JSON DEFAULT NULL',
+      sql: "JSON DEFAULT NULL",
       options: JsonOptions,
       isJson: true,
+    },
+    creator: {
+      options: CreatorOptions,
+      isJson: false,
     },
   };
 
@@ -166,11 +178,17 @@ class Column {
     return Object.keys(Column.COLUMN_MAP).includes(type);
   }
 
-  constructor({ id = generateUuid(), name, type, required = false, options = {} }) {
+  constructor({
+    id = generateUuid(),
+    name,
+    type,
+    required = false,
+    options = {},
+  }) {
     this.id = id;
     this.name = name;
     this.type = type;
-    this.required = required
+    this.required = required;
     this.options = new Column.COLUMN_MAP[type].options(options);
   }
 
