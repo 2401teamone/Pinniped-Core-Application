@@ -5,7 +5,6 @@ dist
 .DS_Store
 
 backup
-pnpd_data
 pnpd.db
 hb.db
 pnpd.db-shm

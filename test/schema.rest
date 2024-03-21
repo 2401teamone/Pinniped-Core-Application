@@ -5,13 +5,13 @@ POST http://localhost:3000/api/schema
 content-type : application/json
 
 {
-  "name" : "Bears",
-  "columns" : [{"name":"size","type":"text"}, {"name":"type", "type":"text"}],
-  "getAllRule": "public",
-  "getOneRule": "public",
-  "createRule": "public",
-  "deleteRule": "public",
-  "updateRule": "public"
+  "name" : "users",
+  "columns" : [{"name":"username","type":"text"}, {"name":"password", "type":"text"}, {"name":"role", "type":"text"}],
+  "getAllRule": "admin",
+  "getOneRule": "admin",
+  "createRule": "admin",
+  "deleteRule": "admin",
+  "updateRule": "admin"
 }
 ### Adds a table
 
