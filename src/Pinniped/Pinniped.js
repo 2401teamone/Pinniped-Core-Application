@@ -104,11 +104,24 @@ class Pinniped {
    * @returns {object}
    */
   onGetAllRows(...tables) {
-    const EVENT_NAME = "GET_ALL_ROWS";
-    return new PinnipedEvent(this.emitter, EVENT_NAME, tables);
+    return new PinnipedEvent(this.emitter, "GET_ALL_ROWS", tables);
   }
 
-  onGetOneRow() {}
+  onGetOneRow(...tables) {
+    return new PinnipedEvent(this.emitter, "GET_ONE_ROW", tables);
+  }
+
+  onCreateOneRow(...tables) {
+    return new PinnipedEvent(this.emitter, "CREATE_ONE_ROW", tables);
+  }
+
+  onUpdateOneRow(...tables) {
+    return new PinnipedEvent(this.emitter, "UPDATE_ONE_ROW", tables);
+  }
+
+  onDeleteOneRow(...tables) {
+    return new PinnipedEvent(this.emitter, "DELETE_ONE_ROW", tables);
+  }
 
   /**
    * Returns the app's DAO instance.

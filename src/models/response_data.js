@@ -1,12 +1,13 @@
 export default class ResponseData {
-  constructor(table, rows, res) {
+  constructor(table, rows, res, req) {
     this.table = table;
     this.rows = rows;
     this.res = res;
+    this.req = req;
   }
 
   responseSent() {
-    return this.res.finished
+    return this.res.finished;
   }
 
   formatAllResponse() {
@@ -16,7 +17,7 @@ export default class ResponseData {
         name: this.table.name,
       },
       rows: this.rows,
-    }
+    };
   }
 
   formatOneResponse() {
@@ -26,7 +27,6 @@ export default class ResponseData {
         name: this.table.name,
       },
       row: this.rows[0],
-    }
+    };
   }
 }
-
