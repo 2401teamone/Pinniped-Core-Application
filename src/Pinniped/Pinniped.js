@@ -33,7 +33,7 @@ class Pinniped {
   async seedDatabase() {
     try {
       const usersExists = await this.getDAO().tableExists("users");
-      const _adminExists = await this.getDAO().tableExists("_admin");
+      const _adminExists = await this.getDAO().tableExists("_admins");
       const tablemetaExists = await this.getDAO().tableExists("tablemeta");
 
       if (!tablemetaExists) {
