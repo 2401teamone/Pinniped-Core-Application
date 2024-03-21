@@ -17,6 +17,14 @@ export default class ResponseData {
     return { data: this.data };
   }
 
+  formatTableMetaResponse() {
+    return { tables: this.data.allTableMeta };
+  }
+
+  formatTableMetaOneResponse() {
+    return { table: this.data.table };
+  }
+
   formatAllResponse() {
     return {
       table: {

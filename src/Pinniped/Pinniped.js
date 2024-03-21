@@ -151,6 +151,22 @@ class Pinniped {
     return new PinnipedEvent(this.emitter, "CUSTOM_ROUTE");
   }
 
+  onGetTableMeta() {
+    return new PinnipedEvent(this.emitter, "GET_TABLE_META");
+  }
+
+  onCreateTable() {
+    return new PinnipedEvent(this.emitter, "CREATE_TABLE");
+  }
+
+  onUpdateTable() {
+    return new PinnipedEvent(this.emitter, "UPDATE_TABLE");
+  }
+
+  onDropTable() {
+    return new PinnipedEvent(this.emitter, "DROP_TABLE");
+  }
+
   /**
    * Returns the app's DAO instance.
    * @returns {object DAO}

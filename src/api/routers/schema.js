@@ -53,6 +53,12 @@ class SchemaApi {
     return async (req, res, next) => {
       let allTableMeta = await this.app.getDAO().getAll("tablemeta");
       allTableMeta = allTableMeta.map((table) => new Table(table));
+
+      const responseData = new ResponseData(req, res, { allTableMeta });
+      this.app.onGetTableMeta().trigger(responseData);
+
+      if (responseData.responseSent()) return null;
+
       res.json({ tables: allTableMeta });
     };
   }
@@ -67,6 +73,11 @@ class SchemaApi {
     return async (req, res, next) => {
       const table = new Table(req.body);
       await table.create();
+
+      const responseData = new ResponseData(req, res, { table });
+      this.app.onCreateTable().trigger(responseData);
+
+      if (responseData.responseSent()) return null;
       res.status(200).json({ table });
     };
   }
@@ -84,6 +95,11 @@ class SchemaApi {
       const newTable = new Table(req.body);
 
       await oldTable.updateTo(newTable);
+
+      const responseData = new ResponseData(req, res, { oldTable, newTable });
+      this.app.onUpdateTable().trigger(responseData);
+      if (responseData.responseSent()) return null;
+
       res.json({ table: newTable });
     };
   }
@@ -100,6 +116,10 @@ class SchemaApi {
       const tableToDelete = res.locals.table;
       await tableToDelete.drop();
 
+      const responseData = new ResponseData(req, res, { tableToDelete });
+      this.app.onDropTable().trigger(responseData);
+
+      if (responseData.responseSent()) return null;
       res.status(204).end();
     };
   }
