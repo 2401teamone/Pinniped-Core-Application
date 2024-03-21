@@ -6,6 +6,10 @@ export default class ResponseData {
     this.req = req;
   }
 
+  /**
+   * Check if the response has been sent
+   * @returns {boolean}
+   */
   responseSent() {
     return this.res.finished;
   }

@@ -90,6 +90,7 @@ class DAO {
     console.log(`Backing up ${dbName} as '${newName}'...`);
     await connection.backup(newPath);
     console.log("Backup Complete!");
+    return newPath;
   }
 
   /**

@@ -27,7 +27,11 @@ app.onDeleteOneRow("Animals").add((event) => {
 });
 
 app.onCreateOneRow("Animals").add((event) => {
-  console.log("Triggered event: INSERT ONE ROW");
+  console.log("Triggered event: CREATE ONE ROW");
+});
+
+app.onBackupDatabase().add((event) => {
+  console.log("Triggered event: BACKUP_DATABASE");
 });
 
 app.start(3000);

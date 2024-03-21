@@ -19,10 +19,9 @@ class AdminAPI {
 
   backupHandler() {
     return async (req, res, next) => {
-      await this.app.getDAO().dbBackup();
+      let filePath = await this.app.getDAO().dbBackup();
+      this.app.onBackupDatabase().trigger({ req, res, filePath });
       res.sendStatus(200);
     };
   }
 }
-
-

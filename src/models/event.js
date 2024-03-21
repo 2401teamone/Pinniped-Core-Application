@@ -1,5 +1,5 @@
 export default class PinnipedEvent {
-  constructor(emitter, eventName, tables) {
+  constructor(emitter, eventName, tables = []) {
     this.emitter = emitter;
     this.eventName = eventName;
     this.tables = tables;
