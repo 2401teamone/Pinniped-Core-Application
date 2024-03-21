@@ -24,7 +24,7 @@ class AdminAPI {
 
       const responseData = new ResponseData(req, res, { filePath });
 
-      this.app.onBackupDatabase().trigger(responseData);
+      await this.app.onBackupDatabase().trigger(responseData);
 
       if (responseData.responseSent()) return null;
 

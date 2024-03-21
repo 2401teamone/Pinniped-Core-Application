@@ -55,7 +55,7 @@ class SchemaApi {
       allTableMeta = allTableMeta.map((table) => new Table(table));
 
       const responseData = new ResponseData(req, res, { allTableMeta });
-      this.app.onGetTableMeta().trigger(responseData);
+      await this.app.onGetTableMeta().trigger(responseData);
 
       if (responseData.responseSent()) return null;
 
@@ -75,7 +75,7 @@ class SchemaApi {
       await table.create();
 
       const responseData = new ResponseData(req, res, { table });
-      this.app.onCreateTable().trigger(responseData);
+      await this.app.onCreateTable().trigger(responseData);
 
       if (responseData.responseSent()) return null;
       res.status(200).json({ table });
@@ -97,7 +97,7 @@ class SchemaApi {
       await oldTable.updateTo(newTable);
 
       const responseData = new ResponseData(req, res, { oldTable, newTable });
-      this.app.onUpdateTable().trigger(responseData);
+      await this.app.onUpdateTable().trigger(responseData);
       if (responseData.responseSent()) return null;
 
       res.json({ table: newTable });
@@ -117,7 +117,7 @@ class SchemaApi {
       await tableToDelete.drop();
 
       const responseData = new ResponseData(req, res, { tableToDelete });
-      this.app.onDropTable().trigger(responseData);
+      await this.app.onDropTable().trigger(responseData);
 
       if (responseData.responseSent()) return null;
       res.status(204).end();

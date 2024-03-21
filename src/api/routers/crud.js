@@ -93,7 +93,7 @@ class CrudApi {
       const responseData = new ResponseData(req, res, { table, rows });
 
       // Fire the onGetAllRows event
-      this.app.onGetAllRows().trigger(responseData);
+      await this.app.onGetAllRows().trigger(responseData);
 
       // If a registered event handler sends a response to the client, early return.
       if (responseData.responseSent()) return null;
@@ -124,7 +124,7 @@ class CrudApi {
 
       const responseData = new ResponseData(req, res, { table, rows: row });
 
-      this.app.onGetOneRow().trigger(responseData);
+      await this.app.onGetOneRow().trigger(responseData);
 
       if (responseData.responseSent()) return null;
 
@@ -156,7 +156,7 @@ class CrudApi {
         rows: createdRow,
       });
 
-      this.app.onCreateOneRow().trigger(responseData);
+      await this.app.onCreateOneRow().trigger(responseData);
 
       if (responseData.responseSent()) return null;
 
@@ -193,7 +193,7 @@ class CrudApi {
         rows: updatedRow,
       });
 
-      this.app.onUpdateOneRow().trigger(responseData);
+      await this.app.onUpdateOneRow().trigger(responseData);
       if (responseData.responseSent()) return null;
 
       res.status(200).json(responseData.formatOneResponse());
@@ -221,7 +221,7 @@ class CrudApi {
       await this.app.getDAO().deleteOne(table.name, rowId);
 
       const responseData = new ResponseData(req, res, { table, rows: row });
-      this.app.onDeleteOneRow().trigger(responseData);
+      await this.app.onDeleteOneRow().trigger(responseData);
 
       if (responseData.responseSent()) return null;
 
