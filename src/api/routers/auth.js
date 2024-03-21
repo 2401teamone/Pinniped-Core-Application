@@ -56,13 +56,12 @@ class AuthApi {
 
       // Hashes the inputted password and inserts this user's credentials into the 'users' table.
       const hashedPassword = await bcrypt.hash(password, 10);
-      const createdUser = await this.app
-        .getDAO()
-        .createOne("users", {
-          id: generateUuid(),
-          username,
-          password: hashedPassword,
-        });
+      const createdUser = await this.app.getDAO().createOne("users", {
+        id: generateUuid(),
+        username,
+        password: hashedPassword,
+        role: "user",
+      });
 
       delete createdUser[0].password;
 
@@ -89,14 +88,14 @@ class AuthApi {
 
       // Hashes the inputted password and inserts this admin's credentials into the '_admin' table.
       const hashedPassword = await bcrypt.hash(password, 10);
-      const createdAdmin = await this.app
-        .getDAO()
-        .createOne("_admins", {
-          id: generateUuid(),
-          username,
-          password: hashedPassword,
-        });
+      const createdAdmin = await this.app.getDAO().createOne("_admins", {
+        id: generateUuid(),
+        username,
+        password: hashedPassword,
+        role: "admin",
+      });
 
+      delete createdAdmin[0].password;
       console.log("Admin created :", createdAdmin[0]);
       res.status(201).json({ username });
     };

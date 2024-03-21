@@ -111,6 +111,11 @@ class DAO {
     }
   }
 
+  async tableExists(tableName) {
+    const exists = await this.getDB().schema.hasTable(tableName);
+    return exists;
+  }
+
   /**
    * Searches the table 'tablemeta' and filters based on the name parameter.
    * Receives an instance of Table if found.
@@ -197,9 +202,7 @@ class DAO {
    * @returns {object[]} row
    */
   async getOne(tableName, rowId) {
-    const row = await this.getDB()(tableName)
-      .select("*")
-      .where({ id: rowId });
+    const row = await this.getDB()(tableName).select("*").where({ id: rowId });
     return row;
   }
 
@@ -215,7 +218,7 @@ class DAO {
         .insert(newRow);
       return createdRow;
     } catch (e) {
-      console.log(e)
+      console.log(e);
       if (e.message.slice(0, 11) === "insert into") {
         throw new BadRequestError();
       } else {
@@ -248,6 +251,20 @@ class DAO {
    */
   async deleteOne(tableName, rowId) {
     await this.getDB()(tableName).where({ id: rowId }).del();
+  }
+
+  async createTablemeta() {
+    await this.getDB().schema.createTable("tablemeta", function (table) {
+      table.text("id").primary();
+      table.text("name").unique().notNullable();
+      table.text("columns").notNullable();
+      table.text("getAllRule").defaultTo("admin");
+      table.text("getOneRule").defaultTo("admin");
+      table.text("createRule").defaultTo("admin");
+      table.text("updateRule").defaultTo("admin");
+      table.text("deleteRule").defaultTo("admin");
+    });
+    console.log("tablemeta created");
   }
 
   /**
@@ -311,11 +328,12 @@ class DAO {
       columns.forEach((column) => {
         if (column.type === "relation") {
           table.specificType(column.name, "TEXT");
-          table.foreign(column.name)
-          .references("id")
-          .inTable(column.options.tableName)
-          .onDelete(column.options.cascadeDelete ? "CASCADE" : "SET NULL")
-          .onUpdate('CASCADE');
+          table
+            .foreign(column.name)
+            .references("id")
+            .inTable(column.options.tableName)
+            .onDelete(column.options.cascadeDelete ? "CASCADE" : "SET NULL")
+            .onUpdate("CASCADE");
         } else {
           table.specificType(column.name, Column.COLUMN_MAP[column.type].sql);
         }

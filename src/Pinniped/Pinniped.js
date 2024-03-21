@@ -3,6 +3,7 @@ import DAO from "../dao/dao.js";
 import EventEmitter from "events";
 import registerProcessListeners from "../utils/register_process_listeners.js";
 import { InvalidCustomRouteError } from "../utils/errors.js";
+import Table from "../models/table.js";
 
 /**
  * Pinniped Class
@@ -18,7 +19,56 @@ class Pinniped {
     this.DAO = new DAO();
     this.events = new EventEmitter();
     this.customRoutes = [];
+    this.seedDatabase();
   }
+
+  /**
+   * Seeds the database with the necessary tables.
+   * If the tables do not exist, it creates them.
+   * If the tables do exist, it does nothing.
+   * If the tables are not created, it throws an error.
+   * @returns {Promise}
+   * @throws {Error}
+   */
+  async seedDatabase() {
+    //check if users, _admin, and tableMeta tables exist
+    try {
+      const usersExists = await this.getDAO().tableExists("users");
+      const _adminExists = await this.getDAO().tableExists("_admin");
+      const tablemetaExists = await this.getDAO().tableExists("tablemeta");
+
+      if (!tablemetaExists) {
+        await this.getDAO().createTablemeta();
+      }
+
+      if (!usersExists) {
+        const users = new Table({
+          name: "users",
+          columns: [
+            { name: "username", type: "text" },
+            { name: "password", type: "text" },
+            { name: "role", type: "text" },
+          ],
+        });
+        await users.create();
+      }
+
+      if (!_adminExists) {
+        const _admins = new Table({
+          name: "_admins",
+          columns: [
+            { name: "username", type: "text" },
+            { name: "password", type: "text" },
+            { name: "role", type: "text" },
+          ],
+        });
+        await _admins.create();
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   /**
    * Allows developers to add their own route
    * That can receive a HTTP request to the given path.
@@ -55,7 +105,7 @@ class Pinniped {
    */
   onGetAllRows(...tables) {
     const EVENT_NAME = "GET_ALL_ROWS";
-    
+
     return {
       add: (handler) => {
         this.events.on(EVENT_NAME, (event) => {
@@ -96,7 +146,7 @@ class Pinniped {
     server.listen(port, () => {
       console.log(`\nServer started at: http://localhost:${port}`);
       console.log(`├─ REST API: http://localhost:${port}/api`);
-      console.log(`└─ Admin UI: http://localhost:${port}/_/\n`)
+      console.log(`└─ Admin UI: http://localhost:${port}/_/\n`);
     });
   }
 }
