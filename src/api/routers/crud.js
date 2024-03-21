@@ -90,7 +90,7 @@ class CrudApi {
 
       parseJsonColumns(table, rows);
 
-      const responseData = new ResponseData(table, rows, res);
+      const responseData = new ResponseData(req, res, { table, rows });
 
       // Fire the onGetAllRows event
       this.app.onGetAllRows().trigger(responseData);
@@ -122,7 +122,9 @@ class CrudApi {
 
       parseJsonColumns(table, row);
 
-      const responseData = new ResponseData(table, row, res);
+      const responseData = new ResponseData(req, res, { table, rows: row });
+
+      this.app.onGetOneRow().trigger(responseData);
 
       if (responseData.responseSent()) return null;
 
@@ -149,7 +151,12 @@ class CrudApi {
 
       parseJsonColumns(table, createdRow);
 
-      const responseData = new ResponseData(table, createdRow, res);
+      const responseData = new ResponseData(req, res, {
+        table,
+        rows: createdRow,
+      });
+
+      this.app.onCreateOneRow().trigger(responseData);
 
       if (responseData.responseSent()) return null;
 
@@ -181,8 +188,12 @@ class CrudApi {
 
       parseJsonColumns(table, updatedRow);
 
-      const responseData = new ResponseData(table, updatedRow, res);
+      const responseData = new ResponseData(req, res, {
+        table,
+        rows: updatedRow,
+      });
 
+      this.app.onUpdateOneRow().trigger(responseData);
       if (responseData.responseSent()) return null;
 
       res.status(200).json(responseData.formatOneResponse());
@@ -209,7 +220,8 @@ class CrudApi {
 
       await this.app.getDAO().deleteOne(table.name, rowId);
 
-      const responseData = new ResponseData(table, [], res);
+      const responseData = new ResponseData(req, res, { table, rows: row });
+      this.app.onDeleteOneRow().trigger(responseData);
 
       if (responseData.responseSent()) return null;
 

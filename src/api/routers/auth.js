@@ -3,6 +3,7 @@ import { Router } from "express";
 import catchError from "../../utils/catch_error.js";
 import { AuthenticationError } from "../../utils/errors.js";
 import generateUuid from "../../utils/generate_uuid.js";
+import ResponseData from "../../models/response_data.js";
 
 /**
  * Creates an Express Router object
@@ -56,6 +57,7 @@ class AuthApi {
 
       // Hashes the inputted password and inserts this user's credentials into the 'users' table.
       const hashedPassword = await bcrypt.hash(password, 10);
+
       const createdUser = await this.app.getDAO().createOne("users", {
         id: generateUuid(),
         username,
@@ -66,7 +68,14 @@ class AuthApi {
       delete createdUser[0].password;
 
       console.log("User created :", createdUser[0]);
-      res.status(201).json({ username });
+
+      const responseData = new ResponseData(req, res, {
+        user: createdUser[0].username,
+      });
+      this.app.onRegisterUser().trigger(responseData);
+      if (responseData.responseSent()) return null;
+
+      res.status(201).json(responseData.formatGeneralResponse());
     };
   }
 
@@ -96,8 +105,15 @@ class AuthApi {
       });
 
       delete createdAdmin[0].password;
-      console.log("Admin created :", createdAdmin[0]);
-      res.status(201).json({ username });
+      console.log("Admin Created: ", createdAdmin[0]);
+
+      const responseData = new ResponseData(req, res, {
+        user: createdAdmin[0].username,
+      });
+      this.app.onRegisterAdmin().trigger(responseData);
+      if (responseData.responseSent()) return null;
+
+      res.status(201).json(responseData.formatGeneralResponse());
     };
   }
 
@@ -125,7 +141,13 @@ class AuthApi {
       delete req.session.user.password;
 
       console.log("Logged in user: ", req.session.user);
-      res.status(200).json({ user: req.session.user });
+      const responseData = new ResponseData(req, res, {
+        user: req.session.user,
+      });
+      this.app.onLoginUser().trigger(responseData);
+      if (responseData.responseSent()) return null;
+
+      res.status(200).send(responseData.formatGeneralResponse());
     };
   }
 
@@ -151,8 +173,14 @@ class AuthApi {
       req.session.user = existingAdmin[0];
       delete req.session.user.password;
 
-      console.log("logged in admin: ", req.session.user);
-      res.status(200).json({ admin: req.session.user });
+      console.log("Logged in Admin: ", req.session.user);
+      const responseData = new ResponseData(req, res, {
+        user: req.session.user,
+      });
+      this.app.onLoginAdmin().trigger(responseData);
+      if (responseData.responseSent()) return null;
+
+      res.status(200).send(responseData.formatGeneralResponse());
     };
   }
 
@@ -163,10 +191,18 @@ class AuthApi {
   logoutHandler() {
     return async (req, res, next) => {
       console.log("Logging out user: ", req.session.user);
+      const responseData = new ResponseData(req, res, "User Logged Out");
+
+      this.app.onLogout().trigger(responseData);
+
+      if (responseData.responseSent()) return null;
+
       delete req.session.user;
-      res.status(200).json({ message: "User logged out." });
+
+      res.status(200).json(responseData.formatGeneralResponse());
     };
   }
+
   /**
    * Checks if there is an admin in the _admins table
    * @returns {function}

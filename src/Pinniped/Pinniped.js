@@ -4,6 +4,7 @@ import EventEmitter from "events";
 import registerProcessListeners from "../utils/register_process_listeners.js";
 import { InvalidCustomRouteError } from "../utils/errors.js";
 import Table from "../models/table.js";
+import PinnipedEvent from "../models/pnpd_event.js";
 
 /**
  * Pinniped Class
@@ -17,7 +18,7 @@ class Pinniped {
 
   constructor(config) {
     this.DAO = new DAO();
-    this.events = new EventEmitter();
+    this.emitter = new EventEmitter();
     this.customRoutes = [];
     this.seedDatabase();
   }
@@ -103,26 +104,52 @@ class Pinniped {
    * @returns {object}
    */
   onGetAllRows(...tables) {
-    const EVENT_NAME = "GET_ALL_ROWS";
-
-    return {
-      add: (handler) => {
-        this.events.on(EVENT_NAME, (event) => {
-          if (
-            (!tables.length || tables.includes(event.table)) &&
-            !event.res.finished
-          )
-            handler(event);
-        });
-      },
-      // should this trigger be exposed to developers? Alternative would be only allow backend to trigger
-      trigger: (event) => {
-        this.events.emit(EVENT_NAME, event);
-      },
-    };
+    return new PinnipedEvent(this.emitter, "GET_ALL_ROWS", tables);
   }
 
-  onGetOneRow() {}
+  onGetOneRow(...tables) {
+    return new PinnipedEvent(this.emitter, "GET_ONE_ROW", tables);
+  }
+
+  onCreateOneRow(...tables) {
+    return new PinnipedEvent(this.emitter, "CREATE_ONE_ROW", tables);
+  }
+
+  onUpdateOneRow(...tables) {
+    return new PinnipedEvent(this.emitter, "UPDATE_ONE_ROW", tables);
+  }
+
+  onDeleteOneRow(...tables) {
+    return new PinnipedEvent(this.emitter, "DELETE_ONE_ROW", tables);
+  }
+
+  onBackupDatabase() {
+    return new PinnipedEvent(this.emitter, "BACKUP_DATABASE");
+  }
+
+  onRegisterUser() {
+    return new PinnipedEvent(this.emitter, "REGISTER_USER");
+  }
+
+  onRegisterAdmin() {
+    return new PinnipedEvent(this.emitter, "REGISTER_ADMIN");
+  }
+
+  onLoginUser() {
+    return new PinnipedEvent(this.emitter, "LOGIN_USER");
+  }
+
+  onLoginAdmin() {
+    return new PinnipedEvent(this.emitter, "LOGIN_ADMIN");
+  }
+
+  onLogout() {
+    return new PinnipedEvent(this.emitter, "LOGOUT");
+  }
+
+  onCustomRoute() {
+    return new PinnipedEvent(this.emitter, "CUSTOM_ROUTE");
+  }
 
   /**
    * Returns the app's DAO instance.
@@ -136,7 +163,6 @@ class Pinniped {
    * Starts the server on the given port, and registers process event handlers.
    * @param {number} port
    */
-
   start(port) {
     registerProcessListeners(this);
 

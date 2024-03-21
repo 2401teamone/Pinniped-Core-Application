@@ -1,32 +1,39 @@
 export default class ResponseData {
-  constructor(table, rows, res) {
-    this.table = table;
-    this.rows = rows;
+  constructor(req, res, data = {}) {
+    this.req = req;
     this.res = res;
+    this.data = data;
   }
 
+  /**
+   * Check if the response has been sent
+   * @returns {boolean}
+   */
   responseSent() {
-    return this.res.finished
+    return this.res.finished;
+  }
+
+  formatGeneralResponse() {
+    return { data: this.data };
   }
 
   formatAllResponse() {
     return {
       table: {
-        id: this.table.id,
-        name: this.table.name,
+        id: this.data.table.id,
+        name: this.data.table.name,
       },
-      rows: this.rows,
-    }
+      rows: this.data.rows,
+    };
   }
 
   formatOneResponse() {
     return {
       table: {
-        id: this.table.id,
-        name: this.table.name,
+        id: this.data.table.id,
+        name: this.data.table.name,
       },
-      row: this.rows[0],
-    }
+      row: this.data.rows[0],
+    };
   }
 }
-
