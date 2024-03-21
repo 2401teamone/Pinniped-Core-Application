@@ -1,9 +1,8 @@
 export default class ResponseData {
-  constructor(table, rows, res, req) {
-    this.table = table;
-    this.rows = rows;
-    this.res = res;
+  constructor(req, res, data = {}) {
     this.req = req;
+    this.res = res;
+    this.data = data;
   }
 
   /**
@@ -14,23 +13,27 @@ export default class ResponseData {
     return this.res.finished;
   }
 
+  formatGeneralResponse() {
+    return { data: this.data };
+  }
+
   formatAllResponse() {
     return {
       table: {
-        id: this.table.id,
-        name: this.table.name,
+        id: this.data.table.id,
+        name: this.data.table.name,
       },
-      rows: this.rows,
+      rows: this.data.rows,
     };
   }
 
   formatOneResponse() {
     return {
       table: {
-        id: this.table.id,
-        name: this.table.name,
+        id: this.data.table.id,
+        name: this.data.table.name,
       },
-      row: this.rows[0],
+      row: this.data.rows[0],
     };
   }
 }

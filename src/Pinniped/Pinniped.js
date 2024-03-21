@@ -107,53 +107,44 @@ class Pinniped {
     return new PinnipedEvent(this.emitter, "GET_ALL_ROWS", tables);
   }
 
-  /**
-   * Returns an object that adds an event handler and trigger events of the type: "GET_ONE_ROW".
-   * The callback passed to add is executed when the event is heard on the passed in tables.
-   * @param {...string} tables
-   * @returns {object} PinnipedEvent
-   */
   onGetOneRow(...tables) {
     return new PinnipedEvent(this.emitter, "GET_ONE_ROW", tables);
   }
 
-  /**
-   * Returns an object that adds an event handler and trigger events of the type: "CREATE_ONE_ROW".
-   * The callback passed to add is executed when the event is heard on the passed in tables.
-   * @param {...string} tables
-   * @returns {object} PinnipedEvent
-   */
   onCreateOneRow(...tables) {
     return new PinnipedEvent(this.emitter, "CREATE_ONE_ROW", tables);
   }
 
-  /**
-   * Returns an object that adds an event handler and trigger events of the type: "UPDATE_ONE_ROW".
-   * The callback passed to add is executed when the event is heard on the passed in tables.
-   * @param {...string} tables
-   * @returns {object} PinnipedEvent
-   */
   onUpdateOneRow(...tables) {
     return new PinnipedEvent(this.emitter, "UPDATE_ONE_ROW", tables);
   }
 
-  /**
-   * Returns an object that adds an event handler and trigger events of the type: "DELETE_ONE_ROW".
-   * The callback passed to add is executed when the event is heard on the passed in tables.
-   * @param {...string} tables
-   * @returns {object} PinnipedEvent
-   */
   onDeleteOneRow(...tables) {
     return new PinnipedEvent(this.emitter, "DELETE_ONE_ROW", tables);
   }
 
-  /**
-   * Returns an object that adds an event handler and trigger events of the type: "BACKUP_DATABASE".
-   * The callback passed to add is executed when the event is heard.
-   * @returns {object} PinnipedEvent
-   */
   onBackupDatabase() {
     return new PinnipedEvent(this.emitter, "BACKUP_DATABASE");
+  }
+
+  onRegisterUser() {
+    return new PinnipedEvent(this.emitter, "REGISTER_USER");
+  }
+
+  onRegisterAdmin() {
+    return new PinnipedEvent(this.emitter, "REGISTER_ADMIN");
+  }
+
+  onLoginUser() {
+    return new PinnipedEvent(this.emitter, "LOGIN_USER");
+  }
+
+  onLoginAdmin() {
+    return new PinnipedEvent(this.emitter, "LOGIN_ADMIN");
+  }
+
+  onLogout() {
+    return new PinnipedEvent(this.emitter, "LOGOUT");
   }
 
   /**
@@ -168,7 +159,6 @@ class Pinniped {
    * Starts the server on the given port, and registers process event handlers.
    * @param {number} port
    */
-
   start(port) {
     registerProcessListeners(this);
 

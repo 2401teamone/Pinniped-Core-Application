@@ -9,7 +9,7 @@ export default class PinnipedEvent {
     this.emitter.on(this.eventName, (responseData) => {
       if (
         (!this.tables.length ||
-          this.tables.includes(responseData.table.name)) &&
+          this.tables.includes(responseData.data.table.name)) &&
         !responseData.res.finished
       ) {
         handler(responseData);
