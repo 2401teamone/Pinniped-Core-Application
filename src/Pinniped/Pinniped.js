@@ -4,6 +4,7 @@ import EventEmitter from "events";
 import registerProcessListeners from "../utils/register_process_listeners.js";
 import { InvalidCustomRouteError } from "../utils/errors.js";
 import Table from "../models/table.js";
+import PinnipedEvent from "../models/event.js";
 
 /**
  * Pinniped Class
@@ -17,7 +18,7 @@ class Pinniped {
 
   constructor(config) {
     this.DAO = new DAO();
-    this.events = new EventEmitter();
+    this.emitter = new EventEmitter();
     this.customRoutes = [];
     this.seedDatabase();
   }
@@ -104,22 +105,7 @@ class Pinniped {
    */
   onGetAllRows(...tables) {
     const EVENT_NAME = "GET_ALL_ROWS";
-
-    return {
-      add: (handler) => {
-        this.events.on(EVENT_NAME, (event) => {
-          if (
-            (!tables.length || tables.includes(event.table)) &&
-            !event.res.finished
-          )
-            handler(event);
-        });
-      },
-      // should this trigger be exposed to developers? Alternative would be only allow backend to trigger
-      trigger: (event) => {
-        this.events.emit(EVENT_NAME, event);
-      },
-    };
+    return new PinnipedEvent(this.emitter, EVENT_NAME, tables);
   }
 
   onGetOneRow() {}
