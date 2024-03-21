@@ -82,9 +82,11 @@ class CrudApi {
       const { table } = res.locals;
       const { pageNum, limit, sortBy, order } = req.query;
 
-      const rows = await this.app
+      let rows = await this.app
         .getDAO()
         .getAll(table.name, pageNum, limit, sortBy, order);
+
+      rows = creatorAuthFilter(req.session.user, res, rows);
 
       parseJsonColumns(table, rows);
 
@@ -196,6 +198,14 @@ class CrudApi {
     return async (req, res, next) => {
       const { table } = res.locals;
       const { rowId } = req.params;
+
+      const row = await this.app.getDAO().getOne(table.name, rowId);
+      if (!row.length)
+        throw new BadRequestError(
+          `Row with id ${rowId} not found in table ${table.name}.`
+        );
+
+      creatorAuthCheck(req.session.user, res, row);
 
       await this.app.getDAO().deleteOne(table.name, rowId);
 
