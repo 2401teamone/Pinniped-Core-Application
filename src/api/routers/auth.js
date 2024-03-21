@@ -58,7 +58,13 @@ class AuthApi {
       const hashedPassword = await bcrypt.hash(password, 10);
       const createdUser = await this.app
         .getDAO()
-        .createOne("users", {id: generateUuid(),  username, password: hashedPassword });
+        .createOne("users", {
+          id: generateUuid(),
+          username,
+          password: hashedPassword,
+        });
+
+      delete createdUser[0].password;
 
       console.log("User created :", createdUser[0]);
       res.status(201).json({ username });
@@ -85,7 +91,11 @@ class AuthApi {
       const hashedPassword = await bcrypt.hash(password, 10);
       const createdAdmin = await this.app
         .getDAO()
-        .createOne("_admins", {id: generateUuid(), username, password: hashedPassword });
+        .createOne("_admins", {
+          id: generateUuid(),
+          username,
+          password: hashedPassword,
+        });
 
       console.log("Admin created :", createdAdmin[0]);
       res.status(201).json({ username });
@@ -160,11 +170,11 @@ class AuthApi {
   }
   /**
    * Checks if there is an admin in the _admins table
-   * @returns {function} 
+   * @returns {function}
    */
   adminExistsHandler() {
     return async (req, res, next) => {
-      const existingAdmin = await this.app.getDAO().getAll('_admins');
+      const existingAdmin = await this.app.getDAO().getAll("_admins");
       if (existingAdmin.length) {
         res.status(200).json({ registered: true });
       } else {
