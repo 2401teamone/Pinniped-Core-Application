@@ -72,7 +72,7 @@ class AuthApi {
       const responseData = new ResponseData(req, res, {
         user: createdUser[0].username,
       });
-      this.app.onRegisterUser().trigger(responseData);
+      await this.app.onRegisterUser().trigger(responseData);
       if (responseData.responseSent()) return null;
 
       res.status(201).json(responseData.formatGeneralResponse());
@@ -110,7 +110,7 @@ class AuthApi {
       const responseData = new ResponseData(req, res, {
         user: createdAdmin[0].username,
       });
-      this.app.onRegisterAdmin().trigger(responseData);
+      await this.app.onRegisterAdmin().trigger(responseData);
       if (responseData.responseSent()) return null;
 
       res.status(201).json(responseData.formatGeneralResponse());
@@ -144,7 +144,7 @@ class AuthApi {
       const responseData = new ResponseData(req, res, {
         user: req.session.user,
       });
-      this.app.onLoginUser().trigger(responseData);
+      await this.app.onLoginUser().trigger(responseData);
       if (responseData.responseSent()) return null;
 
       res.status(200).send(responseData.formatGeneralResponse());
@@ -177,7 +177,7 @@ class AuthApi {
       const responseData = new ResponseData(req, res, {
         user: req.session.user,
       });
-      this.app.onLoginAdmin().trigger(responseData);
+      await this.app.onLoginAdmin().trigger(responseData);
       if (responseData.responseSent()) return null;
 
       res.status(200).send(responseData.formatGeneralResponse());
@@ -193,7 +193,7 @@ class AuthApi {
       console.log("Logging out user: ", req.session.user);
       const responseData = new ResponseData(req, res, "User Logged Out");
 
-      this.app.onLogout().trigger(responseData);
+      await this.app.onLogout().trigger(responseData);
 
       if (responseData.responseSent()) return null;
 

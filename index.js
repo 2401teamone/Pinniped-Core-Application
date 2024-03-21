@@ -12,61 +12,66 @@ app.addRoute("GET", "/custom", (req, res, next) => {
 // add event-driven functionality
 app.onGetAllRows("Animals", "users").add((event) => {
   console.log("Triggered event: onGetAllRows");
-  // console.log(event.data);
 });
 
 app.onGetOneRow("Animals").add((event) => {
   console.log("Triggered event: GET ONE ROW");
-  console.log(event.data);
 });
 
 app.onUpdateOneRow("Animals").add((event) => {
   console.log("Triggered event: UPDATE ONE ROW");
-  console.log(event.data);
 });
 
 app.onDeleteOneRow("Animals").add((event) => {
   console.log("Triggered event: DELETE ONE ROW");
-  console.log(event.data);
 });
 
 app.onCreateOneRow("Animals").add((event) => {
   console.log("Triggered event: CREATE ONE ROW");
-  console.log(event.data);
 });
 
 app.onBackupDatabase().add((event) => {
   console.log("Triggered event: BACKUP_DATABASE");
-  console.log(event.data);
 });
 
 app.onLogout().add((event) => {
   console.log("Triggered event: LOGOUT");
-  console.log(event.data);
 });
 
 app.onLoginUser().add((event) => {
   console.log("Triggered event: LOGIN");
-  console.log(event.data);
 });
 
 app.onRegisterAdmin().add((event) => {
   console.log("Triggered event: ON_REGISTER_ADMIN");
-  console.log(event.data);
 });
 
 app.onLoginAdmin().add((event) => {
   console.log("Triggered event: LOGIN_ADMIN");
-  console.log(event.data);
 });
 
 app.onRegisterUser().add((event) => {
   console.log("Triggered event: REGISTER_USER");
-  console.log(event.data);
 });
 
 app.onCustomRoute().add((event) => {
   console.log("Triggered event: CUSTOM_ROUTE");
+});
+
+app.onGetTableMeta().add((event) => {
+  console.log("Triggered Event: TABLE_META_GET");
+});
+
+app.onCreateTable().add((event) => {
+  console.log("Triggered Event: CREATE TABLE");
+});
+
+app.onUpdateTable().add((event) => {
+  console.log("Triggered Event: UPDATE TABLE");
+});
+
+app.onDropTable().add((event) => {
+  console.log("Triggered Event: DROP TABLE");
 });
 
 app.start(3000);
