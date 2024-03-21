@@ -142,7 +142,7 @@ class CrudApi {
       const { table } = res.locals;
 
       if (table.createRule === "creator") {
-        req.body.creatorId = req.session.user.id;
+        req.body.creator = req.session.user.id;
       }
 
       const createdRow = await this.app

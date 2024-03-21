@@ -204,7 +204,6 @@ class DAO {
    */
   async getOne(tableName, rowId) {
     const row = await this.getDB()(tableName).select("*").where({ id: rowId });
-    const row = await this.getDB()(tableName).select("*").where({ id: rowId });
     return row;
   }
 
@@ -406,14 +405,6 @@ class DAO {
         .foreign(column.name)
         .references("id")
         .inTable(column.options.tableName)
-        .onDelete(column.options.cascadeDelete ? "CASCADE" : "SET NULL")
-        .onUpdate("CASCADE");
-    } else if (column.type === "creator") {
-      table.specificType("creator_id", "TEXT");
-      table
-        .foreign("creator_id")
-        .references("id")
-        .inTable("users")
         .onDelete(column.options.cascadeDelete ? "CASCADE" : "SET NULL")
         .onUpdate("CASCADE");
     } else {
