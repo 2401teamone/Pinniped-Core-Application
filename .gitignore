@@ -6,7 +6,9 @@ dist
 
 backup
 pnpd.db
+hb.db
 pnpd.db-shm
 pnpd.db-wal
 session.db
 migrations
+package-lock.json
