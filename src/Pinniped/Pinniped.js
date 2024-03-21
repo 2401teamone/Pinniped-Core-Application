@@ -4,7 +4,7 @@ import EventEmitter from "events";
 import registerProcessListeners from "../utils/register_process_listeners.js";
 import { InvalidCustomRouteError } from "../utils/errors.js";
 import Table from "../models/table.js";
-import PinnipedEvent from "../models/event.js";
+import PinnipedEvent from "../models/pnpd_event.js";
 
 /**
  * Pinniped Class
@@ -145,6 +145,10 @@ class Pinniped {
 
   onLogout() {
     return new PinnipedEvent(this.emitter, "LOGOUT");
+  }
+
+  onCustomRoute() {
+    return new PinnipedEvent(this.emitter, "CUSTOM_ROUTE");
   }
 
   /**

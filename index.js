@@ -64,4 +64,9 @@ app.onRegisterUser().add((event) => {
   console.log("Triggered event: REGISTER_USER");
   console.log(event.data);
 });
+
+app.onCustomRoute().add((event) => {
+  console.log("Triggered event: CUSTOM_ROUTE");
+});
+
 app.start(3000);
