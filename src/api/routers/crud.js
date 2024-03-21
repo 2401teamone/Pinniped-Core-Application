@@ -79,14 +79,14 @@ class CrudApi {
    */
   getAllHandler() {
     return async (req, res, next) => {
-      const { table } = res.locals;
+      const { table, apiRule } = res.locals;
       const { pageNum, limit, sortBy, order } = req.query;
 
       let rows = await this.app
         .getDAO()
         .getAll(table.name, pageNum, limit, sortBy, order);
 
-      rows = creatorAuthFilter(req.session.user, res, rows);
+      rows = creatorAuthFilter(req.session.user, table[apiRule], rows);
 
       parseJsonColumns(table, rows);
 
@@ -109,7 +109,7 @@ class CrudApi {
    */
   getOneHandler() {
     return async (req, res, next) => {
-      const { table } = res.locals;
+      const { table, apiRule } = res.locals;
       const { rowId } = req.params;
 
       const row = await this.app.getDAO().getOne(table.name, rowId);
@@ -118,7 +118,7 @@ class CrudApi {
           `Row with id ${rowId} not found in table ${table.name}.`
         );
 
-      creatorAuthCheck(req.session.user, res, row);
+      creatorAuthCheck(req.session.user, table[apiRule], row);
 
       parseJsonColumns(table, row);
 
@@ -164,7 +164,7 @@ class CrudApi {
    */
   updateOneHandler() {
     return async (req, res, next) => {
-      const { table } = res.locals;
+      const { table, apiRule } = res.locals;
       const { rowId } = req.params;
 
       const row = await this.app.getDAO().getOne(table.name, rowId);
@@ -173,7 +173,7 @@ class CrudApi {
           `Row with id ${rowId} not found in table ${table.name}.`
         );
 
-      creatorAuthCheck(req.session.user, res, row);
+      creatorAuthCheck(req.session.user, table[apiRule], row);
 
       const updatedRow = await this.app
         .getDAO()
@@ -196,7 +196,7 @@ class CrudApi {
    */
   deleteOneHandler() {
     return async (req, res, next) => {
-      const { table } = res.locals;
+      const { table, apiRule } = res.locals;
       const { rowId } = req.params;
 
       const row = await this.app.getDAO().getOne(table.name, rowId);
@@ -205,7 +205,7 @@ class CrudApi {
           `Row with id ${rowId} not found in table ${table.name}.`
         );
 
-      creatorAuthCheck(req.session.user, res, row);
+      creatorAuthCheck(req.session.user, table[apiRule], row);
 
       await this.app.getDAO().deleteOne(table.name, rowId);
 
