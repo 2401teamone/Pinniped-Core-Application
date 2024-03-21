@@ -253,6 +253,10 @@ class DAO {
     await this.getDB()(tableName).where({ id: rowId }).del();
   }
 
+  /**
+   * Creates the tablemeta table in the database.
+   * @returns {Promise <undefined>}
+   */
   async createTablemeta() {
     await this.getDB().schema.createTable("tablemeta", function (table) {
       table.text("id").primary();

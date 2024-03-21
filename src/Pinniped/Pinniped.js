@@ -31,7 +31,6 @@ class Pinniped {
    * @throws {Error}
    */
   async seedDatabase() {
-    //check if users, _admin, and tableMeta tables exist
     try {
       const usersExists = await this.getDAO().tableExists("users");
       const _adminExists = await this.getDAO().tableExists("_admin");
