@@ -8,7 +8,7 @@ import catchError from "../../utils/catch_error.js";
 import { BadRequestError, ForbiddenError } from "../../utils/errors.js";
 import generateUuid from "../../utils/generate_uuid.js";
 import ResponseData from "../../models/response_data.js";
-import creatorAuthCheck from "../../utils/row_auth.js";
+import { creatorAuthCheck, creatorAuthFilter } from "../../utils/row_auth.js";
 
 const BASE = "/:tableId/rows";
 
@@ -111,7 +111,10 @@ class CrudApi {
       const { rowId } = req.params;
 
       const row = await this.app.getDAO().getOne(table.name, rowId);
-      if (!row.length) throw new BadRequestError();
+      if (!row.length)
+        throw new BadRequestError(
+          `Row with id ${rowId} not found in table ${table.name}.`
+        );
 
       creatorAuthCheck(req.session.user, res, row);
 
@@ -133,6 +136,10 @@ class CrudApi {
   createOneHandler() {
     return async (req, res, next) => {
       const { table } = res.locals;
+
+      if (table.createRule === "creator") {
+        req.body.creatorId = req.session.user.id;
+      }
 
       const createdRow = await this.app
         .getDAO()
@@ -157,6 +164,14 @@ class CrudApi {
     return async (req, res, next) => {
       const { table } = res.locals;
       const { rowId } = req.params;
+
+      const row = await this.app.getDAO().getOne(table.name, rowId);
+      if (!row.length)
+        throw new BadRequestError(
+          `Row with id ${rowId} not found in table ${table.name}.`
+        );
+
+      creatorAuthCheck(req.session.user, res, row);
 
       const updatedRow = await this.app
         .getDAO()

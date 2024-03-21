@@ -1,5 +1,5 @@
 
-GET http://localhost:3000/api/tables/52b22193-a0f1-4346-8f17-ccb0c2b4f7d5/rows
+GET http://localhost:3000/api/tables/4869fb56fd381a/rows
 ### getAll From ElephantSeals
 
 GET http://localhost:3000/api/tables/4869fb56fd381a/rows/3abde3770d64f7
@@ -31,7 +31,7 @@ content-type: application/json
   "type": "Elephant Seal"
 }
 ###
-DELETE http://localhost:3000/api/tables/7e637ce9-68cb-4dec-a7b1-81bb5fe13b6e/rows/acc8e899-49f5-46a0-a6ce-e825cc3174aa
+DELETE http://localhost:3000/api/tables/4869fb56fd381a/rows/3abde3770d64f7
 ### deleteOne From todos
 
 GET http://localhost:3000/custom
