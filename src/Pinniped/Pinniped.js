@@ -98,6 +98,30 @@ class Pinniped {
   }
 
   /**
+   * Returns the app's DAO instance.
+   * @returns {object DAO}
+   */
+  getDAO() {
+    return this.DAO;
+  }
+
+  /**
+   * Starts the server on the given port, and registers process event handlers.
+   * @param {number} port
+   */
+  start(port) {
+    registerProcessListeners(this);
+
+    const server = initApi(this);
+
+    server.listen(port, () => {
+      console.log(`\nServer started at: http://localhost:${port}`);
+      console.log(`├─ REST API: http://localhost:${port}/api`);
+      console.log(`└─ Admin UI: http://localhost:${port}/_/\n`);
+    });
+  }
+
+  /**
    * Returns an object that adds an event handler and trigger events of the type: "GET_ALL_ROWS".
    * The callback passed to add is executed when the event is heard on the passed in tables.
    * @param {...string} tables
@@ -165,30 +189,6 @@ class Pinniped {
 
   onDropTable() {
     return new PinnipedEvent(this.emitter, "DROP_TABLE");
-  }
-
-  /**
-   * Returns the app's DAO instance.
-   * @returns {object DAO}
-   */
-  getDAO() {
-    return this.DAO;
-  }
-
-  /**
-   * Starts the server on the given port, and registers process event handlers.
-   * @param {number} port
-   */
-  start(port) {
-    registerProcessListeners(this);
-
-    const server = initApi(this);
-
-    server.listen(port, () => {
-      console.log(`\nServer started at: http://localhost:${port}`);
-      console.log(`├─ REST API: http://localhost:${port}/api`);
-      console.log(`└─ Admin UI: http://localhost:${port}/_/\n`);
-    });
   }
 }
 
