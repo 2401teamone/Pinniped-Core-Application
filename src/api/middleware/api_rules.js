@@ -1,5 +1,5 @@
-import catchError from '../../utils/catch_error.js';
-import { ForbiddenError, UnauthenticatedError } from '../../utils/errors.js';
+import catchError from "../../utils/catch_error.js";
+import { ForbiddenError, UnauthenticatedError } from "../../utils/errors.js";
 
 const ACCESS_LEVEL = {
   admin: 3,
@@ -9,12 +9,12 @@ const ACCESS_LEVEL = {
 };
 
 const API_RULE_KEY = {
-  GETALL: 'getAllRule',
-  GET: 'getOneRule',
-  POST: 'createRule',
-  PUT: 'updateRule',
-  PATCH: 'updateRule',
-  DELETE: 'deleteRule',
+  GETALL: "getAllRule",
+  GET: "getOneRule",
+  POST: "createRule",
+  PUT: "updateRule",
+  PATCH: "updateRule",
+  DELETE: "deleteRule",
 };
 
 /**
@@ -25,30 +25,28 @@ const API_RULE_KEY = {
  */
 export default function apiRules() {
   return catchError(async (req, res, next) => {
-    //find out what action the user is trying to complete, and associate that with
-    //the appropriate API rule
-    //if the method is GET and the path ends in "/rows", reassign method to "GETALL"
-    const apiRule =
-      req.method === 'GET' && req.path.endsWith('/rows')
+    //Find out what action the user is trying to complete, and associate that with
+    //the appropriate API rule.
+    //If the method is GET and the path ends in "/rows", reassign method to "GETALL"
+    res.locals.apiRule =
+      req.method === "GET" && req.path.endsWith("/rows")
         ? API_RULE_KEY.GETALL
         : API_RULE_KEY[req.method];
 
     const { table } = res.locals;
-    // // JUST FOR TESTING
-    // table.updateRule = 'admin';
 
     // User Access Level
-    const sessionAccessLevel = req.session.hasOwnProperty('user')
+    const sessionAccessLevel = req.session.hasOwnProperty("user")
       ? ACCESS_LEVEL[req.session.user.role]
-      : ACCESS_LEVEL['public'];
+      : ACCESS_LEVEL["public"];
 
     // Required Table Access Level
-    const requiredAccessLevel = ACCESS_LEVEL[table[apiRule]];
+    const requiredAccessLevel = ACCESS_LEVEL[table[res.locals.apiRule]];
 
     // If the user is not authenticated, and needs to be, return a 401 error
     if (
-      sessionAccessLevel === ACCESS_LEVEL['public'] &&
-      requiredAccessLevel > ACCESS_LEVEL['public']
+      sessionAccessLevel === ACCESS_LEVEL["public"] &&
+      requiredAccessLevel > ACCESS_LEVEL["public"]
     ) {
       throw new UnauthenticatedError();
     }
