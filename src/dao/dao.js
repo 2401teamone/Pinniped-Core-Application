@@ -197,9 +197,7 @@ class DAO {
    * @returns {object[]} row
    */
   async getOne(tableName, rowId) {
-    const row = await this.getDB()(tableName)
-      .select("*")
-      .where({ id: rowId });
+    const row = await this.getDB()(tableName).select("*").where({ id: rowId });
     return row;
   }
 
@@ -215,7 +213,7 @@ class DAO {
         .insert(newRow);
       return createdRow;
     } catch (e) {
-      console.log(e)
+      console.log(e);
       if (e.message.slice(0, 11) === "insert into") {
         throw new BadRequestError();
       } else {
@@ -311,11 +309,12 @@ class DAO {
       columns.forEach((column) => {
         if (column.type === "relation") {
           table.specificType(column.name, "TEXT");
-          table.foreign(column.name)
-          .references("id")
-          .inTable(column.options.tableName)
-          .onDelete(column.options.cascadeDelete ? "CASCADE" : "SET NULL")
-          .onUpdate('CASCADE');
+          table
+            .foreign(column.name)
+            .references("id")
+            .inTable(column.options.tableName)
+            .onDelete(column.options.cascadeDelete ? "CASCADE" : "SET NULL")
+            .onUpdate("CASCADE");
         } else {
           table.specificType(column.name, Column.COLUMN_MAP[column.type].sql);
         }
@@ -348,9 +347,19 @@ class DAO {
    * @param {object Column} column
    */
   async addColumn(tableName, column) {
+    console.log(`Adding column ${JSON.stringify(column)} to ${tableName}`);
     await this.getDB().schema.table(tableName, (table) => {
-      console.log(`Adding column ${JSON.stringify(column)} to ${tableName}`);
-      table.specificType(column.name, Column.COLUMN_MAP[column.type].sql);
+      if (column.type === "relation") {
+        table.specificType(column.name, "TEXT");
+        table
+          .foreign(column.name)
+          .references("id")
+          .inTable(column.options.tableName)
+          .onDelete(column.options.cascadeDelete ? "CASCADE" : "SET NULL")
+          .onUpdate("CASCADE");
+      } else {
+        table.specificType(column.name, Column.COLUMN_MAP[column.type].sql);
+      }
     });
   }
 
