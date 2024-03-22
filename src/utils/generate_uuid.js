@@ -1,5 +1,5 @@
-import crypto from 'crypto';
+import crypto from "crypto";
 
 export default function generateRandomUUID(size = 7) {
-  return crypto.randomBytes(size).toString('hex');
+  return crypto.randomBytes(size).toString("hex");
 }
