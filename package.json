@@ -1,11 +1,12 @@
 {
   "name": "pinniped",
-  "version": "0.1.10",
+  "version": "0.2.1",
   "description": "Easy-to-deploy Node backend server.",
   "keywords": [
     "backend",
     "sqlite3",
-    "node"
+    "node",
+    "baas"
   ],
   "main": "./src/Pinniped/Pinniped.js",
   "type": "module",
