@@ -7,8 +7,8 @@ export default function generateAdminRouter(app) {
   const router = Router();
   const adminAPI = new AdminAPI(app);
 
-  // router.use(adminOnly());
-  router.get("/backup", catchError(adminAPI.backupHandler()));
+  router.use(adminOnly());
+  router.post("/backup", catchError(adminAPI.backupHandler()));
 
   return router;
 }
