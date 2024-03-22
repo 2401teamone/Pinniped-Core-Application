@@ -10,7 +10,7 @@ import { ForbiddenError } from "./errors.js";
 export function creatorAuthCheck(user, apiRule, row) {
   if (apiRule !== "creator" || user.role === "admin") return;
 
-  if (row[0].creatorId !== user.id) throw new ForbiddenError();
+  if (row[0].creator !== user.id) throw new ForbiddenError();
 }
 
 /**
@@ -24,5 +24,5 @@ export function creatorAuthCheck(user, apiRule, row) {
 export function creatorAuthFilter(user, apiRule, rows) {
   if (apiRule !== "creator" || user.role === "admin") return rows;
 
-  return rows.filter((row) => row.creatorId === user.id);
+  return rows.filter((row) => row.creator === user.id);
 }

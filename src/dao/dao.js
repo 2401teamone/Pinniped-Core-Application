@@ -407,14 +407,6 @@ class DAO {
         .inTable(column.options.tableName)
         .onDelete(column.options.cascadeDelete ? "CASCADE" : "SET NULL")
         .onUpdate("CASCADE");
-    } else if (column.type === "creator") {
-      table.specificType("creator_id", "TEXT");
-      table
-        .foreign("creator_id")
-        .references("id")
-        .inTable("users")
-        .onDelete(column.options.cascadeDelete ? "CASCADE" : "SET NULL")
-        .onUpdate("CASCADE");
     } else {
       table.specificType(column.name, Column.COLUMN_MAP[column.type].sql);
     }

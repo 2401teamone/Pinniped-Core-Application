@@ -169,6 +169,7 @@ class Column {
       isJson: true,
     },
     creator: {
+      sql: "TEXT DEFAULT '' NOT NULL",
       options: CreatorOptions,
       isJson: false,
     },
@@ -180,12 +181,14 @@ class Column {
 
   constructor({
     id = generateUuid(),
+    system = false,
     name,
     type,
     required = false,
     options = {},
   }) {
     this.id = id;
+    this.system = system;
     this.name = name;
     this.type = type;
     this.required = required;
