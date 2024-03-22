@@ -204,7 +204,6 @@ class DAO {
    */
   async getOne(tableName, rowId) {
     const row = await this.getDB()(tableName).select("*").where({ id: rowId });
-    const row = await this.getDB()(tableName).select("*").where({ id: rowId });
     return row;
   }
 
