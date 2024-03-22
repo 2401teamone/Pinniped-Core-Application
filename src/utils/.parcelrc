@@ -1,0 +1,13 @@
+{
+  "extends": "@parcel/config-default",
+  "targets": {
+    "main": {
+      "context": "node",
+      "engines": {
+        "node": ">=14.17.0"
+      },
+      "outputFormat": "esmodule",
+      "includeNodeModules": true
+    }
+  }
+}

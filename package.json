@@ -8,8 +8,6 @@
     "node",
     "baas"
   ],
-  "main": "./src/Pinniped/Pinniped.js",
-  "type": "module",
   "scripts": {
     "start": "node index.js",
     "prod": "node ./dist/Pinniped.js",
@@ -18,7 +16,7 @@
     "reset-db": "rm -f pnpd_data/pnpd.db && touch pnpd_data/pnpd.db && rm -f pnpd_data/pnpd.db-wal && rm -f pnpd_data/pnpd.db-shm",
     "reset-sessions": "rm -f pnpd_data/session.db && touch pnpd_data/session.db",
     "reset-migrations": "rm -r pnpd_data/migrations && sqlite3 pnpd_data/pnpd.db < pnpd_data/drop-migrations.sql",
-    "build": "npx parcel build index.js && npm run build-cleanup",
+    "build": "npx parcel build",
     "build-cleanup": "rm -rf .parcel-cache"
   },
   "contributors": [
@@ -41,6 +39,7 @@
   ],
   "license": "MIT",
   "dependencies": {
+    "aws-sdk": "^2.1583.0",
     "bcrypt": "^5.1.1",
     "better-sqlite3": "^9.4.3",
     "better-sqlite3-session-store": "^0.1.0",
@@ -49,11 +48,20 @@
     "express": "^4.18.3",
     "express-session": "^1.18.0",
     "knex": "^3.1.0",
-    "pinniped": "latest",
+    "pinniped": "^0.2.1",
     "xss": "^1.0.15"
   },
   "devDependencies": {
     "nodemon": "^3.1.0",
-    "parcel": "^2.12.0"
+    "parcel": "latest"
+  },
+  "type": "module",
+  "main": "./dist/Pinniped.js",
+  "source": "index.js",
+  "targets": {
+    "main": {
+      "outputFormat": "esmodule",
+      "includeNodeModules": true
+    }
   }
 }
