@@ -31,7 +31,7 @@ export class TableNotFoundError extends AppError {
       `Table with an id of ${tableId} was not found`,
       404,
       "TABLE_NOT_FOUND",
-      `Table not found.  You've likely attempted to access a table that does not exist within the database.`
+      "Table not found.  You've likely attempted to access a table that does not exist within the database."
     );
   }
 }
@@ -64,7 +64,7 @@ export class AuthenticationError extends AppError {
       message,
       400,
       "AUTH_ERROR",
-      `Please try again with updated credentials.`
+      "Please try again with updated credentials."
       );
     }
   }
