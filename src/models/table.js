@@ -109,7 +109,6 @@ class Table {
     }
   }
 
-  
   /**
    * Validates the proposed schema changes.
    * @param {object Table} newTable
@@ -183,6 +182,20 @@ class Table {
     this.columns.forEach((column) => column.initializeId());
   }
 
+  async makeMigration(db, filePath) {
+    const fileName = filePath.match(/[^\\/]+$/)[0];
+    try {
+      await db.migrate.up();
+    } catch (e) {
+      console.log(
+        "There was a problem making the migration. The migration file will be removed"
+      );
+
+      await db("knex_migrations").where({ name: fileName }).del();
+      fs.unlinkSync(filePath);
+      throw new Error(e);
+    }
+  }
   /**
    * Adds the calling table to the database and to the tablemeta
 
@@ -210,9 +223,8 @@ class Table {
         await dao.createTable(${stringTable});
         await dao.addTableMetaData(${stringTableMetaRow});
       }
-
       export async function down(knex) {
-        const dao = new DAO(knex);
+        const dao = new MigrationDao(knex);
         await dao.dropTable("${this.name}");
         await dao.deleteTableMetaData("${this.id}");
       }
@@ -220,8 +232,8 @@ class Table {
 
     fs.writeFileSync(filePath, migrateTemplate);
 
-    // Executes migration transaction and destroys the connection after the transaction is successful.
-    await db.migrate.up();
+    await this.makeMigration(db, filePath);
+
     await db.destroy();
   }
 
@@ -233,7 +245,7 @@ class Table {
    */
   async drop() {
     let db = Table.getNewConnection();
-    let filePath = await db.migrate.make(`drop_table_${this.name}`);
+    const filePath = await db.migrate.make(`drop_table_${this.name}`);
 
     const stringTable = JSON.stringify(this);
     const stringTableMetaRow = JSON.stringify({
@@ -252,7 +264,7 @@ class Table {
         }
 
         export async function down(knex) {
-          const dao = new DAO(knex);
+          const dao = new MigrationDao(knex);
           await dao.createTable(${stringTable});
           await dao.addTableMetaData(${stringTableMetaRow})
         }
@@ -260,8 +272,8 @@ class Table {
 
     fs.writeFileSync(filePath, migrateTemplate);
 
-    // Calls the 'up' function in the migrate template and destroys the connection after running the migration to avoid socket hangup.
-    await db.migrate.up();
+    await this.makeMigration(db, filePath);
+
     await db.destroy();
   }
 
@@ -367,10 +379,7 @@ class Table {
    `;
 
     fs.writeFileSync(filePath, migrateTemplate);
-
-    await db.migrate.up();
-
-    // must close connection after running migrations or socket will hang
+    await this.makeMigration(db, filePath);
     await db.destroy();
   }
 }
