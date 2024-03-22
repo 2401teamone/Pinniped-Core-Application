@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import fs from "fs";
+import { resolve } from "path";
 dotenv.config();
 
 //Routers
@@ -28,14 +29,7 @@ const db = new sqlite("pnpd_data/session.db");
 function initApi(app) {
   const server = express();
 
-  server.use(
-    "/_",
-    express.static(
-      fs.existsSync("node_modules/pinniped/ui")
-        ? "node_modules/pinniped/ui"
-        : "ui"
-    )
-  );
+  server.use("/_", express.static("node_modules/pinniped/ui"));
 
   server.use(express.json());
   server.use(
@@ -78,6 +72,14 @@ function initApi(app) {
   server.use("/api/schema", schemaRouter);
   server.use("/api/admin", adminRouter);
   server.use("/", customRouter);
+
+  // routes all of the front end routes back to index. Needed for static vite build
+  server.get(
+    ["/_/login", "/_/register", "/_/observability", "/_/data", "/_/settings"],
+    (req, res, next) => {
+      res.sendFile(resolve("node_modules/pinniped/ui/index.html"));
+    }
+  );
 
   server.get("*", (req, res, next) => {
     res.send("Page does not exist");
