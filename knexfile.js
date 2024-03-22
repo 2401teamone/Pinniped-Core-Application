@@ -7,7 +7,7 @@ export default {
   development: {
     client: "better-sqlite3",
     connection: {
-      filename: "pndpd.db",
+      filename: "pnpd_data/pnpd.db",
     },
     useNullAsDefault: true,
     migrations: {
@@ -19,7 +19,7 @@ export default {
   staging: {
     client: "better-sqlite3",
     connection: {
-      filename: "pndpd.db",
+      filename: "pnpd_data/pnpd.db",
     },
     useNullAsDefault: true,
     migrations: {
@@ -31,7 +31,7 @@ export default {
   production: {
     client: "better-sqlite3",
     connection: {
-      filename: "pndpd.db",
+      filename: "pnpd_data/pnpd.db",
     },
     useNullAsDefault: true,
     migrations: {
