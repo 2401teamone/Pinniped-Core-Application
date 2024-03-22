@@ -1,9 +1,14 @@
-import Column from '../models/column.js';
+import Column from "../models/column.js";
 
 export default function parseJsonColumns(table, rows) {
   for (let row of rows) {
     for (let key in row) {
-      if (key === 'id' || key === 'created_at' || key === 'updated_at')
+      if (
+        key === "id" ||
+        key === "created_at" ||
+        key === "updated_at" ||
+        key === "creator"
+      )
         continue;
       const column = table.getColumnByName(key);
       const columnType = column?.type;
