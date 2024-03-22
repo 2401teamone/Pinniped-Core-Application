@@ -29,14 +29,7 @@ const db = new sqlite("pnpd_data/session.db");
 function initApi(app) {
   const server = express();
 
-  server.use(
-    "/_",
-    express.static(
-      fs.existsSync("node_modules/pinniped/ui")
-        ? "node_modules/pinniped/ui"
-        : "ui"
-    )
-  );
+  server.use("/_", express.static("node_modules/pinniped/ui"));
 
   server.use(express.json());
   server.use(
@@ -82,16 +75,9 @@ function initApi(app) {
 
   // routes all of the front end routes back to index. Needed for static vite build
   server.get(
-    [
-      "/_/",
-      "/_/login",
-      "/_/register",
-      "/_/observability",
-      "/_/data",
-      "/_/settings",
-    ],
+    ["/_/login", "/_/register", "/_/observability", "/_/data", "/_/settings"],
     (req, res, next) => {
-      res.sendFile(resolve("ui/index.html"));
+      res.sendFile(resolve("node_modules/pinniped/ui/index.html"));
     }
   );
 
