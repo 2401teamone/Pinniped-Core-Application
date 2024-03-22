@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import fs from "fs";
+import { resolve } from "path";
 dotenv.config();
 
 //Routers
@@ -78,6 +79,21 @@ function initApi(app) {
   server.use("/api/schema", schemaRouter);
   server.use("/api/admin", adminRouter);
   server.use("/", customRouter);
+
+  // routes all of the front end routes back to index. Needed for static vite build
+  server.get(
+    [
+      "/_/",
+      "/_/login",
+      "/_/register",
+      "/_/observability",
+      "/_/data",
+      "/_/settings",
+    ],
+    (req, res, next) => {
+      res.sendFile(resolve("ui/index.html"));
+    }
+  );
 
   server.get("*", (req, res, next) => {
     res.send("Page does not exist");
