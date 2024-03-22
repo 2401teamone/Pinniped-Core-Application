@@ -2,7 +2,7 @@
 .gitignore
 .dockerignore
 Dockerfile
-test
+rest
 pnpd_data
 index.js
 .DS_Store
