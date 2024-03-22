@@ -182,6 +182,13 @@ class Table {
     this.columns.forEach((column) => column.initializeId());
   }
 
+  /**
+   * Attempts to run migration up, throws error and removes migration file and
+   * row from database.
+   * @param {knex instance} db
+   * @param {string} filePath
+   * @returns {undefined}
+   */
   async makeMigration(db, filePath) {
     const fileName = filePath.match(/[^\\/]+$/)[0];
     try {
