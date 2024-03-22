@@ -20,6 +20,9 @@ class DAO {
    */
   _connect(thisDAO) {
     if (!fs.existsSync("pnpd_data")) fs.mkdirSync("pnpd_data");
+    if (!fs.existsSync("pnpd_data/migrations")) {
+      fs.mkdirSync("pnpd_data/migrations");
+    }
 
     let db = knex({
       client: "better-sqlite3",
