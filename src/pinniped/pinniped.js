@@ -20,9 +20,13 @@ class Pinniped {
     this.DAO = new DAO();
     this.emitter = new EventEmitter();
     this.customRoutes = [];
-    this.seedDatabase();
+    this.dataBaseSetup();
   }
 
+  async dataBaseSetup() {
+    await this.runLatestMigrations();
+    await this.seedDatabase();
+  }
   /**
    * Seeds the database with the necessary tables.
    * If the tables do not exist, it creates them.
@@ -35,11 +39,6 @@ class Pinniped {
     try {
       const usersExists = await this.getDAO().tableExists("users");
       const _adminExists = await this.getDAO().tableExists("_admins");
-      const tablemetaExists = await this.getDAO().tableExists("tablemeta");
-
-      if (!tablemetaExists) {
-        await this.getDAO().createTablemeta();
-      }
 
       if (!usersExists) {
         const users = new Table({
@@ -67,6 +66,18 @@ class Pinniped {
     } catch (error) {
       console.error(error);
     }
+  }
+
+  /**
+   * Runs any migrations that haven't run yet after setting up tablemeta
+   * @returns {undefined}
+   */
+  async runLatestMigrations() {
+    const tablemetaExists = await this.getDAO().tableExists("tablemeta");
+    if (!tablemetaExists) {
+      await this.getDAO().createTablemeta();
+    }
+    await this.DAO.getDB().migrate.latest();
   }
 
   /**
