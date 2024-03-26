@@ -60,7 +60,6 @@ function initApi(app) {
   );
 
   server.use(pinoHttp({ stream: app.logger.sqliteStream() }));
-
   server.use(sanitize());
   server.use(setHeaders());
 
