@@ -41,7 +41,7 @@ class Pinniped {
   async seedDatabase() {
     try {
       const usersExists = await this.getDAO().tableExists("users");
-      const _adminExists = await this.getDAO().tableExists("_admins");
+      const adminsExists = await this.getDAO().tableExists("admins");
 
       if (!usersExists) {
         const users = new Table({
@@ -55,16 +55,16 @@ class Pinniped {
         await users.create();
       }
 
-      if (!_adminExists) {
-        const _admins = new Table({
-          name: "_admins",
+      if (!adminsExists) {
+        const admins = new Table({
+          name: "admins",
           columns: [
             { name: "username", type: "text" },
             { name: "password", type: "text" },
             { name: "role", type: "text" },
           ],
         });
-        await _admins.create();
+        await admins.create();
       }
     } catch (error) {
       console.error(error);

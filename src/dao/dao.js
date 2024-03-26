@@ -90,9 +90,8 @@ class DAO {
     let newName = `backup_${Date.now()}_${dbName}`;
     let newPath = `pnpd_data/backup/${newName}`;
 
-    console.log(`Backing up ${dbName} as '${newName}'...`);
     await connection.backup(newPath);
-    console.log("Backup Complete!");
+
     return newPath;
   }
 
@@ -223,7 +222,6 @@ class DAO {
       return createdRow;
     } catch (e) {
       console.log(e);
-      console.log(e);
       if (e.message.slice(0, 11) === "insert into") {
         throw new BadRequestError();
       } else {
@@ -273,7 +271,6 @@ class DAO {
       table.text("updateRule").defaultTo("admin");
       table.text("deleteRule").defaultTo("admin");
     });
-    console.log("tablemeta created");
   }
 
   /**
@@ -283,7 +280,6 @@ class DAO {
    * @return {object} createdRow
    */
   async addTableMetaData(tableData) {
-    console.log(`Adding tablemeta row for: ${tableData.name}`);
     const createdRow = await this.getDB()("tablemeta")
       .returning("*")
       .insert(tableData);
@@ -297,7 +293,6 @@ class DAO {
    * @return {object} updatedRow
    */
   async updateTableMetaData(tableData) {
-    console.log(`Updating tablemeta row for: ${tableData.name}`);
     const updatedRow = await this.getDB()("tablemeta")
       .returning("*")
       .where({ id: tableData.id })
@@ -311,7 +306,6 @@ class DAO {
    * @param {string} tableId
    */
   async deleteTableMetaData(tableId) {
-    console.log(`Deleting tablemeta row with ID :${tableId}`);
     await this.getDB()("tablemeta").where({ id: tableId }).del();
   }
 
@@ -324,7 +318,6 @@ class DAO {
   async createTable(table) {
     const name = table.name;
     const columns = table.columns;
-    console.log(`Creating Table: ${name}`);
 
     return await this.getDB().schema.createTable(name, (table) => {
       table.specificType(
@@ -345,7 +338,6 @@ class DAO {
    * @param {string} tableName
    */
   async dropTable(tableName) {
-    console.log(`Dropping Table: ${tableName}`);
     await this.getDB().schema.dropTable(tableName);
   }
 
@@ -355,7 +347,6 @@ class DAO {
    * @param {string} newName
    */
   async renameTable(tableName, newName) {
-    console.log(`Renaming ${tableName} to ${newName}`);
     await this.getDB().schema.renameTable(tableName, newName);
   }
 
@@ -365,7 +356,6 @@ class DAO {
    * @param {object Column} column
    */
   async addColumn(tableName, column) {
-    console.log(`Adding column ${JSON.stringify(column)} to ${tableName}`);
     await this.getDB().schema.table(tableName, (table) => {
       this._addColumnPerSpecs(column, table);
     });
@@ -379,7 +369,6 @@ class DAO {
    */
   async renameColumn(tableName, name, newName) {
     await this.getDB().schema.table(tableName, (table) => {
-      console.log(`Renaming ${tableName}'s column ${name} to ${newName}`);
       table.renameColumn(name, newName);
     });
   }
@@ -391,7 +380,6 @@ class DAO {
    */
   async dropColumn(tableName, columnName) {
     await this.getDB().schema.table(tableName, (table) => {
-      console.log("DROPPING COLUMN", columnName, " on", tableName);
       table.dropColumn(columnName);
     });
   }

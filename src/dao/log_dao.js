@@ -61,7 +61,6 @@ class LogDao {
     return {
       write: (log) => {
         const parsedLog = this.parseLog(log);
-        console.log("PARSED LOG", parsedLog);
         if (
           parsedLog.url.startsWith("/api/admin/logs") ||
           parsedLog.url === "/api/auth/"
