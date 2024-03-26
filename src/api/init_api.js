@@ -1,5 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
+import pinoHttp from "pino-http";
 import fs from "fs";
 import { resolve } from "path";
 dotenv.config();
@@ -57,6 +58,8 @@ function initApi(app) {
       },
     })
   );
+
+  server.use(pinoHttp({ stream: app.logger.sqliteStream() }));
 
   server.use(sanitize());
   server.use(setHeaders());

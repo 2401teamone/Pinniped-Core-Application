@@ -51,6 +51,7 @@
     "express-session": "^1.18.0",
     "knex": "^3.1.0",
     "pinniped": "latest",
+    "pino-http": "^9.0.0",
     "xss": "^1.0.15"
   },
   "devDependencies": {

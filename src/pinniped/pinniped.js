@@ -1,5 +1,6 @@
 import initApi from "../api/init_api.js";
 import DAO from "../dao/dao.js";
+import LogDao from "../dao/log_dao.js";
 import EventEmitter from "events";
 import registerProcessListeners from "../utils/register_process_listeners.js";
 import { InvalidCustomRouteError } from "../utils/errors.js";
@@ -18,6 +19,7 @@ class Pinniped {
 
   constructor(config) {
     this.DAO = new DAO();
+    this.logger = new LogDao();
     this.emitter = new EventEmitter();
     this.customRoutes = [];
     this.dataBaseSetup();
@@ -26,6 +28,7 @@ class Pinniped {
   async dataBaseSetup() {
     await this.runLatestMigrations();
     await this.seedDatabase();
+    await this.logger.createTable();
   }
   /**
    * Seeds the database with the necessary tables.
