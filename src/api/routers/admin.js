@@ -7,7 +7,7 @@ export default function generateAdminRouter(app) {
   const router = Router();
   const adminAPI = new AdminAPI(app);
 
-  // router.use(adminOnly());
+  router.use(adminOnly());
 
   router.get("/logs", catchError(adminAPI.getLogsHandler()));
   router.delete("/logs/:id", catchError(adminAPI.deleteLogHandler()));
