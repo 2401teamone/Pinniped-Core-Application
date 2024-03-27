@@ -83,6 +83,11 @@ function initApi(app) {
     }
   );
 
+  server.use("/", express.static("dist"));
+  server.get("/*", (req, res, next) => {
+    res.sendFile(resolve("dist/index.html"));
+  });
+
   server.get("*", (req, res, next) => {
     res.send("Page does not exist");
   });
