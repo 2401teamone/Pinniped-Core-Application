@@ -169,6 +169,22 @@ class DAO {
   }
 
   /**
+   * Searches a table for columns' values that match the provided fields' values.
+   * Returns true if the values are unique, false otherwise.
+   * @param {string} tableName
+   * @param {object} fields
+   * @returns {boolean} isUnique
+   */
+  async checkUnique(tableName, fields, rowId) {
+    const check = this.getDB()(tableName).count("id").where(fields);
+    if (rowId) {
+      check.whereNot({ id: rowId });
+    }
+    const [count] = await check;
+    return Object.values(count)[0] === 0;
+  }
+
+  /**
    * Returns all the requested rows from the specific queried table.
    * @param {string} tableName - name of the table
    * @param {number} [pageNum] - page number of the results

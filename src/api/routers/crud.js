@@ -5,6 +5,7 @@ import {
   validatePostMeetsRequiredFields,
   validatePatchMeetsRequiredFields,
   validateRequestMeetsCustomValidation,
+  validateRequestMeetsUniqueValidation,
 } from "../middleware/validate_record.js";
 import stringifyJsonColumns from "../middleware/stringify_json.js";
 import parseJsonColumns from "../../utils/parse_json_columns.js";
@@ -45,6 +46,7 @@ export default function generateCrudRouter(app) {
     apiRules(app),
     validatePostMeetsRequiredFields(),
     validateRequestMeetsCustomValidation(),
+    validateRequestMeetsUniqueValidation(app),
     stringifyJsonColumns(),
     catchError(crudApi.createOneHandler())
   );
@@ -54,6 +56,7 @@ export default function generateCrudRouter(app) {
     apiRules(app),
     validatePatchMeetsRequiredFields(),
     validateRequestMeetsCustomValidation(),
+    validateRequestMeetsUniqueValidation(app),
     stringifyJsonColumns(),
     catchError(crudApi.updateOneHandler())
   );
