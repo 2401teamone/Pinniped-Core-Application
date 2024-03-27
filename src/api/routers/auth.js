@@ -20,7 +20,7 @@ export default function generateAuthRouter(app) {
   router.get("/", catchError(authApi.getUserHandler()));
   router.post(
     "/register",
-    catchError(validateRegistration()),
+    validateRegistration(app),
     catchError(authApi.registerHandler())
   );
   router.post("/login", catchError(authApi.loginHandler()));
@@ -52,13 +52,6 @@ class AuthApi {
   registerHandler() {
     return async (req, res, next) => {
       const { username, password } = req.body;
-
-      // Checks if 'username' exists in 'users'
-      const existingUser = await this.app
-        .getDAO()
-        .search("users", { username });
-      if (existingUser.length)
-        throw new AuthenticationError("Username not available.");
 
       // Hashes the inputted password and inserts this user's credentials into the 'users' table.
       const hashedPassword = await bcrypt.hash(password, 10);
