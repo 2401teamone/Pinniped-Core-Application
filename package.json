@@ -1,6 +1,6 @@
 {
   "name": "pinniped",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Easy-to-deploy Node backend server.",
   "keywords": [
     "backend",
@@ -8,7 +8,7 @@
     "node",
     "baas"
   ],
-  "main": "./src/Pinniped/Pinniped.js",
+  "main": "./src/pinniped/pinniped.js",
   "type": "module",
   "scripts": {
     "start": "node index.js",

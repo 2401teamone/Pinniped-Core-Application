@@ -6,7 +6,7 @@ dist
 
 backup
 pnpd.db
-hb.db
+logs.db
 pnpd.db-shm
 pnpd.db-wal
 session.db
