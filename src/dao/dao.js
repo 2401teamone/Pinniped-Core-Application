@@ -79,7 +79,7 @@ class DAO {
    * @params
    * @returns {undefined}
    */
-  async dbBackup() {
+  async dbBackup(filename) {
     let connection = await this.getRawSqliteConnection();
 
     // matches the filename from the full filepath
@@ -87,7 +87,13 @@ class DAO {
 
     if (!fs.existsSync("pnpd_data/backup")) fs.mkdirSync("pnpd_data/backup");
 
-    let newName = `backup_${Date.now()}_${dbName}`;
+    let newName;
+    if (filename === "" || filename === undefined) {
+      newName = `backup_${Date.now()}_${dbName}`;
+    } else {
+      newName = `backup_${Date.now()}_${filename}`;
+    }
+
     let newPath = `pnpd_data/backup/${newName}`;
 
     await connection.backup(newPath);

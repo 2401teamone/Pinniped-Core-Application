@@ -20,11 +20,11 @@ export class BadRequestError extends AppError {
       message,
       400,
       "BAD_REQUEST",
-      "Failed to execute the request. Probably due to an invalid ID provided."
-      );
-    }
+      "Bad request.  This is typically due to a malformed request from invalid parameters or an invalid body."
+    );
   }
-  
+}
+
 export class TableNotFoundError extends AppError {
   constructor(tableId) {
     super(
@@ -65,17 +65,17 @@ export class AuthenticationError extends AppError {
       400,
       "AUTH_ERROR",
       "Please try again with updated credentials."
-      );
-    }
+    );
   }
+}
 
-  export class InvalidCustomRouteError extends AppError {
-    constructor(message) {
-      super(
-        message,
-        400,
-        "INVALID_CUSTOM_ROUTE",
-        "Your provided method, path, and/or handler were invalid per the custom route requirements.  Please visit our documentation to learn more."
-      );
-    }
+export class InvalidCustomRouteError extends AppError {
+  constructor(message) {
+    super(
+      message,
+      400,
+      "INVALID_CUSTOM_ROUTE",
+      "Your provided method, path, and/or handler were invalid per the custom route requirements.  Please visit our documentation to learn more."
+    );
   }
+}

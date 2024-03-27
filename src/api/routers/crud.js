@@ -1,11 +1,15 @@
 import { Router } from "express";
 import loadTableContext from "../middleware/load_table_context.js";
 import apiRules from "../middleware/api_rules.js";
-import validateRecord from "../middleware/validate_record.js";
+import {
+  validatePostMeetsRequiredFields,
+  validatePatchMeetsRequiredFields,
+  validateRequestMeetsCustomValidation,
+} from "../middleware/validate_record.js";
 import stringifyJsonColumns from "../middleware/stringify_json.js";
 import parseJsonColumns from "../../utils/parse_json_columns.js";
 import catchError from "../../utils/catch_error.js";
-import { BadRequestError, ForbiddenError } from "../../utils/errors.js";
+import { BadRequestError } from "../../utils/errors.js";
 import generateUuid from "../../utils/generate_uuid.js";
 import ResponseData from "../../models/response_data.js";
 import { creatorAuthCheck, creatorAuthFilter } from "../../utils/row_auth.js";
@@ -39,7 +43,8 @@ export default function generateCrudRouter(app) {
     BASE,
     loadTableContext(app),
     apiRules(app),
-    validateRecord(),
+    validatePostMeetsRequiredFields(),
+    validateRequestMeetsCustomValidation(),
     stringifyJsonColumns(),
     catchError(crudApi.createOneHandler())
   );
@@ -47,7 +52,8 @@ export default function generateCrudRouter(app) {
     `${BASE}/:rowId`,
     loadTableContext(app),
     apiRules(app),
-    validateRecord(),
+    validatePatchMeetsRequiredFields(),
+    validateRequestMeetsCustomValidation(),
     stringifyJsonColumns(),
     catchError(crudApi.updateOneHandler())
   );
