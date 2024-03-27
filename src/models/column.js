@@ -32,7 +32,9 @@ class BoolOptions {
   constructor({}) {}
 
   validate(value) {
-    if (!typeof value === "boolean") return [false, "Value must be a boolean."];
+    if (value !== 0 && value !== 1 && typeof value !== "boolean") {
+      return [false, "Value must be a boolean."];
+    }
     return [true, ""];
   }
 }
@@ -43,13 +45,17 @@ class DateOptions {
     this.latest = latest;
   }
   validate(value) {
-    // if (!(value instanceof DateOptions)) return [false, 'Value is not a date.'];
+    if (typeof value !== "string") return [false, "Value must be a string."];
+    if (new Date(value) === "Invalid Date") {
+      return [false, "Value is not a date."];
+    }
     return [true, ""];
   }
 }
 
 class EmailOptions {
   validate(value) {
+    if (typeof value !== "string") return [false, "Value must be a string."];
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
       return [false, "Invalid email address."];
     return [true, ""];
@@ -90,6 +96,8 @@ class RelationOptions {
   }
 
   validate(value) {
+    if (typeof value !== "string" || value !== null)
+      return [false, "Invalid input."];
     return [true, ""];
   }
 }
@@ -115,6 +123,14 @@ class JsonOptions {
 }
 
 class CreatorOptions {
+  constructor({}) {}
+
+  validate(value) {
+    return [true, ""];
+  }
+}
+
+class PasswordOptions {
   constructor({}) {}
 
   validate(value) {
@@ -171,6 +187,11 @@ class Column {
     creator: {
       sql: "TEXT DEFAULT '' NOT NULL",
       options: CreatorOptions,
+      isJson: false,
+    },
+    password: {
+      sql: "TEXT DEFAULT '' NOT NULL",
+      options: PasswordOptions,
       isJson: false,
     },
   };
