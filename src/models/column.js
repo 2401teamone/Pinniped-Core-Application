@@ -181,10 +181,10 @@ class Column {
 
   constructor({
     id = generateUuid(),
-    system = false,
+    system = 0,
     name,
     type,
-    required = false,
+    required = 0,
     options = {},
   }) {
     this.id = id;
