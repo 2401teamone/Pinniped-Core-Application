@@ -80,8 +80,8 @@ class AuthApi {
   }
 
   /**
-   * Returns a handler that adds an admin user to the '_admin' table.
-   * It checks if the username already exists, and if not, adds the user to the '_admin' table.
+   * Returns a handler that adds an admin user to the 'admins' table.
+   * It checks if the username already exists, and if not, adds the user to the 'admin' table.
    * @returns {function}
    */
   registerAdminHandler() {
@@ -91,13 +91,13 @@ class AuthApi {
       // Checks if 'username' exists in 'users'.
       const existingAdmin = await this.app
         .getDAO()
-        .search("_admins", { username });
+        .search("admins", { username });
       if (existingAdmin.length)
         throw new AuthenticationError("Username not available");
 
-      // Hashes the inputted password and inserts this admin's credentials into the '_admin' table.
+      // Hashes the inputted password and inserts this admin's credentials into the 'admin' table.
       const hashedPassword = await bcrypt.hash(password, 10);
-      const createdAdmin = await this.app.getDAO().createOne("_admins", {
+      const createdAdmin = await this.app.getDAO().createOne("admins", {
         id: generateUuid(),
         username,
         password: hashedPassword,
@@ -153,8 +153,8 @@ class AuthApi {
 
   /**
    * Returns a handler that logs in an admin.
-   * It checks if the credentials for the admin exists in '_admin',
-   * And checks if the credentials inputted match the saved admin in '_admin'.
+   * It checks if the credentials for the admin exists in 'admins',
+   * And checks if the credentials inputted match the saved admin in 'admin'.
    * If the credentials match, then the admin's session is established.
    * @returns {function}
    */
@@ -164,7 +164,7 @@ class AuthApi {
 
       const existingAdmin = await this.app
         .getDAO()
-        .search("_admins", { username });
+        .search("admins", { username });
       if (!existingAdmin.length) throw new AuthenticationError();
 
       const match = await bcrypt.compare(password, existingAdmin[0].password);
@@ -204,12 +204,12 @@ class AuthApi {
   }
 
   /**
-   * Checks if there is an admin in the _admins table
+   * Checks if there is an admin in the admins table
    * @returns {function}
    */
   adminExistsHandler() {
     return async (req, res, next) => {
-      const existingAdmin = await this.app.getDAO().getAll("_admins");
+      const existingAdmin = await this.app.getDAO().getAll("admins");
       if (existingAdmin.length) {
         res.status(200).json({ registered: true });
       } else {
