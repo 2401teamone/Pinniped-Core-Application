@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import { Router } from "express";
 import catchError from "../../utils/catch_error.js";
-import { AuthenticationError } from "../../utils/errors.js";
+import { BadRequestError, AuthenticationError } from "../../utils/errors.js";
 import generateUuid from "../../utils/generate_uuid.js";
 import ResponseData from "../../models/response_data.js";
 
@@ -48,6 +48,16 @@ class AuthApi {
     return async (req, res, next) => {
       const { username, password } = req.body;
 
+      if (!username) {
+        throw new BadRequestError("Username cannot be empty.");
+      } else if (password.length < 10) {
+        throw new BadRequestError("Password must be at least 10 characters");
+      } else if (!/(?=.*\d)(?=.*[!@#$%^&*])/.test(password)) {
+        throw new BadRequestError(
+          "Password must contain at least one number and one special character"
+        );
+      }
+
       // Checks if 'username' exists in 'users'
       const existingUser = await this.app
         .getDAO()
@@ -58,20 +68,23 @@ class AuthApi {
       // Hashes the inputted password and inserts this user's credentials into the 'users' table.
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      const createdUser = await this.app.getDAO().createOne("users", {
+      let createdUser = await this.app.getDAO().createOne("users", {
         id: generateUuid(),
         username,
         password: hashedPassword,
         role: "user",
       });
 
-      delete createdUser[0].password;
+      createdUser = createdUser[0];
 
-      console.log("User created :", createdUser[0]);
+      delete createdUser.password;
+
+      console.log("User created :", createdUser);
 
       const responseData = new ResponseData(req, res, {
-        user: createdUser[0].username,
+        ...createdUser,
       });
+
       await this.app.onRegisterUser().trigger(responseData);
       if (responseData.responseSent()) return null;
 

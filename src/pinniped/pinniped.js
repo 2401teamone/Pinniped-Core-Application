@@ -47,9 +47,28 @@ class Pinniped {
         const users = new Table({
           name: "users",
           columns: [
-            { name: "username", type: "text" },
-            { name: "password", type: "text" },
-            { name: "role", type: "text" },
+            {
+              name: "username",
+              type: "text",
+              system: true,
+              editable: true,
+              required: true,
+              unique: true,
+            },
+            {
+              name: "password",
+              type: "password",
+              system: true,
+              editable: false,
+              required: true,
+            },
+            {
+              name: "role",
+              type: "text",
+              system: true,
+              editable: false,
+              required: true,
+            },
           ],
         });
         await users.create();
@@ -59,9 +78,27 @@ class Pinniped {
         const admins = new Table({
           name: "admins",
           columns: [
-            { name: "username", type: "text" },
-            { name: "password", type: "text" },
-            { name: "role", type: "text" },
+            {
+              name: "username",
+              type: "text",
+              system: true,
+              editable: false,
+              required: true,
+            },
+            {
+              name: "password",
+              type: "password",
+              system: true,
+              editable: false,
+              required: true,
+            },
+            {
+              name: "role",
+              type: "text",
+              system: true,
+              editable: false,
+              required: true,
+            },
           ],
         });
         await admins.create();
