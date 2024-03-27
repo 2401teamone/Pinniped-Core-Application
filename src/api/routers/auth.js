@@ -1,9 +1,10 @@
 import bcrypt from "bcrypt";
 import { Router } from "express";
 import catchError from "../../utils/catch_error.js";
-import { BadRequestError, AuthenticationError } from "../../utils/errors.js";
+import { AuthenticationError } from "../../utils/errors.js";
 import generateUuid from "../../utils/generate_uuid.js";
 import ResponseData from "../../models/response_data.js";
+import validateRegistration from "../middleware/validate_registration.js";
 
 /**
  * Creates an Express Router object
@@ -17,7 +18,11 @@ export default function generateAuthRouter(app) {
   const authApi = new AuthApi(app);
 
   router.get("/", catchError(authApi.getUserHandler()));
-  router.post("/register", catchError(authApi.registerHandler()));
+  router.post(
+    "/register",
+    catchError(validateRegistration()),
+    catchError(authApi.registerHandler())
+  );
   router.post("/login", catchError(authApi.loginHandler()));
   router.post("/admin/register", catchError(authApi.registerAdminHandler()));
   router.post("/admin/login", catchError(authApi.loginAdminHandler()));
@@ -47,16 +52,6 @@ class AuthApi {
   registerHandler() {
     return async (req, res, next) => {
       const { username, password } = req.body;
-
-      if (!username) {
-        throw new BadRequestError("Username cannot be empty.");
-      } else if (password.length < 10) {
-        throw new BadRequestError("Password must be at least 10 characters");
-      } else if (!/(?=.*\d)(?=.*[!@#$%^&*])/.test(password)) {
-        throw new BadRequestError(
-          "Password must contain at least one number and one special character"
-        );
-      }
 
       // Checks if 'username' exists in 'users'
       const existingUser = await this.app
