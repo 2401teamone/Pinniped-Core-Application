@@ -42,7 +42,7 @@ export default function generateCrudRouter(app) {
   router.post(
     BASE,
     loadTableContext(app),
-    // apiRules(app),
+    apiRules(app),
     validatePostMeetsRequiredFields(),
     validateRequestMeetsCustomValidation(),
     stringifyJsonColumns(),
@@ -51,7 +51,7 @@ export default function generateCrudRouter(app) {
   router.patch(
     `${BASE}/:rowId`,
     loadTableContext(app),
-    // apiRules(app),
+    apiRules(app),
     validatePatchMeetsRequiredFields(),
     validateRequestMeetsCustomValidation(),
     stringifyJsonColumns(),
