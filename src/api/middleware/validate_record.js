@@ -8,7 +8,7 @@ export const validatePostMeetsRequiredFields = () => {
       .getColumns()
       .filter((column) => column.required);
     for (let column of requiredColumns) {
-      if (!req.body[column.name]) {
+      if (handleRequiredField(column.type, req.body[column.name])) {
         throw new BadRequestError(`Column ${column.name} is required.`);
       }
     }
@@ -23,7 +23,8 @@ export const validatePatchMeetsRequiredFields = () => {
 
     for (let key in req.body) {
       let val = req.body[key];
-      if (!val && table.getColumnByName(key).required) {
+      let column = table.getColumnByName(key);
+      if (column.required && handleRequiredField(column.type, val)) {
         throw new BadRequestError(`Column ${key} is required.`);
       }
     }
@@ -45,4 +46,26 @@ export const validateRequestMeetsCustomValidation = () => {
     }
     next();
   };
+};
+
+export const handleRequiredField = (type, val) => {
+  switch (type) {
+    case "text":
+    case "number":
+    case "password":
+    case "email":
+    case "url":
+    case "date":
+    case "json":
+      return val === "";
+    case "relation":
+      return val === null;
+    case "csv":
+    case "select":
+      return val.length === 0;
+    case "bool":
+      return val === null;
+    default:
+      return false;
+  }
 };
