@@ -24,6 +24,10 @@ export default function generateAdminRouter(app) {
     "/backups/:filename",
     catchError(adminAPI.deleteBackupHandler())
   );
+  router.post(
+    "/migrate/latest",
+    catchError(adminAPI.forceLatestMigrationHandler())
+  );
 
   return router;
 }
@@ -31,6 +35,16 @@ export default function generateAdminRouter(app) {
 class AdminAPI {
   constructor(app) {
     this.app = app;
+  }
+
+  async forceLatestMigrationHandler() {
+    try {
+      await this.app.getDAO().getDB().migrate.latest;
+    } catch (e) {
+      console.error(
+        "Running latest migrations did not work. Please verify the Knex migrations state manually."
+      );
+    }
   }
 
   getLogsHandler() {
