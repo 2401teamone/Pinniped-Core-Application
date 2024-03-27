@@ -96,7 +96,7 @@ class RelationOptions {
   }
 
   validate(value) {
-    if (typeof value !== "string" || value !== null)
+    if (typeof value !== "string" && value !== null)
       return [false, "Invalid input."];
     return [true, ""];
   }
@@ -206,6 +206,8 @@ class Column {
     name,
     type,
     required = 0,
+    editable = 1,
+    unique = 0,
     options = {},
   }) {
     this.id = id;
@@ -213,6 +215,8 @@ class Column {
     this.name = name;
     this.type = type;
     this.required = required;
+    this.editable = editable;
+    this.unique = unique;
     this.options = new Column.COLUMN_MAP[type].options(options);
   }
 

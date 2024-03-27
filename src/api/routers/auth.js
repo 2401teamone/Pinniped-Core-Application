@@ -4,6 +4,7 @@ import catchError from "../../utils/catch_error.js";
 import { AuthenticationError } from "../../utils/errors.js";
 import generateUuid from "../../utils/generate_uuid.js";
 import ResponseData from "../../models/response_data.js";
+import validateRegistration from "../middleware/validate_registration.js";
 
 /**
  * Creates an Express Router object
@@ -17,7 +18,11 @@ export default function generateAuthRouter(app) {
   const authApi = new AuthApi(app);
 
   router.get("/", catchError(authApi.getUserHandler()));
-  router.post("/register", catchError(authApi.registerHandler()));
+  router.post(
+    "/register",
+    validateRegistration(app),
+    catchError(authApi.registerHandler())
+  );
   router.post("/login", catchError(authApi.loginHandler()));
   router.post("/admin/register", catchError(authApi.registerAdminHandler()));
   router.post("/admin/login", catchError(authApi.loginAdminHandler()));
@@ -48,30 +53,26 @@ class AuthApi {
     return async (req, res, next) => {
       const { username, password } = req.body;
 
-      // Checks if 'username' exists in 'users'
-      const existingUser = await this.app
-        .getDAO()
-        .search("users", { username });
-      if (existingUser.length)
-        throw new AuthenticationError("Username not available.");
-
       // Hashes the inputted password and inserts this user's credentials into the 'users' table.
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      const createdUser = await this.app.getDAO().createOne("users", {
+      let createdUser = await this.app.getDAO().createOne("users", {
         id: generateUuid(),
         username,
         password: hashedPassword,
         role: "user",
       });
 
-      delete createdUser[0].password;
+      createdUser = createdUser[0];
 
-      console.log("User created :", createdUser[0]);
+      delete createdUser.password;
+
+      console.log("User created :", createdUser);
 
       const responseData = new ResponseData(req, res, {
-        user: createdUser[0].username,
+        ...createdUser,
       });
+
       await this.app.onRegisterUser().trigger(responseData);
       if (responseData.responseSent()) return null;
 

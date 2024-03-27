@@ -1,7 +1,31 @@
 import { BadRequestError } from "../../utils/errors.js";
+import catchError from "../../utils/catch_error.js";
+
+export const validateRequestMeetsUniqueValidation = (app) => {
+  return catchError(async (req, res, next) => {
+    const { table } = res.locals;
+    const { rowId } = req.params;
+
+    for (let key in req.body) {
+      let column = table.getColumnByName(key);
+      if (!column)
+        throw new BadRequestError("Column does not exist in the schema.");
+      if (column.unique) {
+        let val = req.body[key];
+        const isUnique = await app
+          .getDAO()
+          .checkUnique(table.name, { [key]: val }, rowId);
+        if (!isUnique) {
+          throw new BadRequestError(`Value ${val} is not unique.`);
+        }
+      }
+    }
+    next();
+  });
+};
 
 export const validatePostMeetsRequiredFields = () => {
-  return (req, res, next) => {
+  return catchError((req, res, next) => {
     const { table } = res.locals;
 
     const requiredColumns = table
@@ -14,11 +38,11 @@ export const validatePostMeetsRequiredFields = () => {
     }
 
     next();
-  };
+  });
 };
 
 export const validatePatchMeetsRequiredFields = () => {
-  return (req, res, next) => {
+  return catchError((req, res, next) => {
     const { table } = res.locals;
 
     for (let key in req.body) {
@@ -30,11 +54,11 @@ export const validatePatchMeetsRequiredFields = () => {
     }
 
     next();
-  };
+  });
 };
 
 export const validateRequestMeetsCustomValidation = () => {
-  return (req, res, next) => {
+  return catchError((req, res, next) => {
     const { table } = res.locals;
 
     for (let key in req.body) {
@@ -45,7 +69,7 @@ export const validateRequestMeetsCustomValidation = () => {
       if (!isValid) throw new BadRequestError(errorMessage);
     }
     next();
-  };
+  });
 };
 
 export const handleRequiredField = (type, val) => {
